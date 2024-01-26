@@ -1,0 +1,11 @@
+{
+  "utils": {
+    "confirm": "ยืนยัน",
+    "okText": "ยืนยัน",
+    "cancelText": "ยกเลิก",
+    "close": "ปิด",
+    "fullscreen": "เต็มหน้าจอ",
+    "exitFullscreen": "ออกจากโหมดเต็มหน้าจอ",
+    "translucent": "ความโปร่งแสง"
+  }
+}

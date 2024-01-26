@@ -1,0 +1,11 @@
+{
+  "utils": {
+    "confirm": "Ok",
+    "okText": "Ok",
+    "cancelText": "Cancel",
+    "close": "Đóng cửa",
+    "fullscreen": "Toàn màn hình",
+    "exitFullscreen": "Thoát toàn màn hình",
+    "translucent": "Trong suốt"
+  }
+}

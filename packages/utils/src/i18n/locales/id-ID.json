@@ -1,0 +1,11 @@
+{
+  "utils": {
+    "confirm": "Ok",
+    "okText": "Ok",
+    "cancelText": "Batalkan",
+    "close": "Tutup",
+    "fullscreen": "Layar penuh",
+    "exitFullscreen": "Keluar layar penuh",
+    "translucent": "Translucent"
+  }
+}

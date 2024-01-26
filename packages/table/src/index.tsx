@@ -1,0 +1,15 @@
+import ProTable from './ProTable'
+// import './style.less'
+
+export * from './types'
+export { default as useProTableEditFieldPlugin } from './plugins/editField'
+export { default as useProTableQueryFieldPlugin } from './plugins/queryField'
+export { default as useProTableTablePlugin } from './plugins/table'
+export { default as useProTableValueTypePlugin } from './plugins/valueType'
+export { default as useProTableActionsPlugin } from './plugins/actions'
+export { default as useProTableConfigPlugin } from './plugins/config'
+export { default as useProTableModalPlugin } from './plugins/modal'
+export { createPlugin as createProTablePlugin } from './utils'
+export { setDefaultProps as setProTableDefaultProps } from './useProps'
+export { builtInPlugins as proTableBuiltInPlugins, createProTable, useProTableRef, ProTable } from './ProTable'
+export default ProTable

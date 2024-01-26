@@ -1,0 +1,11 @@
+{
+  "utils": {
+    "confirm": "确认",
+    "okText": "确认",
+    "cancelText": "取消",
+    "close": "关闭",
+    "fullscreen": "全屏",
+    "exitFullscreen": "退出全屏",
+    "translucent": "半透明"
+  }
+}

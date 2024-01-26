@@ -1,0 +1,11 @@
+.wrapper {
+  :global {
+    .code-kitchen-root[data-dir='h'] .code-kitchen-files-editor-panel {
+      flex: 0.6;
+    }
+
+    .code-kitchen-root[data-dir='v'] .code-kitchen-files-editor-panel {
+      min-height: 82vh;
+    }
+  }
+}

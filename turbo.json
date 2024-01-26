@@ -1,0 +1,18 @@
+{
+  "pipeline": {
+    "tsc": {
+      "inputs": ["config/**", "src/**", "index.html", "public/**", "package.json", "vite.config.ts", "vue.config.js"]
+    },
+    "less2css": {
+      "dependsOn": [],
+      "cache": false,
+      "outputs": ["es/**/*.css", "lib/**/*.css"],
+      "inputs": ["es/**/*.less", "lib/**/*.less"]
+    },
+    "build": {
+      "outputs": ["es/**", "lib/**"],
+      "inputs": ["src/**", "scripts/**", "package.json"]
+    }
+  },
+  "globalDependencies": [".father.ts", "package.json"]
+}

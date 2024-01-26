@@ -1,0 +1,133 @@
+{
+  "workspaces": [
+    "packages/*"
+  ],
+  "private": true,
+  "scripts": {
+    "init": "npx pnpm@6 i",
+    "docs:init": "npx pnpm@6 i --no-frozen-lockfile",
+    "start": "npm run dev",
+    "dev": "dumi setup && dumi dev",
+    "build": "turbo run build && npm run less2css",
+    "less2css": "turbo run less2css",
+    "slow:build": "npm run applyPublishConfig && turbo run build --concurrency=1 && turbo run less2css --concurrency=1",
+    "clean:build": "rimraf ./packages/*/lib ./packages/*/es",
+    "clean:all": "npm run clean:build && rimraf .umi .umi-production docs-dist node_modules/ ./**/node_modules",
+    "build:docs": "dumi setup && dumi build",
+    "docs:release": "node ./scripts/git/pushToDocsSite",
+    "prettier": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,less,md,json}\"",
+    "applyDevelopConfig": "node ./scripts/applyDevelopConfig.js",
+    "applyPublishConfig": "node ./scripts/applyPublishConfig.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage",
+    "eslint": "eslint --cache \"./{packages,documents}/**/*.{js,jsx,ts,tsx}\"",
+    "eslint:error": "npm run eslint -- --quiet",
+    "stylelint": "stylelint \"./{packages,documents}/**/*.{css,less}\"",
+    "tsc:lint": "tsc --noEmit",
+    "release:public": "pnpm -r publish --no-git-checks --force --access=public",
+    "release": "pnpm -r publish --no-git-checks --force",
+    "unpublish": "node ./scripts/unpublish",
+    "link:project": "node ./scripts/symlink",
+    "size": "node ./scripts/size/index.js",
+    "new:component": "node ./scripts/new-component/index.js"
+  },
+  "devDependencies": {
+    "@cjy0208/import-cost": "^2.2.1",
+    "@commitlint/cli": "^12.0.1",
+    "@commitlint/config-conventional": "^12.0.1",
+    "@fexd/tools": "^0.1.0",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.5",
+    "@testing-library/react-hooks": "^7.0.0",
+    "@types/jest": "^28.1.2",
+    "@types/mockjs": "^1.0.6",
+    "@umijs/fabric": "^2.8.1",
+    "@umijs/plugins": "^4.0.57",
+    "antd": "^5.x",
+    "babel-plugin-import": "^1.13.3",
+    "babel-plugin-jsx-css-modules": "^0.1.1",
+    "chalk": "^2.4.2",
+    "code-kitchen": "^1.2.7",
+    "cross-env": "^7.0.3",
+    "dumi": "^2.1.7",
+    "dumi-theme-antd-style": "^0.21.3",
+    "esbuild-wasm": "0.14.54",
+    "father": "^4.1.6",
+    "filesize": "^8.0.3",
+    "husky": "4.x",
+    "jest": "^28.1.1",
+    "jest-environment-jsdom": "^28.1.1",
+    "less": "4.x",
+    "lint-staged": "^10.0.7",
+    "ora": "^5.1.0",
+    "particles-bg": "^2.5.5",
+    "prettier": "^3.1.0",
+    "qrcode.react": "^1.0.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "react-node-key": "^0.2.0",
+    "rimraf": "^3.0.2",
+    "sass": "^1.43.4",
+    "tailwindcss": "^3",
+    "ts-jest": "^28.0.5",
+    "turbo": "1.2.14",
+    "typescript": "^4.4.4",
+    "yargs": "^17.2.1"
+  },
+  "resolutions": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "subject-case": [
+        0
+      ],
+      "header-max-length": [1, "always", 100]
+    }
+  },
+  "lint-staged": {
+    "*.{md,json}": [
+      "prettier --write"
+    ],
+    "*.{css,less}": [
+      "stylelint",
+      "prettier --write"
+    ],
+    "*.js?(x)": [
+      "eslint --cache",
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "eslint --cache",
+      "prettier --parser=typescript --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "dependencies": {
+    "@fexd/pro-components": "workspace:*",
+    "@fexd/pro-form": "workspace:*",
+    "@fexd/pro-provider": "workspace:*",
+    "@fexd/pro-table": "workspace:*",
+    "@fexd/pro-utils": "workspace:*",
+    "@types/intro.js": "^5.1.0 ",
+    "@types/mockjs": "^1.0.6",
+    "array-move": "^4.0.0",
+    "intro.js": "^5.1.0",
+    "mockjs": "^1.1.0",
+    "monaco": "^1.201704190613.0",
+    "monaco-editor": "^0.36.1",
+    "monaco-editor-webpack-plugin": "^7.0.1",
+    "monaco-themes": "^0.4.3",
+    "react-monaco-editor": "^0.52.0",
+    "react-sortable-hoc": "^2.0.0"
+  }
+}

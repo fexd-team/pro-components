@@ -1,0 +1,59 @@
+{
+  "size": [
+    {
+      "fileName": "size",
+      "name": "@fexd/pro-components",
+      "line": 1,
+      "string": "require('@fexd/pro-components')",
+      "size": "1.4M",
+      "gzip": "406.8k",
+      "rawSize": 1394322,
+      "rawGzip": 406844,
+      "label": "1.4M (gzipped: 406.8k)"
+    },
+    {
+      "fileName": "size",
+      "name": "@fexd/pro-table",
+      "line": 3,
+      "string": "require('@fexd/pro-table')",
+      "size": "1.4M",
+      "gzip": "405.4k",
+      "rawSize": 1390424,
+      "rawGzip": 405423,
+      "label": "1.4M (gzipped: 405.4k)"
+    },
+    {
+      "fileName": "size",
+      "name": "@fexd/pro-form",
+      "line": 2,
+      "string": "require('@fexd/pro-form')",
+      "size": "1.2M",
+      "gzip": "340.5k",
+      "rawSize": 1157106,
+      "rawGzip": 340541,
+      "label": "1.2M (gzipped: 340.5k)"
+    },
+    {
+      "fileName": "size",
+      "name": "@fexd/pro-utils",
+      "line": 4,
+      "string": "require('@fexd/pro-utils')",
+      "size": "462.7k",
+      "gzip": "147.1k",
+      "rawSize": 462686,
+      "rawGzip": 147068,
+      "label": "462.7k (gzipped: 147.1k)"
+    },
+    {
+      "fileName": "size",
+      "name": "@fexd/pro-provider",
+      "line": 5,
+      "string": "require('@fexd/pro-provider')",
+      "size": "142.1k",
+      "gzip": "43.6k",
+      "rawSize": 142090,
+      "rawGzip": 43568,
+      "label": "142.1k (gzipped: 43.6k)"
+    }
+  ]
+}

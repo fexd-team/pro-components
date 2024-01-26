@@ -1,0 +1,11 @@
+{
+  "utils": {
+    "confirm": "Ok",
+    "okText": "Ok",
+    "cancelText": "Cancel",
+    "close": "Close",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "translucent": "Translucent"
+  }
+}

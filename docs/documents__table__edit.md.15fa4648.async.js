@@ -1,0 +1,411 @@
+'use strict'
+;(self.webpackChunk = self.webpackChunk || []).push([
+  [2146],
+  {
+    39474: function (_, r, t) {
+      t.r(r)
+      var E = t(93463),
+        d = t(771),
+        n = t(21410),
+        o = t(98670),
+        m = t(16008),
+        a = t(87343),
+        e = t(57689)
+      function c() {
+        var u = (0, a.eL)(),
+          l = u.texts
+        return e.createElement(
+          a.dY,
+          null,
+          e.createElement(
+            e.Fragment,
+            null,
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h1',
+                { id: '\u5185\u7F6E\u7F16\u8F91' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u7F6E\u7F16\u8F91' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u7F6E\u7F16\u8F91',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[0].value,
+                e.createElement('code', null, l[1].value),
+                l[2].value,
+                e.createElement(
+                  a.rU,
+                  { to: '/table/plugins#%E8%AE%BF%E9%97%AE%E5%86%85%E9%83%A8%E6%8F%92%E4%BB%B6' },
+                  l[3].value,
+                ),
+                l[4].value,
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[5].value,
+                e.createElement(a.rU, { to: '/table/plugins#editfield' }, l[6].value),
+              ),
+              e.createElement(
+                'h2',
+                { id: '\u57FA\u7840\u7528\u6CD5' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u57FA\u7840\u7528\u6CD5' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u57FA\u7840\u7528\u6CD5',
+              ),
+              e.createElement(
+                'ol',
+                null,
+                e.createElement('li', null, l[7].value, e.createElement('code', null, l[8].value), l[9].value),
+                e.createElement('li', null, l[10].value, e.createElement('code', null, l[11].value), l[12].value),
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[13].value,
+                e.createElement('code', null, l[14].value),
+                l[15].value,
+                e.createElement('code', null, l[16].value),
+                l[17].value,
+              ),
+              e.createElement('p', null, l[18].value, e.createElement('code', null, l[19].value), l[20].value),
+              e.createElement(
+                'p',
+                null,
+                l[21].value,
+                e.createElement('code', null, l[22].value),
+                l[23].value,
+                e.createElement('code', null, l[24].value),
+                l[25].value,
+              ),
+              e.createElement('p', null, e.createElement('code', null, l[26].value), l[27].value),
+              e.createElement(n.Z, { lang: 'jsx' }, l[28].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-0' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u4ECE-columns-\u7EE7\u627F' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u4ECE-columns-\u7EE7\u627F' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u4ECE columns \u7EE7\u627F',
+              ),
+              e.createElement('p', null, l[29].value, e.createElement('code', null, l[30].value), l[31].value),
+              e.createElement(
+                'ol',
+                null,
+                e.createElement('li', null, l[32].value, e.createElement('code', null, l[33].value), l[34].value),
+                e.createElement('li', null, l[35].value, e.createElement('code', null, l[36].value), l[37].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[38].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-1' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u8868\u683C\u5185\u7F16\u8F91' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8868\u683C\u5185\u7F16\u8F91' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8868\u683C\u5185\u7F16\u8F91',
+              ),
+              e.createElement('p', null, l[39].value, e.createElement('code', null, l[40].value), l[41].value),
+              e.createElement(
+                'p',
+                null,
+                l[42].value,
+                e.createElement('code', null, l[43].value),
+                l[44].value,
+                e.createElement('code', null, l[45].value),
+                l[46].value,
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[47].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-2' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u8868\u5355\u6821\u9A8C' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8868\u5355\u6821\u9A8C' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8868\u5355\u6821\u9A8C',
+              ),
+              e.createElement(
+                'ul',
+                null,
+                e.createElement('li', null, l[48].value, e.createElement('code', null, l[49].value), l[50].value),
+                e.createElement(
+                  'li',
+                  null,
+                  l[51].value,
+                  e.createElement('code', null, l[52].value),
+                  l[53].value,
+                  e.createElement('code', null, l[54].value),
+                  l[55].value,
+                  e.createElement('code', null, l[56].value),
+                  l[57].value,
+                ),
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[58].value,
+                e.createElement('code', null, l[59].value),
+                l[60].value,
+                e.createElement(a.rU, { to: '/form/validate' }, l[61].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[62].value),
+              e.createElement(
+                'h2',
+                { id: '\u8868\u5355\u5173\u8054' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8868\u5355\u5173\u8054' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8868\u5355\u5173\u8054',
+              ),
+              e.createElement('p', null, l[63].value, e.createElement('code', null, l[64].value), l[65].value),
+              e.createElement(
+                'p',
+                null,
+                l[66].value,
+                e.createElement('code', null, l[67].value),
+                l[68].value,
+                e.createElement(a.rU, { to: '/form/relates' }, l[69].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[70].value),
+              e.createElement(
+                'h2',
+                { id: '\u81EA\u5B9A\u4E49\u5E03\u5C40' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u81EA\u5B9A\u4E49\u5E03\u5C40' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u81EA\u5B9A\u4E49\u5E03\u5C40',
+              ),
+              e.createElement(
+                'h3',
+                { id: '\u5185\u8054-label' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u8054-label' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u8054 label',
+              ),
+              e.createElement('p', null, e.createElement('strong', null, l[71].value), l[72].value),
+              e.createElement('p', null, l[73].value, e.createElement('code', null, l[74].value), l[75].value),
+              e.createElement(n.Z, { lang: 'jsx' }, l[76].value),
+              e.createElement(
+                'h3',
+                { id: '\u5B8C\u5168\u81EA\u5B9A\u4E49' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5B8C\u5168\u81EA\u5B9A\u4E49' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5B8C\u5168\u81EA\u5B9A\u4E49',
+              ),
+              e.createElement('p', null, l[77].value, e.createElement('code', null, l[78].value), l[79].value),
+              e.createElement('p', null, l[80].value),
+              e.createElement(
+                'ul',
+                null,
+                e.createElement('li', null, l[81].value),
+                e.createElement('li', null, l[82].value),
+                e.createElement('li', null, l[83].value),
+                e.createElement('li', null, l[84].value),
+                e.createElement('li', null, l[85].value),
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[86].value,
+                e.createElement('code', null, l[87].value),
+                l[88].value,
+                e.createElement(a.rU, { to: '/form/layouts' }, l[89].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[90].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-3' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[91].value,
+                e.createElement('code', null, l[92].value),
+                l[93].value,
+                e.createElement(a.rU, { to: '/form/types#%E5%86%85%E7%BD%AE%E7%B1%BB%E5%9E%8B' }, l[94].value),
+              ),
+              e.createElement(
+                'h2',
+                { id: '\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[95].value,
+                e.createElement('code', null, l[96].value),
+                l[97].value,
+                e.createElement(a.rU, { to: '/form/types#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%9E%8B' }, l[98].value),
+              ),
+              e.createElement(
+                'h2',
+                { id: '\u5F39\u7A97\u914D\u7F6E' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5F39\u7A97\u914D\u7F6E' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5F39\u7A97\u914D\u7F6E',
+              ),
+              e.createElement(
+                'h3',
+                { id: '\u5C3A\u5BF8' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5C3A\u5BF8' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5C3A\u5BF8',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[99].value,
+                e.createElement('code', null, l[100].value),
+                l[101].value,
+                e.createElement('a', { href: 'https://ant.design/components/modal-cn/#API' }, l[102].value),
+                l[103].value,
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[104].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-4' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h3',
+                { id: '\u4F7F\u7528\u62BD\u5C49' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u4F7F\u7528\u62BD\u5C49' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u4F7F\u7528\u62BD\u5C49',
+              ),
+              e.createElement('p', null, l[105].value, e.createElement('code', null, l[106].value), l[107].value),
+              e.createElement(
+                'p',
+                null,
+                l[108].value,
+                e.createElement('a', { href: 'https://ant.design/components/drawer-cn/#API' }, l[109].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[110].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-5' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h3',
+                { id: '\u62BD\u5C49\u4F4D\u7F6E' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u62BD\u5C49\u4F4D\u7F6E' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u62BD\u5C49\u4F4D\u7F6E',
+              ),
+              e.createElement('p', null, l[111].value, e.createElement('code', null, l[112].value), l[113].value),
+              e.createElement(
+                'p',
+                null,
+                l[114].value,
+                e.createElement(
+                  'a',
+                  { href: 'https://ant.design/components/drawer-cn/#components-drawer-demo-placement' },
+                  l[115].value,
+                ),
+                l[116].value,
+                e.createElement('code', null, l[117].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[118].value),
+            ),
+            e.createElement(a.Dl, { demo: { id: 'documents-table-edit-demo-6' }, previewerProps: {} }),
+          ),
+        )
+      }
+      r.default = c
+    },
+    16008: function (_, r, t) {
+      var E = t(60799),
+        d = t.n(E),
+        n = t(57213),
+        o = t.n(n),
+        m = t(57689),
+        a = t(6953),
+        e = t(25191),
+        c = t(66593)
+      r.Z = function (u) {
+        var l
+        return m.createElement(
+          e.Z,
+          { title: '\u70B9\u51FB\u653E\u5927\u56FE\u7247', mouseEnterDelay: 1, placement: 'topRight' },
+          m.createElement(
+            c.Z,
+            d()({ preview: { mask: !1 }, className: (0, a.Z)('mb-6', u == null ? void 0 : u.className) }, u, {
+              style: o()(
+                { cursor: 'zoom-in', maxWidth: 1080 },
+                (l = u == null ? void 0 : u.style) !== null && l !== void 0 ? l : {},
+              ),
+            }),
+          ),
+        )
+      }
+    },
+  },
+])

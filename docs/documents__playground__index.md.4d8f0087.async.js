@@ -1,0 +1,73 @@
+'use strict'
+;(self.webpackChunk = self.webpackChunk || []).push([
+  [941],
+  {
+    23245: function (r, o, _) {
+      _.r(o)
+      var a = _(93463),
+        l = _(771),
+        E = _(98670),
+        u = _(16008),
+        t = _(87343),
+        e = _(57689)
+      function d() {
+        var m = (0, t.eL)(),
+          n = m.texts
+        return e.createElement(
+          t.dY,
+          null,
+          e.createElement(
+            e.Fragment,
+            null,
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h1',
+                { id: 'playground' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#playground' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                'Playground ',
+                e.createElement(l.Z, { type: 'warning' }, n[0].value),
+              ),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-playground-demo-playground', inline: !0 },
+              previewerProps: {},
+            }),
+          ),
+        )
+      }
+      o.default = d
+    },
+    16008: function (r, o, _) {
+      var a = _(60799),
+        l = _.n(a),
+        E = _(57213),
+        u = _.n(E),
+        t = _(57689),
+        e = _(6953),
+        d = _(25191),
+        m = _(66593)
+      o.Z = function (n) {
+        var s
+        return t.createElement(
+          d.Z,
+          { title: '\u70B9\u51FB\u653E\u5927\u56FE\u7247', mouseEnterDelay: 1, placement: 'topRight' },
+          t.createElement(
+            m.Z,
+            l()({ preview: { mask: !1 }, className: (0, e.Z)('mb-6', n == null ? void 0 : n.className) }, n, {
+              style: u()(
+                { cursor: 'zoom-in', maxWidth: 1080 },
+                (s = n == null ? void 0 : n.style) !== null && s !== void 0 ? s : {},
+              ),
+            }),
+          ),
+        )
+      }
+    },
+  },
+])

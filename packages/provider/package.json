@@ -1,0 +1,53 @@
+{
+  "name": "@fexd/pro-provider",
+  "version": "0.1.10",
+  "main": "src/index.tsx",
+  "module": "src/index.tsx",
+  "types": "src/index.tsx",
+  "publishConfig": {
+    "main": "lib/index.js",
+    "module": "es/index.js",
+    "types": "types.d.ts"
+  },
+  "scripts": {
+    "build": "father build",
+    "less2css": "node ./scripts/less2css",
+    "republish": "node ./scripts/republish"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17",
+    "react-dom": "^16.8.0 || ^17"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.2.2",
+    "@babel/runtime": "^7.13.10",
+    "@fexd/tools": "^0.1.0",
+    "@types/hoist-non-react-statics": "^3.3.1",
+    "ahooks": "^3.3.10",
+    "antd": "^4.24.10",
+    "dayjs": "^1.11.3",
+    "hoist-non-react-statics": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.178",
+    "less-plugin-import-node-modules": "^1.0.0",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "files": [
+    "es",
+    "lib",
+    "src",
+    "types.d.ts"
+  ],
+  "sideEffects": [
+    "*.less"
+  ],
+  "homepage": "https://fexd-team.github.io/pro-components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fexd-team/pro-components.git"
+  },
+  "license": "ISC",
+  "gitHead": "23db7a12eb4a3cf2b82be582c3db7bf8cb9e7982"
+}

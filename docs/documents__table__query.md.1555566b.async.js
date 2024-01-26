@@ -1,0 +1,436 @@
+'use strict'
+;(self.webpackChunk = self.webpackChunk || []).push([
+  [8664],
+  {
+    53952: function (s, m, a) {
+      a.r(m)
+      var E = a(93463),
+        d = a(771),
+        n = a(21410),
+        o = a(98670),
+        r = a(16008),
+        t = a(87343),
+        e = a(57689)
+      function c() {
+        var u = (0, t.eL)(),
+          l = u.texts
+        return e.createElement(
+          t.dY,
+          null,
+          e.createElement(
+            e.Fragment,
+            null,
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h1',
+                { id: '\u5185\u7F6E\u67E5\u8BE2' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u7F6E\u67E5\u8BE2' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u7F6E\u67E5\u8BE2',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[0].value,
+                e.createElement('code', null, l[1].value),
+                l[2].value,
+                e.createElement(
+                  t.rU,
+                  { to: '/table/plugins#%E8%AE%BF%E9%97%AE%E5%86%85%E9%83%A8%E6%8F%92%E4%BB%B6' },
+                  l[3].value,
+                ),
+                l[4].value,
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[5].value,
+                e.createElement(t.rU, { to: '/table/plugins#queryfield' }, l[6].value),
+              ),
+              e.createElement(
+                'h2',
+                { id: '\u57FA\u7840\u7528\u6CD5' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u57FA\u7840\u7528\u6CD5' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u57FA\u7840\u7528\u6CD5',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[7].value,
+                e.createElement('code', null, l[8].value),
+                l[9].value,
+                e.createElement('code', null, l[10].value),
+                l[11].value,
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[12].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-basic' },
+              previewerProps: { filename: 'documents/table/demos/query/basic.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u4ECE-columns-\u7EE7\u627F' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u4ECE-columns-\u7EE7\u627F' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u4ECE columns \u7EE7\u627F',
+              ),
+              e.createElement('p', null, l[13].value, e.createElement('code', null, l[14].value), l[15].value),
+              e.createElement(n.Z, { lang: 'jsx' }, l[16].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-extend-from-columns' },
+              previewerProps: { filename: 'documents/table/demos/query/extend-from-columns.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u8868\u5355\u6821\u9A8C' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8868\u5355\u6821\u9A8C' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8868\u5355\u6821\u9A8C',
+              ),
+              e.createElement(
+                'ul',
+                null,
+                e.createElement('li', null, l[17].value, e.createElement('code', null, l[18].value), l[19].value),
+                e.createElement(
+                  'li',
+                  null,
+                  l[20].value,
+                  e.createElement('code', null, l[21].value),
+                  l[22].value,
+                  e.createElement('code', null, l[23].value),
+                  l[24].value,
+                  e.createElement('code', null, l[25].value),
+                  l[26].value,
+                ),
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[27].value,
+                e.createElement('code', null, l[28].value),
+                l[29].value,
+                e.createElement(t.rU, { to: '/form/validate' }, l[30].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[31].value),
+            ),
+            e.createElement(t.Dl, { demo: { id: 'documents-table-query-demo-0' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u8868\u5355\u5173\u8054' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8868\u5355\u5173\u8054' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8868\u5355\u5173\u8054',
+              ),
+              e.createElement('p', null, l[32].value, e.createElement('code', null, l[33].value), l[34].value),
+              e.createElement(
+                'p',
+                null,
+                l[35].value,
+                e.createElement('code', null, l[36].value),
+                l[37].value,
+                e.createElement(t.rU, { to: '/form/relates' }, l[38].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[39].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-relate' },
+              previewerProps: { filename: 'documents/table/demos/query/relate.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u66F4\u591A--\u6536\u8D77' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u66F4\u591A--\u6536\u8D77' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u66F4\u591A / \u6536\u8D77',
+              ),
+              e.createElement('p', null, l[40].value),
+              e.createElement(
+                'ol',
+                null,
+                e.createElement(
+                  'li',
+                  null,
+                  e.createElement('p', null, l[41].value),
+                  e.createElement(
+                    'ul',
+                    null,
+                    e.createElement('li', null, l[42].value, e.createElement('code', null, l[43].value), l[44].value),
+                    e.createElement('li', null, l[45].value, e.createElement('code', null, l[46].value), l[47].value),
+                  ),
+                ),
+                e.createElement(
+                  'li',
+                  null,
+                  e.createElement('p', null, l[48].value),
+                  e.createElement(
+                    'ul',
+                    null,
+                    e.createElement('li', null, l[49].value, e.createElement('code', null, l[50].value), l[51].value),
+                  ),
+                ),
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[52].value,
+                e.createElement('code', null, l[53].value),
+                l[54].value,
+                e.createElement('code', null, l[55].value),
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[56].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-fold' },
+              previewerProps: { filename: 'documents/table/demos/query/fold.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u8C03\u6574\u987A\u5E8F' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u8C03\u6574\u987A\u5E8F' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u8C03\u6574\u987A\u5E8F',
+              ),
+              e.createElement('p', null, l[57].value, e.createElement('code', null, l[58].value), l[59].value),
+              e.createElement('p', null, l[60].value),
+              e.createElement(n.Z, { lang: 'jsx' }, l[61].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-order' },
+              previewerProps: { filename: 'documents/table/demos/query/order.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u81EA\u5B9A\u4E49\u5E03\u5C40' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u81EA\u5B9A\u4E49\u5E03\u5C40' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u81EA\u5B9A\u4E49\u5E03\u5C40',
+              ),
+              e.createElement(
+                'h3',
+                { id: '\u5185\u8054-label' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u8054-label' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u8054 label',
+              ),
+              e.createElement('p', null, e.createElement('strong', null, l[62].value), l[63].value),
+              e.createElement('p', null, l[64].value, e.createElement('code', null, l[65].value), l[66].value),
+              e.createElement(n.Z, { lang: 'jsx' }, l[67].value),
+            ),
+            e.createElement(t.Dl, { demo: { id: 'documents-table-query-demo-1' }, previewerProps: {} }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h3',
+                { id: '\u4E8C\u7EF4-queryfields' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u4E8C\u7EF4-queryfields' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u4E8C\u7EF4 queryFields',
+              ),
+              e.createElement('p', null, e.createElement('code', null, l[68].value), l[69].value),
+              e.createElement('p', null, l[70].value),
+              e.createElement(
+                'p',
+                null,
+                l[71].value,
+                e.createElement('code', null, l[72].value),
+                l[73].value,
+                e.createElement('a', { href: 'https://ant.design/components/grid-cn/#Col' }, l[74].value),
+              ),
+              e.createElement('p', null, e.createElement('strong', null, l[75].value)),
+              e.createElement(n.Z, { lang: 'jsx' }, l[76].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-layout1' },
+              previewerProps: { filename: 'documents/table/demos/query/layout1.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h3',
+                { id: '\u5B8C\u5168\u81EA\u5B9A\u4E49' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5B8C\u5168\u81EA\u5B9A\u4E49' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5B8C\u5168\u81EA\u5B9A\u4E49',
+              ),
+              e.createElement('p', null, l[77].value, e.createElement('code', null, l[78].value), l[79].value),
+              e.createElement('p', null, l[80].value),
+              e.createElement(
+                'ul',
+                null,
+                e.createElement('li', null, l[81].value),
+                e.createElement('li', null, l[82].value),
+                e.createElement('li', null, l[83].value),
+                e.createElement('li', null, l[84].value),
+                e.createElement('li', null, l[85].value),
+                e.createElement('li', null, l[86].value),
+                e.createElement('li', null, l[87].value),
+                e.createElement('li', null, l[88].value),
+              ),
+              e.createElement('p', null, e.createElement('strong', null, l[89].value)),
+              e.createElement(n.Z, { lang: 'jsx' }, l[90].value),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-layout2' },
+              previewerProps: { filename: 'documents/table/demos/query/layout2.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u5185\u7F6E\u7684\u8868\u5355\u7C7B\u578B',
+              ),
+              e.createElement(
+                'ul',
+                null,
+                e.createElement('li', null, l[91].value),
+                e.createElement('li', null, l[92].value),
+                e.createElement('li', null, l[93].value),
+                e.createElement('li', null, l[94].value),
+                e.createElement('li', null, l[95].value),
+                e.createElement('li', null, l[96].value),
+                e.createElement('li', null, l[97].value),
+                e.createElement('li', null, l[98].value),
+                e.createElement('li', null, l[99].value),
+                e.createElement('li', null, l[100].value),
+                e.createElement('li', null, l[101].value),
+                e.createElement('li', null, l[102].value),
+                e.createElement('li', null, l[103].value),
+                e.createElement('li', null, l[104].value),
+                e.createElement('li', null, l[105].value),
+                e.createElement('li', null, l[106].value),
+                e.createElement('li', null, l[107].value),
+                e.createElement('li', null, l[108].value),
+                e.createElement('li', null, l[109].value),
+                e.createElement('li', null, l[110].value),
+                e.createElement('li', null, l[111].value),
+                e.createElement('li', null, l[112].value),
+                e.createElement('li', null, l[113].value),
+              ),
+            ),
+            e.createElement(t.Dl, {
+              demo: { id: 'documents-table-query-demo-types' },
+              previewerProps: { filename: 'documents/table/demos/query/types.tsx' },
+            }),
+            e.createElement(
+              'div',
+              { className: 'markdown' },
+              e.createElement(
+                'h2',
+                { id: '\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B' },
+                e.createElement(
+                  'a',
+                  { 'aria-hidden': 'true', tabIndex: '-1', href: '#\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B' },
+                  e.createElement('span', { className: 'icon icon-link' }),
+                ),
+                '\u81EA\u5B9A\u4E49\u8868\u5355\u7C7B\u578B',
+              ),
+              e.createElement(
+                'p',
+                null,
+                l[114].value,
+                e.createElement('code', null, l[115].value),
+                l[116].value,
+                e.createElement('code', null, l[117].value),
+                l[118].value,
+              ),
+              e.createElement(n.Z, { lang: 'jsx' }, l[119].value),
+            ),
+            e.createElement(t.Dl, { demo: { id: 'documents-table-query-demo-2' }, previewerProps: {} }),
+          ),
+        )
+      }
+      m.default = c
+    },
+    16008: function (s, m, a) {
+      var E = a(60799),
+        d = a.n(E),
+        n = a(57213),
+        o = a.n(n),
+        r = a(57689),
+        t = a(6953),
+        e = a(25191),
+        c = a(66593)
+      m.Z = function (u) {
+        var l
+        return r.createElement(
+          e.Z,
+          { title: '\u70B9\u51FB\u653E\u5927\u56FE\u7247', mouseEnterDelay: 1, placement: 'topRight' },
+          r.createElement(
+            c.Z,
+            d()({ preview: { mask: !1 }, className: (0, t.Z)('mb-6', u == null ? void 0 : u.className) }, u, {
+              style: o()(
+                { cursor: 'zoom-in', maxWidth: 1080 },
+                (l = u == null ? void 0 : u.style) !== null && l !== void 0 ? l : {},
+              ),
+            }),
+          ),
+        )
+      }
+    },
+  },
+])
