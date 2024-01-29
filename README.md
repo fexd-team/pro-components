@@ -2,6 +2,8 @@
 
 管理系统场景集成组件库
 
+[文档](fexd-team.github.io/pro-components/)
+
 ## 安装
 
 ```bash
