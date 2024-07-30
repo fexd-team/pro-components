@@ -11,6 +11,7 @@
 @import '~antd/es/tag/style/index.less';
 @import '~antd/es/pagination/style/index.less';
 @import '~antd/es/alert/style/index.less';
+@import '~antd/es/avatar/style/index.less';
 @import '~antd/es/card/style/index.less';
 @import '~antd/es/popconfirm/style/index.less';
 @import '~antd/es/popover/style/index.less';
@@ -25,6 +26,8 @@
 @import '~antd/es/grid/style/index.less';
 @import '~antd/es/dropdown/style/index.less';
 @import '~antd/es/menu/style/index.less';
+@import '~antd/es/progress/style/index.less';
+@import '~antd/es/typography/style/index.less';
 // @import '~antd/es/textarea/style/index.less';
 @import '~antd/es/checkbox/style/index.less';
 @import '~antd/es/rate/style/index.less';
@@ -48,6 +51,7 @@
 
 .@{pro-table-prefix}-wrapper {
   position: relative;
+
   .ant-btn-two-chinese-chars > .ant-btn-loading-icon {
     margin-right: 0;
   }
@@ -104,6 +108,7 @@
   > .kl-grid {
     margin: 0 -16px;
   }
+
   .kl-grid-item {
     overflow: hidden;
   }
@@ -159,6 +164,7 @@
     width: auto;
   }
 }
+
 .@{pro-table-prefix}-title {
   font-size: 16px;
 }
@@ -206,6 +212,10 @@ html .@{pro-table-prefix}-alert {
     display: none;
   }
 
+  & .ant-upload-list-item:first-child {
+    margin-top: 0;
+  }
+
   &-sticky {
     .ant-table-pagination.ant-pagination {
       margin: 0;
@@ -216,6 +226,7 @@ html .@{pro-table-prefix}-alert {
       bottom: 0;
       z-index: 100;
     }
+
     .@{pro-table-prefix}-sticky-scrollBar-container {
       position: sticky;
       bottom: 0;
@@ -271,6 +282,10 @@ html .@{pro-table-prefix}-alert {
 
     .@{pro-table-prefix}-cell-placeholder {
       max-width: 100%;
+
+      &-content {
+        max-height: 100px;
+      }
     }
   }
 
@@ -326,6 +341,7 @@ html .@{pro-table-prefix}-alert {
   .@{pro-table-prefix}-no-total {
     .ant-pagination-item-active {
       border: none;
+
       .ant-input {
         text-align: center;
         width: 50px;
@@ -352,17 +368,45 @@ html .@{pro-table-prefix}-alert {
   // }
 }
 
+.@{pro-table-prefix}-query-action-popover {
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+
+  &-content {
+    padding: 8px 16px;
+    width: 370px;
+    max-height: 37vh;
+    overflow: auto;
+  }
+
+  &-footer {
+    padding: 8px 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+.dark .@{pro-table-prefix}-query-action-popover-footer {
+  border-top-color: #303030;
+}
+
 .@{pro-table-prefix}-mini {
   .@{pro-table-prefix} {
+    &-batch-toolbar {
+      padding: 4px 10px;
+    }
+
     &-query {
       padding: 12px 16px 4px;
     }
+
     &-title {
       font-size: 14px;
     }
 
     &-alert {
       margin-bottom: 10px;
+
       .ant-alert {
         padding: 6px 10px;
         font-size: 12px;

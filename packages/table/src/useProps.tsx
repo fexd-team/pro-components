@@ -1,9 +1,10 @@
 import { createContext, useContext, createRef } from 'react'
 import { useContextSize, useProContext } from '@fexd/pro-provider'
-import { isObject, run, isExist } from '@fexd/tools'
+import { isObject, run, isExist, isArray } from '@fexd/tools'
 import { Required } from 'utility-types'
 
-import { ProTableProps } from './types'
+import { defineColumns } from './utils/enhanceConfigs'
+import { ProTableProps, ProTableColumnType } from './types'
 
 // 静态默认值
 export const defaultProps: ProTableProps = {
@@ -24,9 +25,14 @@ export const defaultProps: ProTableProps = {
       wait: 128,
     }
   },
+
+  queryFieldFilterEmptyParam: false,
+  queryFieldTriggerOnEnter: true,
+  queryFieldServiceOptions: {},
   whenToTriggerOnEdit: 'changed',
   editFieldLayout: 'vertical',
   queryFieldPersistType: 'sessionStorage',
+  queryFieldFormProps: {},
   queryFieldLayout: 'vertical',
   rowKey: 'id',
   editFieldColumns: 3,
@@ -36,7 +42,6 @@ export const defaultProps: ProTableProps = {
   refreshAfterAdd: true,
   refreshAfterEdit: true,
   normalizeFieldValue: true,
-  queryFieldRefreshAfterReset: true,
   dataSourceIndexCalcWithPage: true,
   editFieldFilterEmptyParam: false,
   pure: false,
@@ -62,6 +67,7 @@ export const defaultProps: ProTableProps = {
   noTableHeaderEllipsis: true,
   lightweightRenderCell: false,
   queryAfterPaginationChange: true,
+  mockDataSource: false,
   // expandableDescriptionConfig: {
   //   gridDynamicRender: false,
   // },
@@ -69,8 +75,9 @@ export const defaultProps: ProTableProps = {
 
 // window.proTableDefaultProps = defaultProps
 
-export interface ProTablePropsContext extends Required<ProTableProps, keyof typeof defaultProps> {
+export interface ProTablePropsContext extends Omit<Required<ProTableProps, keyof typeof defaultProps>, 'columns'> {
   wrapperDomRef: React.RefObject<HTMLDivElement>
+  columns: ProTableColumnType<any>[]
 }
 
 export const propsContext = createContext<ProTablePropsContext>({
@@ -89,10 +96,12 @@ export default function useProps<T = ProTablePropsContext>(): T {
     sticky = props?.pure ? false : true,
     selectable,
     rowSelection,
+    columns,
   } = (props ?? {}) as ProTableProps
   const dynamicProps: ProTableProps = {
     mini,
     sticky,
+    queryWrapperStyle: props?.pure ? { padding: 0 } : {},
     defaultSize: mini
       ? 'small'
       : run(() => {
@@ -110,6 +119,7 @@ export default function useProps<T = ProTablePropsContext>(): T {
     addFieldColumns: props?.editFieldColumns,
     viewFieldGutter: props?.editFieldGutter,
     addFieldGutter: props?.editFieldGutter,
+    queryFieldRefreshAfterReset: props?.manualQuery ? false : true,
     renderModalViewFields: props?.renderModalEditFields,
     renderModalAddFields: props?.renderModalEditFields,
     addFieldFormProps: props?.editFieldFormProps,
@@ -130,6 +140,19 @@ export default function useProps<T = ProTablePropsContext>(): T {
         }
       : rowSelection,
     rawProps: props,
+    columns: run(() => {
+      if (isArray(columns)) {
+        return columns
+      }
+
+      if (isObject(columns)) {
+        return defineColumns(columns as any)?.getConfigs()
+      }
+
+      return []
+
+      // run(columns, 'getConfigs') ??
+    }),
   }
 
   return {

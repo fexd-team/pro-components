@@ -24,7 +24,6 @@ export default () => (
         const formDemo = (
           <ProForm
             mode={readonly ? 'view' : 'edit'}
-            preserve
             ref={(ref) => {
               window.form = ref
             }}

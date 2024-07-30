@@ -27,6 +27,7 @@ export default function useActionsColumn({
     rowKey,
     fixColumnActions,
     dataSource: propDataSource,
+    columnActions,
     columnActionsConfig,
     onEdit: propOnEdit,
     refreshAfterEdit,
@@ -132,7 +133,7 @@ export default function useActionsColumn({
 
   const hasColumnsActions = useMemo(
     () => dataSource?.length > 0 && checkHasColumnsActions(dataSource),
-    [dataSource, builtInActions?.columnActions],
+    [dataSource, builtInActions?.columnActions, columnActions],
   )
 
   const renderActions = useMemoizedFn((_: any, record: any, recordIndex: number) => (

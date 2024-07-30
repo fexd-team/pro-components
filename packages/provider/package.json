@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-provider",
-  "version": "0.1.10",
+  "version": "0.1.12",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -21,7 +21,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
-    "@fexd/tools": "^0.1.0",
+    "@fexd/tools": "^0.1.6",
     "@types/hoist-non-react-statics": "^3.3.1",
     "ahooks": "^3.3.10",
     "antd": "^4.24.10",
@@ -48,6 +48,9 @@
     "type": "git",
     "url": "https://github.com/fexd-team/pro-components.git"
   },
+  "maintainers": [
+    "chenjy"
+  ],
   "license": "ISC",
   "gitHead": "23db7a12eb4a3cf2b82be582c3db7bf8cb9e7982"
 }

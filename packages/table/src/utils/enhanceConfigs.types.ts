@@ -5,7 +5,7 @@ export type DefinedProTableColumns<
     string,
     ProTableColumnType | ((...args: any[]) => ProTableColumnType)
   >,
-> = {
+> = T & {
   getConfigs: () => ProTableColumnType[]
   getRawConfig: () => T
   getViewFieldKeys: () => string[]
@@ -26,7 +26,7 @@ export type DefinedProTableFields<
     string,
     ProTableEditFieldType | ((...args: any[]) => ProTableEditFieldType)
   >,
-> = {
+> = T & {
   getConfigs: () => ProTableEditFieldType[]
   getRawConfig: () => T
   __isProTableFields: true

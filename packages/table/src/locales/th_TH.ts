@@ -14,6 +14,7 @@ export default {
   },
   queryField: {
     query: 'ค้นหา',
+    refresh: 'รีเฟรช',
     reset: 'รีเซ็ต',
     fold: 'พับ',
     more: 'เพิ่มเติม',

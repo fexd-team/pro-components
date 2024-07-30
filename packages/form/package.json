@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-form",
-  "version": "0.2.25",
+  "version": "0.2.35",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -21,13 +21,13 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
-    "@fexd/pro-provider": "^0.1.9",
-    "@fexd/pro-utils": "^0.1.34",
-    "@fexd/tools": "^0.1.0",
+    "@fexd/pro-provider": "^0.1.12",
+    "@fexd/pro-utils": "^0.2.9",
+    "@fexd/tools": "^0.1.6",
     "@types/bignumber.js": "^5.0.0",
     "@types/hoist-non-react-statics": "^3.3.1",
     "ahooks": "^3.3.10",
-    "antd": "^4.16.13",
+    "antd": "^4.24.10",
     "bignumber.js": "^9.1.1",
     "dayjs": "^1.11.3",
     "hoist-non-react-statics": "^3.3.2",
@@ -54,6 +54,9 @@
     "type": "git",
     "url": "https://github.com/fexd-team/pro-components.git"
   },
+  "maintainers": [
+    "chenjy"
+  ],
   "license": "ISC",
   "gitHead": "9a443c4b246e0e3ba5ec9b34afe418729764375f"
 }

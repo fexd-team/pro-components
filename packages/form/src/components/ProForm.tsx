@@ -15,7 +15,7 @@ import React, {
   useState,
   useCallback,
 } from 'react'
-import { Form, FormProps, FormInstance, RowProps, FormItemProps, Descriptions, Space, DescriptionsProps } from 'antd'
+import { Form, FormProps, RowProps, FormItemProps, Descriptions, Space, DescriptionsProps } from 'antd'
 import { DescriptionsItemProps } from 'antd/es/descriptions/Item'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { useDebounceFn, useMemoizedFn, useUpdate, useUpdateEffect } from 'ahooks'
@@ -35,11 +35,14 @@ import {
 import { Hook, ErrorBoundary, Grid, GridProps, GridConfig, Tooltip, filterObjectEmptyValue } from '@fexd/pro-utils'
 import { useContextSize, ConfigProvider, useProContext } from '@fexd/pro-provider'
 import hoistStatic from 'hoist-non-react-statics'
+import { InternalFormInstance } from 'rc-field-form/es/interface'
+import { HOOK_MARK } from 'rc-field-form/es/FieldContext'
 
 import useLocales from '../locales'
 import ProField from './ProField'
 import FormItem from './FormItem'
 import createForm from '../createForm'
+import useForm from '../useForm'
 import { formSharedContext } from './formSharedContext'
 
 import {
@@ -54,8 +57,9 @@ import {
   // ProFormRef,
 } from '../types'
 import types from '../valueTypes'
+import defineCoverableProps from '../defineCoverableProps'
 
-const CodeProForm = memo(
+const CoreProForm = memo(
   forwardRef(function ProForm(
     {
       gridDynamicRender: formPropGridDynamicRender,
@@ -71,6 +75,7 @@ const CodeProForm = memo(
       children,
       render: propRender, // customizedRenderFields,
       sharedFieldProps = {},
+      formRef,
       ...restProps
     }: ProFormProps,
     ref: any,
@@ -78,8 +83,34 @@ const CodeProForm = memo(
     const contextSize = useContextSize()
     const size = propSize ?? contextSize
     const gridGutter = propRridGutter ?? (size === 'small' ? 12 : 16)
-    const [form] = Form.useForm(propForm)
+    const [form] = useForm(propForm)
     const fields = flatten<ProFieldValueFieldType>(propFields)
+    const groupRegisterMap = useRef({})
+
+    useMemo(() => {
+      fields?.map((field) => {
+        const groupRegisterInfo = field?.group
+        if (isExist(groupRegisterInfo)) {
+          try {
+            const groupList = (isArray(groupRegisterInfo) ? groupRegisterInfo : [groupRegisterInfo]).filter((group) =>
+              isString(group),
+            ) as string[]
+
+            groupList.map((group) => {
+              const currentGroupInfo = groupRegisterMap?.current?.[group] ?? {}
+              const name = (isArray(field?.name) ? field?.name : [field?.name]).join('.')
+
+              currentGroupInfo[name] = isArray(field?.name) ? [...field?.name] : field?.name
+              groupRegisterMap.current[group] = currentGroupInfo
+            })
+          } catch {}
+        }
+      })
+
+      // @ts-ignore
+      form.groupRegisterMap = groupRegisterMap.current
+    }, [fields])
+
     const fieldsMap = useMemo<Record<string, ProFieldValueFieldType>>(
       () =>
         fields.reduce((map: any, field: ProFieldValueFieldType) => {
@@ -147,6 +178,7 @@ const CodeProForm = memo(
     const renderDynamicFieldHook = useMemoizedFn(
       ({
         disabled = false,
+        // FIXME: Object.values 会对纯数字 key 做默认排序，影响最终渲染，此处待修复
         fields = Object.values(fieldsMap),
         renderContent = () => null,
         updateDelay = 96,
@@ -224,6 +256,7 @@ const CodeProForm = memo(
       {
         gridDynamicRender = formPropGridDynamicRender,
         freeLayout = isArray(configs?.[0]),
+        useBuiltInGrid = true,
         ...config
       }: RenderFieldsConfig = {},
     ) => {
@@ -251,108 +284,116 @@ const CodeProForm = memo(
 
       return renderDynamicFieldHook({
         disabled: !gridDynamicRender,
-        renderContent: ({ getFieldHook }: any) => (
-          <Grid
-            columns={gridColumns}
-            gutter={gridGutter}
-            {...config}
-            layout={run(() => {
-              const filterConfig = (config: any) => {
-                const fieldConfig = getFieldConfig(config)
+        renderContent: ({ getFieldHook }: any) => {
+          const gridLayout = run(() => {
+            const filterConfig = (config: any) => {
+              const fieldConfig = getFieldConfig(config)
 
-                if (isFunction(fieldConfig?.hook)) {
-                  const dynamicField = run(getFieldHook, undefined, fieldConfig)
+              if (isFunction(fieldConfig?.hook)) {
+                const dynamicField = run(getFieldHook, undefined, fieldConfig)
 
-                  return dynamicField !== false
-                }
-
-                return true
+                return dynamicField !== false
               }
-              const adaptGridConfig = (config: any): GridConfig | undefined => {
-                if (
-                  isValidElement(config) &&
-                  config?.type === FormItem &&
-                  isUndefined((config?.props as any)?.label) &&
-                  layout === 'vertical'
-                ) {
-                  config = React.cloneElement(config, {
-                    ...(config?.props as any),
-                    label: ' ',
-                  })
-                }
 
-                const content =
-                  config?.content ??
-                  (isValidElement(config)
-                    ? config
-                    : run(() => {
-                        const fieldConfig = getFieldConfig(config)
-
-                        if (gridDynamicRender && isFunction(fieldConfig?.hook)) {
-                          return renderField({
-                            ...fieldConfig,
-                            hook: () => run(getFieldHook, undefined, fieldConfig),
-                          })
-                        }
-
-                        return renderField(config)
-                      }))
-
-                const key = run(() => {
-                  if (isString(config)) {
-                    return config
-                  }
-
-                  if (isExist(config?.name)) {
-                    return String(config?.name)
-                  }
-
-                  return undefined
+              return true
+            }
+            const adaptGridConfig = (config: any): GridConfig | undefined => {
+              if (
+                isValidElement(config) &&
+                config?.type === FormItem &&
+                isUndefined((config?.props as any)?.label) &&
+                layout === 'vertical'
+              ) {
+                config = React.cloneElement(config, {
+                  ...(config?.props as any),
+                  label: ' ',
                 })
-                return {
-                  ...(isObject(config) && !isValidElement(config)
-                    ? pick(config, [
-                        'flex',
-                        'offset',
-                        'order',
-                        'pull',
-                        'push',
-                        'span',
-                        'xs',
-                        'sm',
-                        'md',
-                        'lg',
-                        'xl',
-                        'xxl',
-                      ])
-                    : {}),
-                  ...(key ? { key } : {}),
-                  span: config?.colSpan ?? fieldsMap?.[config?.name ?? config]?.colSpan,
-                  content: isString(content) || isValidElement(content) ? content : null,
+              }
+
+              const content =
+                config?.content ??
+                (isValidElement(config)
+                  ? config
+                  : run(() => {
+                      const fieldConfig = getFieldConfig(config)
+
+                      if (gridDynamicRender && isFunction(fieldConfig?.hook)) {
+                        return renderField({
+                          ...fieldConfig,
+                          hook: () => run(getFieldHook, undefined, fieldConfig),
+                        })
+                      }
+
+                      return renderField(config)
+                    }))
+
+              const key = run(() => {
+                if (isString(config)) {
+                  return config
                 }
-              }
 
-              if (freeLayout) {
-                return configs.map((configs: any) => configs.filter(filterConfig).map(adaptGridConfig))
-              }
+                if (isExist(config?.name)) {
+                  return String(config?.name)
+                }
 
-              return configs.filter(filterConfig).map(adaptGridConfig)
-            })}
-          />
-        ),
+                return undefined
+              })
+              return {
+                ...(isObject(config) && !isValidElement(config)
+                  ? pick(config, [
+                      'flex',
+                      'offset',
+                      'order',
+                      'pull',
+                      'push',
+                      'span',
+                      'xs',
+                      'sm',
+                      'md',
+                      'lg',
+                      'xl',
+                      'xxl',
+                    ])
+                  : {}),
+                ...(key ? { key } : {}),
+                span: config?.colSpan ?? fieldsMap?.[config?.name ?? config]?.colSpan,
+                content: isString(content) || isValidElement(content) ? content : null,
+              }
+            }
+
+            if (freeLayout) {
+              return configs.map((configs: any) => configs.filter(filterConfig).map(adaptGridConfig))
+            }
+
+            return configs.filter(filterConfig).map(adaptGridConfig)
+          })
+
+          return useBuiltInGrid ? (
+            <Grid columns={gridColumns} gutter={gridGutter} {...config} layout={gridLayout} />
+          ) : (
+            <>
+              {flatten(gridLayout).map((item) => (
+                <Fragment key={item?.key}>{item?.content}</Fragment>
+              ))}
+            </>
+          )
+        },
         fields,
         updateDelay: 0,
       })
     }
 
-    const renderDescriptions = ({
+    const renderDescriptions: ProFormInternalParams['renderDescriptions'] = ({
       gridDynamicRender = formPropGridDynamicRender,
-      configs = Object.keys(fieldsMap),
+      group,
+      configs = group
+        ? (Object.values(groupRegisterMap?.current?.[group] ?? {}) ?? [])?.map((names) => String(names))
+        : Object.keys(fieldsMap),
       filter = () => true,
       sort = () => undefined, // 火狐浏览器中 sort: () => 1 与 chrome 表现不一致 https://forum.freecodecamp.org/t/the-sort-method-behaves-different-on-different-browsers/237221/4
       descriptionsProps = {},
       descriptionsItemProps = {},
-    }: any = {}) => {
+    } = {}) => {
       const getFieldConfig = (config: (ProFieldValueFieldType | NamePath) | ReactNode) => {
         if (isObject(config) && isValidElement(config)) {
           return null
@@ -368,7 +409,10 @@ const CodeProForm = memo(
       }
 
       const fieldConfigs = run<ProFieldValueFieldType[]>(() => {
-        return configs.map(getFieldConfig).filter(filter).filter(Boolean)
+        return configs
+          .map(getFieldConfig)
+          .filter(filter as any)
+          .filter(Boolean)
       })
 
       return renderDynamicFieldHook({
@@ -376,7 +420,7 @@ const CodeProForm = memo(
         fields: fieldConfigs,
         renderContent: ({ getFieldHook }: any) => (
           <Descriptions
-            layout={layout}
+            layout={layout as any}
             bordered
             style={{ width: '100%' }}
             column={gridColumns}
@@ -393,7 +437,7 @@ const CodeProForm = memo(
 
                 return true
               })
-              .sort(sort)
+              .sort(sort as any)
               .map((field: any, idx: number) => (
                 <Descriptions.Item
                   key={`${field?.key ?? field?.name ?? ''}:${field?.type ?? ''}:${idx}`}
@@ -450,6 +494,14 @@ const CodeProForm = memo(
       })
     }
 
+    const renderGroupFields = (group: string, options: RenderFieldsConfig = {}) => {
+      const fieldNames = (Object.values(groupRegisterMap?.current?.[group] ?? {}) ?? [])?.map((names) => ({
+        name: names,
+      }))
+
+      return renderFields(fieldNames, options)
+    }
+
     const defaultRenderFields = () => {
       if (isArray(propFields?.[0])) {
         return renderFields(propFields as any)
@@ -491,7 +543,7 @@ const CodeProForm = memo(
 
       return filterEmptyParam ? filterObjectEmptyValue(params) : params
     })
-    const currentValuesRef = useRef<any>(restProps?.initialValues ?? {})
+
     const getProFormInternalParams = useMemoizedFn(
       () =>
         ({
@@ -505,23 +557,12 @@ const CodeProForm = memo(
           renderField,
           renderFields,
           renderDescriptions,
+          renderGroupFields,
         }) as ProFormInternalParams,
     )
 
     useImperativeHandle(ref, () => getProFormInternalParams())
-
-    useUpdateEffect(() => {
-      form.setFieldsValue(currentValuesRef?.current ?? {})
-    }, [mode])
-
-    const updateCurrentValues = useDebounceFn(
-      () => {
-        currentValuesRef.current = form.getFieldsValue()
-      },
-      {
-        wait: 96,
-      },
-    )
+    useImperativeHandle(formRef, () => getProFormInternalParams())
 
     const content = (
       <Form
@@ -531,10 +572,6 @@ const CodeProForm = memo(
         preserve={false}
         size={size}
         {...restProps}
-        onChange={(...args) => {
-          run(restProps, 'onChange', ...args)
-          updateCurrentValues.run()
-        }}
         className={classnames('f-pro-form-grid-field', restProps?.className)}
       >
         {isValidElement(children) || isArray(children) ? (
@@ -567,7 +604,9 @@ const CodeProForm = memo(
       <ErrorBoundary>
         <ConfigProvider parentContextFirst numberLocale={{ toFixed: 2 }}>
           <useLocales.Provider>
-            <formSharedContext.Provider value={{ sharedFieldProps }}>{content}</formSharedContext.Provider>
+            <formSharedContext.Provider value={{ sharedFieldProps, groupRegisterMap }}>
+              {content}
+            </formSharedContext.Provider>
           </useLocales.Provider>
         </ConfigProvider>
       </ErrorBoundary>
@@ -587,25 +626,30 @@ export function createProFormRef() {
   return ref!
 }
 
-type CodeProFormType = typeof CodeProForm
+type CoreProFormType = typeof CoreProForm
 type FormType = typeof Form
 
-interface ProFormType extends CodeProFormType {
-  // useForm: typeof Form.useForm
+interface ProFormType extends CoreProFormType {
   useRef: typeof useProFormRef
   createRef: typeof createProFormRef
   createForm: typeof createForm
   defaultProps: ProFormProps
+  defineCoverableProps: typeof defineCoverableProps
 }
 
-interface ProFormType extends FormType {}
+interface ProFormType extends Omit<FormType, 'useForm'> {
+  ref?: ProFormProps['formRef']
+  useForm: typeof useForm
+}
 
-const ProForm: ProFormType = hoistStatic(CodeProForm, Form) as ProFormType
+const ProForm: ProFormType = hoistStatic(CoreProForm, Form) as ProFormType
 Object.assign(ProForm, {
   Item: FormItem,
   useRef: useProFormRef,
   createRef: createProFormRef,
   createForm,
+  useForm,
+  defineCoverableProps,
 })
 
 ProForm.defaultProps = {

@@ -1,0 +1,116 @@
+diff --git a/node_modules/code-kitchen/index.d.ts b/node_modules/code-kitchen/index.d.ts
+index aabbc10..8db5188 100644
+--- a/node_modules/code-kitchen/index.d.ts
++++ b/node_modules/code-kitchen/index.d.ts
+@@ -18,6 +18,7 @@ allowDisconnect, live: defaultLive, dir: defaultDir, }: {
+     allowDisconnect?: boolean;
+     style?: React.CSSProperties;
+     name?: string;
++    onChange?: (files: InputFile[]) => void;  /* patch by CJY */
+ }): JSX.Element;
+ 
+ declare function useMonaco(): typeof monaco_editor;
+diff --git a/node_modules/code-kitchen/index.js b/node_modules/code-kitchen/index.js
+index 0e35150..737dddc 100644
+--- a/node_modules/code-kitchen/index.js
++++ b/node_modules/code-kitchen/index.js
+@@ -1719,7 +1719,7 @@ var hash2 = (str) => {
+   return "" + (hash3 | 0);
+ };
+ var safeId = (id) => hash2(id ? id : genRandomStr());
+-function Playground({
++const Playground = React.forwardRef(function Playground({ /* patch by CJY */
+   initialFiles,
+   require: require2,
+   style,
+@@ -1728,8 +1728,9 @@ function Playground({
+   id,
+   allowDisconnect = false,
+   live: defaultLive = true,
+-  dir: defaultDir = "h"
+-}) {
++  dir: defaultDir = "h",
++  onChange  /* patch by CJY */
++}, forwardedRef) { /* patch by CJY */
+   const [internalId] = React5.useState(() => "code-kitchen-" + safeId(id != null ? id : genRandomStr()));
+   const cacheFiles = !!id;
+   const [files, setFiles] = React5.useState(initialFiles);
+@@ -1741,6 +1742,9 @@ function Playground({
+   const persistedRef = React5.useRef(false);
+   const realConnected = connected || !showCode;
+   const onFilesChange = React5.useCallback((files2) => {
++    if (typeof onChange === 'function') {  /* patch by CJY */
++      onChange(files2);
++    }
+     setFiles(files2);
+     if (cacheFiles) {
+       if (!deepEqual(files2, initialFiles)) {
+@@ -1762,6 +1766,7 @@ function Playground({
+       debug3("Recovered files from sessionStorage");
+     }
+   }, [cacheFiles, internalId, initialFiles]);
++  React.useImperativeHandle(forwardedRef, () => ({ setFiles })); /* patch by CJY */
+   return /* @__PURE__ */ React5.createElement(BodyPortal, {
+     portal: fullScreen ? "body" : void 0
+   }, /* @__PURE__ */ React5.createElement("div", {
+@@ -1819,7 +1824,7 @@ function Playground({
+     files,
+     onChange: onFilesChange
+   })));
+-}
++}); /* patch by CJY */
+ // Annotate the CommonJS export names for ESM import in node:
+ 0 && (module.exports = {
+   Playground,
+diff --git a/node_modules/code-kitchen/index.mjs b/node_modules/code-kitchen/index.mjs
+index 02bdf0e..f430665 100644
+--- a/node_modules/code-kitchen/index.mjs
++++ b/node_modules/code-kitchen/index.mjs
+@@ -1692,7 +1692,7 @@ var hash2 = (str) => {
+   return "" + (hash3 | 0);
+ };
+ var safeId = (id) => hash2(id ? id : genRandomStr());
+-function Playground({
++const Playground = React.forwardRef(function Playground({ /* patch by CJY */
+   initialFiles,
+   require: require2,
+   style,
+@@ -1701,8 +1701,9 @@ function Playground({
+   id,
+   allowDisconnect = false,
+   live: defaultLive = true,
+-  dir: defaultDir = "h"
+-}) {
++  dir: defaultDir = "h",
++  onChange  /* patch by CJY */
++}, forwardedRef) { /* patch by CJY */
+   const [internalId] = React5.useState(() => "code-kitchen-" + safeId(id != null ? id : genRandomStr()));
+   const cacheFiles = !!id;
+   const [files, setFiles] = React5.useState(initialFiles);
+@@ -1714,6 +1715,9 @@ function Playground({
+   const persistedRef = React5.useRef(false);
+   const realConnected = connected || !showCode;
+   const onFilesChange = React5.useCallback((files2) => {
++    if (typeof onChange === 'function') {  /* patch by CJY */
++      onChange(files2);
++    }
+     setFiles(files2);
+     if (cacheFiles) {
+       if (!deepEqual(files2, initialFiles)) {
+@@ -1735,6 +1739,7 @@ function Playground({
+       debug3("Recovered files from sessionStorage");
+     }
+   }, [cacheFiles, internalId, initialFiles]);
++  React.useImperativeHandle(forwardedRef, () => ({ setFiles })); /* patch by CJY */
+   return /* @__PURE__ */ React5.createElement(BodyPortal, {
+     portal: fullScreen ? "body" : void 0
+   }, /* @__PURE__ */ React5.createElement("div", {
+@@ -1792,7 +1797,7 @@ function Playground({
+     files,
+     onChange: onFilesChange
+   })));
+-}
++}) /* patch by CJY */
+ export {
+   Playground,
+   setup,

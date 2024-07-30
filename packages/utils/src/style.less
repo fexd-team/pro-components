@@ -14,6 +14,7 @@
 // @import '~antd/es/card/style/index.less';
 @import '~antd/es/popconfirm/style/index.less';
 @import '~antd/es/popover/style/index.less';
+@import '~antd/es/image/style/index.less';
 // @import '~antd/es/time-picker/style/index.less';
 // @import '~antd/es/date-picker/style/index.less';
 // @import '~antd/es/input-number/style/index.less';
@@ -46,7 +47,7 @@
   }
 
   .ant-modal-close-x {
-    width: 46px;
+    // width: 46px;
     height: 46px;
     line-height: 46px;
   }
@@ -133,14 +134,17 @@
   //   transition: width 0.3s, height 0.3s, top 0.3s, left 0.3s;
   // }
 
-  .anticon {
-    transition: color 0.3s;
-    cursor: pointer;
+  .ant-modal-header {
+    .anticon {
+      transition: color 0.3s;
+      cursor: pointer;
 
-    &:hover {
-      color: rgba(0, 0, 0, 0.75);
+      &:hover {
+        color: rgba(0, 0, 0, 0.75);
+      }
     }
   }
+
   // .ant-modal-close {
   //   &:hover {
   //     color: rgba(0, 0, 0, 0.45);
@@ -193,6 +197,17 @@
   }
 }
 
+.f-pro-utils-preview-image-group {
+  display: inline-flex;
+  flex-direction: row;
+  overflow: hidden;
+  gap: 10px;
+
+  .ant-image-img {
+    object-fit: cover;
+  }
+}
+
 .dark {
   .f-pro-utils-modal,
   .f-pro-utils-drawer {
@@ -205,11 +220,14 @@
   }
 
   .f-pro-utils-custom-action-modal {
-    .anticon {
-      &:hover {
-        color: inherit;
+    .ant-modal-header {
+      .anticon {
+        &:hover {
+          color: inherit;
+        }
       }
     }
+
     // .ant-modal-close {
     //   &:hover {
     //     color: inherit;

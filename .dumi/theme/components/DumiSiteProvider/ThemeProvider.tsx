@@ -16,6 +16,16 @@ export interface ThemeProviderProps {
 export const ThemeProvider = ({ children, token, ssrInline, cache, ...props }: ThemeProviderProps) => {
   const themeMode = useThemeStore((s) => s.themeMode)
 
+  // console.log('themeMode', themeMode)
+
+  React.useEffect(() => {
+    if (themeMode === 'dark') {
+      document.body.classList.add('dark')
+    } else {
+      document.body.classList.remove('dark')
+    }
+  }, [themeMode])
+
   const getCustomToken = useCallback(
     (params: CustomTokenParams) => {
       const base = createCustomToken(params)

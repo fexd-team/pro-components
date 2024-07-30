@@ -13,10 +13,12 @@ export default function RemoteSelect(props: AntdSelectProps<any>) {
 
   const options = useMemo(
     () =>
-      rawOptions?.map((option: any) => ({
-        ...option,
-        label: run(option?.getLabel, undefined) ?? option?.label,
-      })),
+      rawOptions
+        ?.map((option: any) => ({
+          ...option,
+          label: run(option?.getLabel, undefined) ?? option?.label,
+        }))
+        .filter((option) => !option?.readonly),
     [rawOptions, t],
   )
 

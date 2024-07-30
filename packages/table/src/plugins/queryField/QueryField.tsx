@@ -24,6 +24,7 @@ import useQueryFieldsConfig from './useFieldsConfig'
 import useQueryFieldPlugin from './index'
 import useItem from '../table/useItem'
 import useFieldParams from '../editField/useFieldParams'
+import { ProTableQueryFieldPluginConfig } from './types'
 
 function simpleCeil(num: number, base: number) {
   return base * Math.ceil(num / base)
@@ -72,7 +73,7 @@ const QueryButton = memo(function QueryButton(props) {
                   }
                 : undefined
             }
-            children={<I18nText text="queryField.query" />}
+            children={<I18nText text={!isNewValues ? 'queryField.refresh' : 'queryField.query'} />}
             {...props}
           />
         )
@@ -81,8 +82,23 @@ const QueryButton = memo(function QueryButton(props) {
   )
 })
 
-const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: any) {
+interface QueryFieldFormProps extends ProTableQueryFieldPluginConfig {
+  form?: any
+  onEnterDown?: () => any
+  proFormRef?: any
+  showAllFields?: boolean
+}
+
+const QueryField = memo(function QueryField({
+  form,
+  onEnterDown,
+  proFormRef,
+  showAllFields,
+  ...restProps
+}: QueryFieldFormProps) {
+  const tableProps = useProps()
   const {
+    queryFieldFormProps,
     queryFieldRefreshAfterReset,
     queryFieldGutter,
     queryFieldColumns,
@@ -101,7 +117,10 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
     queryFieldTextFoldActionProps,
     queryFieldQueryActionProps,
     queryFieldResetActionProps,
-  } = useProps()
+  } = {
+    ...tableProps,
+    ...restProps,
+  }
   const formStatusRef = useRef({
     focused: false,
   })
@@ -110,7 +129,7 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
     persist: queryFieldPersistType,
     sync: false,
   })
-  const { state: showMoreQueryForm } = showMoreQueryFormProState
+  const showMoreQueryForm = showAllFields === true ? true : showMoreQueryFormProState.state
   const toggleShowMoreQueryForm = () => showMoreQueryFormProState.setState((prevState: any) => !prevState as any)
   // const [showMoreQueryForm, { toggle: toggleShowMoreQueryForm }] = useToggle()
   const { rawQueryFields, queryFieldsMap: fieldsMap } = useQueryFieldsConfig()
@@ -176,6 +195,18 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
       <Space className="f-pro-table-query-form-actions">{rawActions}</Space>
     </FormItem>
   )
+  const rawActionsWithFold = (
+    <Space className="f-pro-table-query-form-actions">
+      {queryAction}
+      {resetAction}
+      {foldAction}
+    </Space>
+  )
+  const actionsWithFold = (
+    <FormItem key="actions" label={queryFieldLayout === 'vertical' ? ' ' : null}>
+      <Space className="f-pro-table-query-form-actions">{rawActionsWithFold}</Space>
+    </FormItem>
+  )
 
   const defaultRenderQueryFields: typeof renderQueryFields = useMemoizedFn(({ renderField, renderFields }) => {
     if (isArray(rawQueryFields?.[0])) {
@@ -190,7 +221,7 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
               <Space className="f-pro-table-query-form-actions">
                 {queryAction}
                 {resetAction}
-                {defaultShowQueryFields?.length < rawQueryFields?.length && foldAction}
+                {!showAllFields && defaultShowQueryFields?.length < rawQueryFields?.length && foldAction}
               </Space>
             </FormItem>,
           ],
@@ -260,6 +291,7 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
     <useFieldParams.Provider value={useMemo(() => ({ mode: 'query', viewType: 'field', form }), [])}>
       <ProForm
         ref={proFormRef}
+        {...queryFieldFormProps}
         form={form}
         fields={rawQueryFields}
         layout={queryFieldLayout}
@@ -291,6 +323,8 @@ const QueryField = memo(function QueryField({ form, onEnterDown, proFormRef }: a
             reset: resetAction,
             form,
             showMore: showMoreQueryForm,
+            rawActionsWithFold,
+            actionsWithFold,
           })
         }
       />

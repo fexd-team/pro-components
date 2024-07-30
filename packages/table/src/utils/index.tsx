@@ -78,10 +78,15 @@ export const TableWrapper = ({ plugins = [], children, ...props }: TableWrapperP
       >
         <sharedContext.Provider value={props} filter={(model: any) => plugins.includes(model.hook)}>
           <div
-            className={classnames('f-pro-table-wrapper', {
-              ['f-pro-table-grey-body']: !noBackgroundColor,
-            })}
+            className={classnames(
+              'f-pro-table-wrapper',
+              {
+                ['f-pro-table-grey-body']: !noBackgroundColor,
+              },
+              props?.wrapperClassName,
+            )}
             ref={wrapperDomRef}
+            style={props?.wrapperStyle}
           >
             {children}
           </div>

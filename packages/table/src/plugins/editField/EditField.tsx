@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useImperativeHandle, forwardRef, useMemo, memo } from 'react'
-import { Form, message, Empty } from 'antd'
+import { message, Empty } from 'antd'
 import { run, isFunction, isUndefined, isBoolean, isExist } from '@fexd/tools'
 import { useMemoizedFn } from 'ahooks'
 import { ProForm, ProFieldValueTypes, ProFormProps } from '@fexd/pro-form'
@@ -73,7 +73,7 @@ const EditField = memo(
 
     const { confirmPromise } = useModalPlugin(() => [])
     const queryField = useQueryFieldPlugin()
-    const [form] = Form.useForm(fieldFormProps?.form)
+    const [form] = ProForm.useForm(fieldFormProps?.form)
     const isFieldsChanged = useMemoizedFn(() => run(form, 'isFieldsTouched'))
     const getFieldsConfig = useFieldsConfig()
     const { types } = useValueTypePlugin(() => [])
@@ -286,14 +286,16 @@ const EditField = memo(
             gridColumns={gridColumns}
             gridGutter={gridGutter}
             gridDynamicRender={mode === 'view'}
-            render={({ renderField, renderFields, renderDescriptions }) =>
+            render={({ renderField, renderFields, renderDescriptions, renderGroupFields, ...rest }) =>
               run(renderModalFields ?? defaultRenderFields, undefined, {
+                ...rest,
                 fieldsMap,
                 fieldsConfig,
                 getField,
                 renderField,
                 renderFields,
                 renderDescriptions,
+                renderGroupFields,
                 form,
                 item,
                 mode,

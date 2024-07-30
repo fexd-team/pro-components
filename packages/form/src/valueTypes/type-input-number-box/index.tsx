@@ -1,8 +1,8 @@
 import React from 'react'
 import { InputNumber } from 'antd'
 import BigNumber from 'bignumber.js'
-import { isString, isExist, isNumber } from '@fexd/tools'
-import { Hook, isBigNumber, isNumberString } from '@fexd/pro-utils'
+import { isString, isExist, isNumber, isBigNumber, isNumberString } from '@fexd/tools'
+import { Hook } from '@fexd/pro-utils'
 
 import useLocales from '../../locales'
 import { ProFieldValueFieldType } from '../../types'

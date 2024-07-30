@@ -37,7 +37,14 @@ import { TextAreaProps } from 'antd/es/input/TextArea'
 import { PresetColorType, PresetStatusColorType } from 'antd/es/_util/colors'
 import { SliderSingleProps, SliderRangeProps } from 'antd/es/slider'
 import { Options as UseRequestOptions, Result as UseRequestResult } from 'ahooks/es/useRequest/src/types'
-import { ConfirmConfig, TooltipConfig, UniteOmit, ShowModalConfig, GridProps } from '@fexd/pro-utils'
+import {
+  ConfirmConfig,
+  TooltipConfig,
+  UniteOmit,
+  ShowModalConfig,
+  GridProps,
+  PreviewImageGroupProps,
+} from '@fexd/pro-utils'
 import { ConfigProviderProps } from '@fexd/pro-provider'
 import { Options as UseInViewportOptions } from 'ahooks/es/useInViewport'
 import { DebounceOptions } from 'ahooks/es/useDebounce/debounceOptions'
@@ -46,6 +53,10 @@ import { Optional } from 'utility-types'
 import { BuiltInValueTypeKeys } from './valueTypes'
 
 // export type UniteOmit<T extends U, U extends string = string> = T | Omit<U, T>
+
+export interface ProFormInstance<T = any> extends FormInstance<T> {
+  validateGroups: (groups: string[]) => Promise<T>
+}
 
 export type ProFieldValueTypes = BuiltInValueTypeKeys
 
@@ -64,12 +75,15 @@ interface ModalSelectProps {
 
 interface BuiltInHookParams {
   [key: string]: any
-  form: FormInstance<any>
+  form: ProFormInstance<any>
 }
 
 export interface ProFieldValueFieldType extends Pick<ConfigProviderProps, 'numberLocale' | 'currencyLocale'> {}
 
 export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'required'> {
+  labelFontBold?: boolean
+  labelClassName?: string
+  labelStyle?: React.CSSProperties
   mode?: 'view' | 'edit'
   value?: any
   tooltip?: TooltipConfig
@@ -98,7 +112,8 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
     | SliderRangeProps
     | ModalSelectProps
     | UploadProps
-  form?: FormInstance<any> | false
+    | PreviewImageGroupProps
+  form?: ProFormInstance<any> | false
   fromNowTooltip?: boolean
   format?: string
   unit?: string
@@ -110,6 +125,7 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
     | (() => Promise<ProFieldOptionType[]>)
     | UseRequestResult<any, any>
     | Record<string | number | symbol, Omit<ProFieldOptionType, 'value'> | string | ReactNode>
+  group?: string | string[]
   // fallbackShowValue?: boolean
   renderField?: (renderParams?: {
     fieldProps?: ProFieldValueFieldType['props'] & {
@@ -145,6 +161,7 @@ export type ProFieldOptionObjectType = {
   label: string | ReactNode
   value: ProFieldOptionValueType
   disabled?: boolean
+  readonly?: boolean
   tag?: UniteOmit<PresetColorType | PresetStatusColorType> | TagProps
   badge?: UniteOmit<PresetColorType | PresetStatusColorType> | BadgeProps
   children?: ProFieldOptionType[]
@@ -157,10 +174,14 @@ export interface RenderFieldsConfig extends GridProps {
   gridDynamicRender?: boolean
   /** 是否通过二维数组自由布局 */
   freeLayout?: boolean
+  /** 是否开启栅格布局 */
+  useBuiltInGrid?: boolean
 }
+
 export interface ProFormRenderDescriptionParams {
   /** 动态控制，根据 field?.hook 计算结果决定是否渲染该区域，若不渲染则销毁其占位，开启后可能会造成初始渲染抖动  */
   gridDynamicRender?: boolean
+  group?: string
   configs?: (ProFieldValueFieldType | NamePath)[]
   filter?: (item: ProFieldValueFieldType) => boolean
   sort?: (prev: ProFieldValueFieldType, next: ProFieldValueFieldType) => number | undefined | void
@@ -174,17 +195,20 @@ export interface ProFormInternalParams<T = ProFieldValueFieldType> {
     fields?: ((T | NamePath) | ReactNode)[] | ((T | NamePath) | ReactNode)[][],
     config?: RenderFieldsConfig,
   ) => ReactNode
+  renderGroupFields: (group: string, config?: RenderFieldsConfig) => ReactNode
   renderDescriptions: (param?: ProFormRenderDescriptionParams) => ReactNode
-  form: FormInstance
-  antdFormRef: React.RefObject<FormInstance>
+  form: ProFormInstance
+  antdFormRef: React.RefObject<ProFormInstance>
   fieldsMapRef: React.RefObject<Record<string, any>>
-  getValues: FormInstance['validateFields']
+  getValues: ProFormInstance['validateFields']
   fieldsMap: Record<string, ProFieldValueFieldType>
 }
 
 export interface ProFormRenderParams<T = ProFieldValueFieldType> extends ProFormInternalParams<T> {}
 
-export interface ProFormProps extends Omit<FormProps, 'fields'> {
+export interface ProFormProps<Values = any> extends Omit<FormProps, 'fields' | 'form'> {
+  form?: ProFormInstance<Values>
+  formRef?: React.Ref<ProFormInternalParams>
   mode?: 'view' | 'edit'
   fields?: ProFieldValueFieldType[] | ProFieldValueFieldType[][]
   normalizeFieldValue?: boolean

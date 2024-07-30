@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/array-type */
+import { DeepPartial } from 'utility-types'
+
 type GetSamePropertiesKey<T extends Record<string, any>, V extends Record<string, any>> = Extract<keyof T, keyof V> &
   Extract<keyof V, keyof T>
 
@@ -31,3 +34,15 @@ export type MergeMultiple<T extends any[], P = {}> = T extends []
     : {}
 
 export type UniteOmit<T extends U, U extends string = string> = T | Omit<U, T>
+
+export interface DeepPartialArray<T> extends Array<DeepPartial<T>> {}
+
+export type DeepPartialObject<T> = {
+  [K in keyof T]?: T[K] extends (...args: any) => any
+    ? T[K]
+    : T extends Array<infer U>
+      ? DeepPartialArray<U>
+      : T[K] extends object
+        ? DeepPartialObject<T[K]>
+        : T[K]
+}

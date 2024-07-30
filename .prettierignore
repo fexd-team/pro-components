@@ -3,6 +3,7 @@
 **/*.html
 node_modules
 package.json
+docs
 dist
 build
 es

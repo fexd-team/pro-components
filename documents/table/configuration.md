@@ -1,6 +1,6 @@
 ---
 title: 可视化配置
-order: 999
+order: 8
 toc: false
 ---
 

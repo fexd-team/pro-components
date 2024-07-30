@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react'
-import { FormInstance } from 'antd'
 import { isObject } from '@fexd/tools'
 import { useMemoizedFn } from 'ahooks'
+import { ProFormInstance } from '@fexd/pro-form'
 import { useProState } from '@fexd/pro-utils'
 
 import { useProps } from '../../utils'
 
-export default function usePersistForm(form: FormInstance) {
+export default function usePersistForm(form: ProFormInstance) {
   const { queryFieldPersistKey, queryFieldPersistType, queryFieldPersistFormKeyExcludes, queryFieldPersistForm } =
     useProps()
   const excludePersistFormKey = useMemoizedFn((params: any) => {

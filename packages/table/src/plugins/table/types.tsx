@@ -1,11 +1,25 @@
 import { ReactNode, Ref } from 'react'
-import { TableProps, TableColumnType } from 'antd'
-import { ProFieldValueFieldType, ProFormProps, ProFormRenderDescriptionParams } from '@fexd/pro-form'
+import {
+  TableProps,
+  TableColumnType,
+  BadgeProps,
+  TagProps,
+  ImageProps,
+  ProgressProps,
+  AvatarProps,
+  RateProps,
+} from 'antd'
+import { TextProps } from 'antd/es/typography/Text'
+import { LinkProps } from 'antd/es/typography/Link'
+import { RenderedCell as RcRenderedCell } from 'rc-table/lib/interface'
+import { ProFieldValueFieldType, ProFormProps, ProFormRenderDescriptionParams, ProFieldProps } from '@fexd/pro-form'
 import { ProLocaleValue } from '@fexd/pro-provider'
-import { TooltipConfig, ButtonActionType, UniteOmit } from '@fexd/pro-utils'
+import { TooltipConfig, ButtonActionType, UniteOmit, ActionProps } from '@fexd/pro-utils'
+import { Random } from 'mockjs'
 
 import { ProTableQueryFieldType } from '../queryField/types'
 import { ProTableEditFieldType } from '../editField/types'
+import { DefinedProTableColumns } from '../../utils/enhanceConfigs.types'
 
 export interface ProTableColumnType<R = any>
   extends Pick<
@@ -30,24 +44,62 @@ export interface ProTableColumnType<R = any>
   addField?: boolean | ProTableEditFieldType<R> | ProTableEditFieldType<R>['hook']
   viewField?: boolean | ProTableEditFieldType<R> | ProTableEditFieldType<R>['hook']
   expandViewField?: boolean | ProTableEditFieldType<R> | ProTableEditFieldType<R>['hook']
+  /** 声明当前字段如何生成模拟数据，规则参考 http://mockjs.com/ */
+  mock?: (options: { Random: typeof Random; viewField: ProTableEditFieldType<R> }) => any
 }
 
-export interface ProTableColumnType<R = any> extends TableColumnType<R> {
+export type ProTableColumnBuiltInRenderType =
+  | 'text'
+  | 'link'
+  | 'tag'
+  | 'button'
+  | 'badge'
+  | 'image'
+  | 'progress'
+  | 'avatar'
+  | 'rate'
+  | 'field'
+export interface ProTableColumnBuiltInRenderConfig {
+  builtIn: ProTableColumnBuiltInRenderType
+  props?:
+    | TextProps
+    | BadgeProps
+    | TagProps
+    | LinkProps
+    | ActionProps
+    | ImageProps
+    | ProgressProps
+    | AvatarProps
+    | RateProps
+    | ProFieldProps
+}
+
+export interface ProTableColumnType<R = any> extends Omit<TableColumnType<R>, 'render'> {
   // key?: React.Key,
   expandView?: boolean
   tooltip?: TooltipConfig
   copyable?: boolean | Pick<ButtonActionType, 'tooltip' | 'confirm'>
   hidden?: boolean
   children?: ProTableColumnType<R>[]
+  render?: (
+    value: any,
+    record: R,
+    index: number,
+  ) => ProTableColumnBuiltInRenderConfig | RcRenderedCell<R> | JSX.Element | string | number
 }
 
 export interface ProTablePluginConfig<R = any>
-  extends Omit<TableProps<R>, 'title' | 'locale' | 'sticky' | 'rowSelection'> {
+  extends Omit<TableProps<R>, 'title' | 'locale' | 'sticky' | 'rowSelection' | 'columns'> {
   ref?: Ref<any>
+
+  mockDataSource?: boolean | number
 
   // Pick<TableProps<R>, 'rowKey' | 'rowSelection' | 'indentSize'> {
   title?: string | ReactNode
-  columns?: ProTableColumnType<R>[]
+  columns?:
+    | ProTableColumnType<R>[]
+    | Record<string, ProTableColumnType<R> | ((...args: any[]) => ProTableColumnType<R>)>
+    | DefinedProTableColumns
 
   /** 是否纯表格，将去除外部边框和边距，且默认 sticky=false */
   pure?: boolean
@@ -118,7 +170,11 @@ export interface ProTablePluginConfig<R = any>
   resizableHeader?: boolean
 
   bodyStyle?: React.CSSProperties
+  bodyClassName?: string
+  wrapperStyle?: React.CSSProperties
+  wrapperClassName?: string
   mainStyle?: React.CSSProperties
+  mainClassName?: string
   toolbarStyle?: React.CSSProperties
   noBackgroundColor?: boolean
 

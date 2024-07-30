@@ -1,6 +1,6 @@
 import React, { memo, isValidElement, forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Form } from 'antd'
-import { random, run, isString, isObject, isFunction, isExist, isNumber } from '@fexd/tools'
+import { random, run, isString, isObject, isFunction, isExist, isNumber, isArray } from '@fexd/tools'
 import { ConfigProvider } from '@fexd/pro-provider'
 import { ErrorBoundary } from '@fexd/pro-utils'
 
@@ -27,18 +27,38 @@ export const ProField: React.FC<ProFieldProps> = memo(
     const { form: propForm, ...propField } = props
     const ctxLocales = useLocales()
     const withLocales = !!ctxLocales
-    const { sharedFieldProps = {} } = useFormSharedContext() ?? {}
+    const { sharedFieldProps = {}, groupRegisterMap } = useFormSharedContext() ?? {}
 
     const {
       hook,
       dependencies,
       shouldUpdate = !dependencies,
+      group: groupRegisterInfo,
       ...field
     } = {
       ...sharedFieldProps,
       ...props,
     } as ProFieldValueFieldType
     const fieldRef = useRef(field)
+
+    if (isExist(groupRegisterInfo)) {
+      try {
+        const groupList = (isArray(groupRegisterInfo) ? groupRegisterInfo : [groupRegisterInfo]).filter((group) =>
+          isString(group),
+        ) as string[]
+
+        groupList.map((group) => {
+          const currentGroupInfo = groupRegisterMap?.current?.[group] ?? {}
+          const name = (isArray(field?.name) ? field?.name : [field?.name]).join('.')
+          // console.log('currentGroupInfo',  field?.name)
+          currentGroupInfo[name] = isArray(field?.name) ? [...field?.name] : field?.name
+          groupRegisterMap.current[group] = currentGroupInfo
+        })
+
+        // @ts-ignore
+        propForm.groupRegisterMap = groupRegisterMap.current
+      } catch {}
+    }
 
     // const startRenderTime = React.useRef(0)
     // startRenderTime.current = Date.now()
@@ -97,7 +117,7 @@ export const ProField: React.FC<ProFieldProps> = memo(
         )
       }
 
-      return <FieldSwitch key={props?.key} {...props} />
+      return <FieldSwitch key={field?.key} {...field} />
     })
     let content = rawContent ?? (
       <ErrorBoundary mode="inline">

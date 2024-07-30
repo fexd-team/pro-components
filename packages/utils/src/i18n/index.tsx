@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
-import { I18n, run, isNaN, isExist, isNumber } from '@fexd/tools'
+import { I18n, run, isNaN, isExist, isNumber, clamp, isBigNumber, isNumberString } from '@fexd/tools'
 
 import BigNumber from 'bignumber.js'
 
 import reactI18nshell from './reactI18nshell'
-import isBigNumber from '../utils/isBigNumber'
 
 import zh_CN from './locales/zh-CN.json'
 import en_US from './locales/en-US.json'
@@ -29,12 +28,18 @@ export const jsxTranslate = (value: any, data: any = {}) => {
   )
 }
 
+// window.isNumberString = isNumberString
+
 export const numberTranslate = (num: any, data: any = {}) => {
+  // console.log('numberTranslate num', num)
+
   const number = Number(num)
 
-  if (!isExist(num) || num === '' || isNaN(number)) {
+  if ((!isNumberString(num) && !isNumber(num)) || !isExist(num) || num === '' || isNaN(number)) {
     return num
   }
+
+  const numberString = String(num).replace(/^0+/, '').replace(/0+$/, '').replace(/\.$/, '')
 
   const locale = data?.locale ?? 'en'
 
@@ -54,14 +59,28 @@ export const numberTranslate = (num: any, data: any = {}) => {
   //   console.log(toLocaleStringConfig, run(number, 'toLocaleString', locale, toLocaleStringConfig))
   // }
 
+  // console.log('toLocaleString', {
+  //   toLocaleStringConfig,
+  //   number,
+  //   num,
+  //   // result
+  // })
+
   // 正常范围内数字处理，直接使用 toLocaleString 进行
-  if (!isBigNumber(num)) {
-    return run(number, 'toLocaleString', locale, toLocaleStringConfig)
+  if (!isBigNumber(numberString)) {
+    const result = run(number, 'toLocaleString', locale, toLocaleStringConfig)
+    // console.log('toLocaleString', {
+    //   toLocaleStringConfig,
+    //   number,
+    //   num,
+    //   result,
+    // })
+    return result
   }
 
   // 超限范围内处理，使用 BigNumber 模拟 toLocaleString 进行
   // bignumber 文档：https://mikemcl.github.io/bignumber.js
-  const bigNumber = BigNumber(num)
+  const bigNumber = BigNumber(numberString)
   const formatConfig = run(() => {
     try {
       return {
@@ -79,8 +98,14 @@ export const numberTranslate = (num: any, data: any = {}) => {
   })
 
   const bigNumberFormatResult = run(() => {
-    if (data?.maximumFractionDigits) {
-      return bigNumber.toFormat(data?.maximumFractionDigits, formatConfig)
+    if (/\.\d+$/.test(numberString)) {
+      const decimalCount = clamp(
+        numberString.split('.')?.[1]?.length ?? 0,
+        toLocaleStringConfig?.minimumFractionDigits,
+        toLocaleStringConfig?.maximumFractionDigits,
+      )
+
+      return bigNumber.toFormat(decimalCount, formatConfig)
     }
 
     return bigNumber.toFormat(formatConfig)
@@ -89,6 +114,13 @@ export const numberTranslate = (num: any, data: any = {}) => {
   // 为确保最大限度模拟 toLocaleString 结果，保留可能存在的货币单位功能等
   // 将 bigNumber 格式化结果填入 toLocaleString 模板
   const localStringTemp = (1010101).toLocaleString('en', toLocaleStringConfig)
+
+  // console.log('bigNumberFormatResult', {
+  //   toLocaleStringConfig,
+  //   bigNumberFormatResult,
+  //   localStringTemp,
+  //   result: localStringTemp.replace(/1,010,101(\.0+)?$/, bigNumberFormatResult),
+  // })
 
   try {
     return localStringTemp.replace(/1,010,101(\.0+)?$/, bigNumberFormatResult)

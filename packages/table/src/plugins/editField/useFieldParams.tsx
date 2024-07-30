@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react'
-import { Form, FormInstance } from 'antd'
+import { Form } from 'antd'
 import { UniteOmit } from '@fexd/pro-utils'
+import { ProFormInstance } from '@fexd/pro-form'
 
 import useItem from '../table/useItem'
 
@@ -8,7 +9,7 @@ export const context = createContext<{
   [key: string]: any
   mode?: UniteOmit<'view' | 'edit' | 'add' | 'query'>
   viewType?: UniteOmit<'field' | 'table' | 'expand'>
-  form?: FormInstance
+  form?: ProFormInstance
   item?: any
 }>({} as any)
 

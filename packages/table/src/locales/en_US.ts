@@ -14,6 +14,7 @@ export default {
   },
   queryField: {
     query: 'Query',
+    refresh: 'Refresh',
     reset: 'Reset',
     fold: 'Fold',
     more: 'More',

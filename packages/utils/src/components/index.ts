@@ -4,6 +4,9 @@ export * from './showModal'
 export { default as showDrawer } from './showDrawer'
 export * from './showDrawer'
 
+export { default as showImages } from './showImages'
+export * from './showImages'
+
 export { default as Button } from './Button'
 export * from './Button'
 
@@ -36,3 +39,6 @@ export * from './Grid'
 
 export { default as Portal } from './Portal'
 export * from './Portal'
+
+export { default as PreviewImageGroup } from './PreviewImageGroup'
+export * from './PreviewImageGroup'

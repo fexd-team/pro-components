@@ -31,7 +31,6 @@ export default () => (
               window.formRef = ref
             }}
             mode={readonly ? 'view' : 'edit'}
-            preserve
             fields={[
               {
                 label: '日期',
@@ -135,7 +134,6 @@ export default () => (
               window.formRef = ref
             }}
             mode={readonly ? 'view' : 'edit'}
-            preserve
             fields={[
               {
                 label: '日期范围',

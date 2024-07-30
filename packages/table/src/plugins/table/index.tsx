@@ -41,6 +41,7 @@ const PluginTable = memo(
       rowKey,
       dataSource: propDataSource,
       mainStyle,
+      mainClassName,
       loading: propLoading,
       sticky,
       components: propComponents,
@@ -90,10 +91,14 @@ const PluginTable = memo(
 
     return (
       <div
-        className={classnames('f-pro-table-main', {
-          'f-pro-table-main-no-toolbar': !hasToolbar,
-          'f-pro-table-main-bordered': !pure,
-        })}
+        className={classnames(
+          'f-pro-table-main',
+          {
+            'f-pro-table-main-no-toolbar': !hasToolbar,
+            'f-pro-table-main-bordered': !pure,
+          },
+          mainClassName,
+        )}
         ref={tableWrapperDomRef}
         style={mainStyle}
       >

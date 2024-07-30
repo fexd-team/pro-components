@@ -1,7 +1,7 @@
 import React from 'react'
 import animateScrollTo from 'animated-scroll-to'
 // @ts-ignore
-import { Helmet, useIntl, useLocation } from 'dumi'
+import { Helmet, useIntl, useLocation, useT } from 'dumi'
 import isEqual from 'fast-deep-equal'
 import { memo, StrictMode, useEffect, FC } from 'react'
 
@@ -13,6 +13,8 @@ import Home from 'dumi-theme-antd-style/dist/pages/Home'
 
 import Docs from '../pages/Docs'
 import { StoreUpdater } from 'dumi-theme-antd-style/dist/components/StoreUpdater'
+
+import { ConfigProvider } from '@fexd/pro-components'
 
 import '@fexd/pro-components/src/style.less'
 import '@fexd/pro-form/src/style.less'
@@ -66,12 +68,14 @@ export default () => {
   const fm = useSiteStore((s) => s.routeMeta.frontmatter, isEqual)
 
   return (
-    <StrictMode>
+    // <StrictMode>
+    <ConfigProvider localeKey="zh-CN">
       <SiteProvider {...fm}>
         <StoreUpdater />
         <GlobalStyle />
         <DocLayout />
       </SiteProvider>
-    </StrictMode>
+    </ConfigProvider>
+    // </StrictMode>
   )
 }

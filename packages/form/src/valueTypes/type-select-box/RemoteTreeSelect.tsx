@@ -10,17 +10,19 @@ export interface TreeSelectProps extends AntdTreeSelectProps<any> {
 }
 
 const adaptTreeSelectItem = (options: any[]) =>
-  options.map((item: any) => ({
-    key: item?.value,
-    id: item?.key ?? item?.value,
-    title: item?.label,
-    ...item,
-    ...(item?.children
-      ? {
-          children: (adaptTreeSelectItem as any)(item.children),
-        }
-      : {}),
-  }))
+  options
+    .filter((option) => !option?.readonly)
+    .map((item: any) => ({
+      key: item?.value,
+      id: item?.key ?? item?.value,
+      title: item?.label,
+      ...item,
+      ...(item?.children
+        ? {
+            children: (adaptTreeSelectItem as any)(item.children),
+          }
+        : {}),
+    }))
 
 export default function RemoteTreeSelect({ options: propOptions, ...props }: TreeSelectProps) {
   const { loading, options } = useRemoteOptions(propOptions)

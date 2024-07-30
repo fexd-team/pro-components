@@ -14,6 +14,7 @@ export default {
   },
   queryField: {
     query: '搜索',
+    refresh: '刷新',
     reset: '重置',
     fold: '收起',
     more: '更多',

@@ -6,7 +6,7 @@ import { SetState } from 'ahooks/es/useSetState'
 
 import { useProps } from '../../utils'
 import useQueryFieldPlugin from '../queryField'
-import { ProTableBuiltInActionType, ProTableTableActionType } from '../../types'
+import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInColumnActionNames } from '../../types'
 import { I18nText } from '../config'
 import Actions, { getActionNodes } from './Actions'
 import Action from '../actions/Action'
@@ -15,7 +15,7 @@ import handleAsyncActionResponse from '../actions/handleAsyncActionResponse'
 // 表格项动作
 export default function useColumnActions(): {
   columnActions: Record<string, ProTableBuiltInActionType>
-  columnActionConfigs: ProTableTableActionType<'view' | 'edit' | 'edit-icon' | 'table-edit'>[]
+  columnActionConfigs: ProTableTableActionType<ProTableBuiltInColumnActionNames>[]
   setColumnActions: SetState<Record<string, ProTableBuiltInActionType>>
   renderColumnsActions: (this: any, record: any, idx: number, dataSource: any[], actionConfigs?: any[]) => JSX.Element
   hasColumnsActions: (dataSource: any[], actionConfigs?: any[]) => boolean
@@ -80,7 +80,21 @@ export default function useColumnActions(): {
           {...actionProps}
           actionType={actionType}
           onClick={async (...args: any[]) => {
-            await run(onClick, undefined, record, idx, dataSource, ...args)
+            let response = await run(onClick, undefined, record, idx, dataSource, ...args)
+
+            if (isBoolean(response)) {
+              response = {
+                success: response,
+              }
+            }
+
+            handleAsyncActionResponse(response)
+
+            const { success, message: msg } = response ?? {}
+
+            if (success) {
+              queryField.search()
+            }
           }}
         />
       )}
@@ -105,7 +119,12 @@ export default function useColumnActions(): {
   return {
     columnActions,
     columnActionConfigs: useMemo(
-      () => (columnActionConfigs ?? []).filter((action) => (action as any)?.hidden !== false),
+      () =>
+        (columnActionConfigs ?? [])
+          .filter(Boolean)
+          .filter(
+            (action) => (action as any)?.hidden !== false,
+          ) as ProTableTableActionType<ProTableBuiltInColumnActionNames>[],
       [columnActionConfigs],
     ),
     setColumnActions,

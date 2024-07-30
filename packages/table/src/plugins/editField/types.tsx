@@ -1,11 +1,12 @@
 import { ReactNode } from 'react'
-import { FormProps, FormInstance, RowProps, DescriptionsProps } from 'antd'
+import { FormProps, RowProps, DescriptionsProps } from 'antd'
 import { DescriptionsItemProps } from 'antd/es/descriptions/Item'
 import {
   ProFieldValueFieldType,
   ProFormRenderParams,
   ProFormProps,
   ProFormRenderDescriptionParams,
+  ProFormInstance,
 } from '@fexd/pro-form'
 import { ShowModalConfig } from '@fexd/pro-utils'
 
@@ -16,7 +17,7 @@ export type ProTableEditFieldMode = 'view' | 'add' | 'edit'
 export interface ProTableEditFieldParams<R = any> {
   [key: string]: any
   item: R | undefined
-  form: FormInstance
+  form: ProFormInstance
   mode: ProTableEditFieldMode
   inTable?: boolean
 }
@@ -38,6 +39,7 @@ export interface ProTableEditFieldRenderParams
   fieldsConfig: ProTableEditFieldsConfig
   getField: (fieldName: string) => ProTableEditFieldType | undefined
   renderDescriptions: (param?: {
+    group?: string
     configs?: ProFormRenderDescriptionParams['configs']
     filter?: (item: ProTableEditFieldType) => boolean
     sort?: (prev: ProTableEditFieldType, next: ProTableEditFieldType) => number | undefined | void
@@ -55,10 +57,10 @@ export interface ProTableEditFieldConfig<R = any> {
   onView?: <T = any>(item: R, mode: 'view' | 'edit') => Promise<ProTableResponse<T> | void> | void
 
   /** 增 */
-  onAdd?: <T = any>(params: any) => Promise<ProTableResponse<any> | void | boolean> | void | boolean
+  onAdd?: <T = any>(params: any) => Promise<ProTableResponse<T> | void | boolean> | void | boolean
 
   /** 改 */
-  onEdit?: <T = any>(params: any, item: R) => Promise<ProTableResponse<any> | void | boolean> | void | boolean
+  onEdit?: <T = any>(params: any, item: R) => Promise<ProTableResponse<T> | void | boolean> | void | boolean
 
   /** 编辑成功后刷新表格 */
   refreshAfterEdit?: boolean

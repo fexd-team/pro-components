@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
-import { FormProps, FormInstance, RowProps, message } from 'antd'
+import { FormProps, RowProps, message } from 'antd'
 import { ArgsProps as NotificationArgsProps } from 'antd/es/notification'
 import { ArgsProps as MessageArgsProps } from 'antd/es/message'
 import { Options as UseRequestOptions, Result as UseRequestResult } from 'ahooks/es/useRequest/src/types'
-import { ProFieldValueFieldType, ProFormRenderParams } from '@fexd/pro-form'
+import { ProFieldValueFieldType, ProFormRenderParams, ProFormProps, ProFormInstance } from '@fexd/pro-form'
 import { UseProStateOptions, ButtonActionType } from '@fexd/pro-utils'
 
 export interface ProTableResponse<T = any> {
@@ -17,13 +17,15 @@ export interface ProTableResponse<T = any> {
 export interface ProTableQueryFieldType extends ProFieldValueFieldType {
   hook?: (params: {
     [key: string]: any
-    form: FormInstance
+    form: ProFormInstance
   }) => Omit<ProTableQueryFieldType, 'hook'> | void | undefined | null | boolean | ReactNode
 }
 
 export interface ProTableQueryFieldRenderParams extends ProFormRenderParams<ProTableQueryFieldType> {
   rawActions: ReactNode
   actions: ReactNode
+  rawActionsWithFold: ReactNode
+  actionsWithFold: ReactNode
   fold: ReactNode
   query: ReactNode
   reset: ReactNode
@@ -44,6 +46,7 @@ export interface ProTableQueryFieldPluginConfig<R = any> {
   queryFieldColumns?: number
   queryFieldGutter?: RowProps['gutter']
   queryFieldLayout?: FormProps['layout']
+  queryFieldFormProps?: ProFormProps
   /** 是否清空查询表单空参数 */
   queryFieldFilterEmptyParam?: boolean
   /** 重置查询表单后是否刷新 */

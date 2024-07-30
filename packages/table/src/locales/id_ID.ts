@@ -14,6 +14,7 @@ export default {
   },
   queryField: {
     query: 'Pertanyaan',
+    refresh: 'Segar',
     reset: 'Reset',
     fold: 'Fold',
     more: 'Lebih',

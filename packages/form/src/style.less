@@ -64,7 +64,7 @@
 // }
 
 .f-pro-form-textarea-content {
-  white-space: pre;
+  white-space: normal;
 }
 
 .@{pro-form-prefix} {
@@ -81,7 +81,7 @@
       }
 
       &.ant-form-item-with-help {
-        margin-bottom: 0;
+        // margin-bottom: 0;
 
         .ant-form-item-explain {
           min-height: 18px;
@@ -151,6 +151,7 @@
     > .kl-grid {
       margin: 0 -16px;
     }
+
     .kl-grid-item {
       overflow: hidden;
     }
@@ -175,10 +176,21 @@
   }
 
   &-field {
+    &-view {
+      & .ant-upload-list-item:first-child {
+        margin-top: 0;
+      }
+    }
+
     &-label {
       // font-weight: 600;
       color: #666;
+
+      &-font-bold {
+        font-weight: 600;
+      }
     }
+
     .ant-form-item-control-input-content {
       word-break: break-all;
     }

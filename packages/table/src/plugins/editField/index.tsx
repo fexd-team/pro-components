@@ -24,7 +24,7 @@ export const useEditFieldPlugin = createPlugin(() => {
   const editFieldRef = useRef<{
     submit: () => Promise<any>
     cancel: () => void
-    proFormRef: ProFormInternalParams
+    proFormRef: { current: ProFormInternalParams }
     form: ProFormInternalParams['form']
   }>(null)
 

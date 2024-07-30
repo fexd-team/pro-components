@@ -1,8 +1,10 @@
 import { pickBy, isUndefined, memoize, run, isExist } from '@fexd/tools'
 
-import { getAllFieldFromColumn } from '../plugins/valueType'
-import { ProTableEditFieldType, ProTableQueryFieldType, ProTableColumnType } from '../types'
+import { getAllFieldFromColumn } from '../plugins/valueType/helpers'
+import { ProTableEditFieldType, ProTableQueryFieldType, ProTableColumnType, ProTableProps } from '../types'
 import { DefinedProTableColumns, DefinedProTableFields } from './enhanceConfigs.types'
+
+export { default as defineCoverableProps } from './defineCoverableProps'
 
 export const extendColumn = (
   columnValue: any, // ProTableColumnType | ((...args: any[]) => ProTableColumnType),

@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, isValidElement, useMemo, memo } from 'react'
+import React, { useEffect, isValidElement, useMemo, memo, Fragment } from 'react'
 import { Space, Form } from 'antd'
 import { useSafeState } from 'ahooks'
 import { QuestionCircleOutlined, CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import { run, isString, isObject, isFunction, copy, isExist, classnames, pickBy, isUndefined } from '@fexd/tools'
-import { Action, Tooltip, useLazyRender } from '@fexd/pro-utils'
+import { Action, Hook, Tooltip, useLazyRender } from '@fexd/pro-utils'
 
 import FormItem from '../FormItem'
 import { ProFieldValueFieldType, ProFieldValueTypes } from '../../types'
@@ -39,142 +39,171 @@ interface ReadonlyFieldProps extends ProFieldValueFieldType {
   static?: boolean
 }
 
-export const ReadonlyField = memo(
-  function ReadonlyField(props: ReadonlyFieldProps) {
-    const {
-      // key,
-      fromNowTooltip,
-      format,
-      unit,
-      builtInRule,
-      numberLocale,
-      currencyLocale,
-      form,
-      static: staticMode = false,
-      tooltip,
-      props: fieldProps = {},
-      fieldItemProps = {},
-      type: fieldTypeName = 'text',
+export function useReadonlyField(props: ReadonlyFieldProps) {
+  const {
+    // key,
+    // @ts-ignore
+    ___value___,
+    fromNowTooltip,
+    format,
+    unit,
+    builtInRule,
+    numberLocale,
+    currencyLocale,
+    form,
+    static: staticMode = false,
+    tooltip,
+    props: fieldProps = {},
+    fieldItemProps = {},
+    type: fieldTypeName = 'text',
+    options: fieldOptions,
+    renderField,
+    renderView = (types?.[(fieldTypeName as ProFieldValueTypes) ?? 'text'] as any)?.renderView,
+    disabled,
+    required,
+    copyable,
+    hook,
+    placeholder,
+    children,
+    lazyRender,
+    labelFontBold,
+    labelClassName,
+    labelStyle,
+    ...field
+  } = props
+
+  // const form = Form.useFormInstance()
+  const value =
+    run(() => {
+      if (!isExist(field?.name) || !form) {
+        return
+      }
+      try {
+        return form?.getFieldValue(field?.name as any)
+      } catch (err) {
+        return
+      }
+    }) ??
+    field?.value ??
+    field?.initialValue
+
+  const valueContent =
+    run<any>(renderView, undefined, value, {
       options: fieldOptions,
-      renderField,
-      renderView = (types?.[(fieldTypeName as ProFieldValueTypes) ?? 'text'] as any)?.renderView,
-      disabled,
-      required,
-      copyable,
-      hook,
-      placeholder,
-      children,
-      lazyRender,
-      ...field
-    } = props
 
-    // const form = Form.useFormInstance()
-    const value =
-      run(() => {
-        if (!isExist(field?.name) || !form) {
-          return
-        }
-        try {
-          return form?.getFieldValue(field?.name as any)
-        } catch (err) {
-          return
-        }
-      }) ??
-      field?.value ??
-      field?.initialValue
+      ...pickBy(
+        {
+          fromNowTooltip,
+          format,
+          unit,
+          builtInRule,
+          numberLocale,
+          currencyLocale,
+        },
+        (value) => !isUndefined(value),
+      ),
+      ...props,
+    }) ?? '--'
 
-    const valueContent =
-      run<any>(renderView, undefined, value, {
-        options: fieldOptions,
+  const lazyContent = useLazyRender({
+    forceVisible: !lazyRender,
+    content: valueContent,
+    ...(isObject(lazyRender) ? (lazyRender as any) : {}),
+  })
 
-        ...pickBy(
-          {
-            fromNowTooltip,
-            format,
-            unit,
-            builtInRule,
-            numberLocale,
-            currencyLocale,
-          },
-          (value) => !isUndefined(value),
-        ),
-        ...props,
-      }) ?? '--'
+  if (isObject(valueContent) && !isValidElement(valueContent)) {
+    console.warn('ProTable.valueType.renderField error! not a valid element', valueContent, { field })
+    return null
+  }
 
-    const lazyContent = useLazyRender({
-      forceVisible: !lazyRender,
-      content: valueContent,
-      ...(isObject(lazyRender) ? (lazyRender as any) : {}),
-    })
+  // return '--'
 
-    useUpdateAfterValueTypeAdd()
+  const content =
+    isValidElement(children) || isFunction(children) ? (
+      run(children)
+    ) : (
+      <>
+        {!!value && copyable && (
+          <CopyButton
+            className="f-pro-form-field-copy-button"
+            text={String(value)}
+            {...((isObject(copyable) ? copyable : {}) as any)}
+          />
+        )}
+        {lazyContent}
+      </>
+    )
 
-    if (isObject(valueContent) && !isValidElement(valueContent)) {
-      console.warn('ProTable.valueType.renderField error! not a valid element', valueContent, { field })
+  // 如果不需要展示 label，且不需要 form，则认为是纯粹的内容展示，不需要 form.item 包裹
+  if (staticMode || (!form && !field?.name && !field?.label)) {
+    if (field?.hidden) {
       return null
     }
 
-    // return '--'
+    return content
+  }
 
-    const content =
-      isValidElement(children) || isFunction(children) ? (
-        run(children)
-      ) : (
-        <>
-          {!!value && copyable && (
-            <CopyButton
-              className="f-pro-form-field-copy-button"
-              text={String(value)}
-              {...((isObject(copyable) ? copyable : {}) as any)}
-            />
-          )}
-          {lazyContent}
-        </>
-      )
+  const mergedFormItemProps = {
+    ...fieldItemProps,
+    ...field,
+  }
 
-    // 如果不需要展示 label，且不需要 form，则认为是纯粹的内容展示，不需要 form.item 包裹
-    if (staticMode || (!form && !field?.name && !field?.label)) {
-      if (field?.hidden) {
-        return null
-      }
-
-      return content
-    }
-
-    const mergedFormItemProps = {
-      ...fieldItemProps,
-      ...field,
-    }
-
-    return (
-      <FormItem
-        {...(isFunction(children) && !mergedFormItemProps?.dependencies
-          ? {
-              shouldUpdate: true,
-            }
-          : {})}
-        {...mergedFormItemProps}
-        label={
-          field?.label && (
-            <Space direction="horizontal" size={6}>
-              {field?.label}
-              {isExist(tooltip) && (
-                <Tooltip config={tooltip} content={isString(tooltip) ? <QuestionCircleOutlined /> : null} />
+  return (
+    <FormItem
+      {...(isFunction(children) && !mergedFormItemProps?.dependencies
+        ? {
+            shouldUpdate: true,
+          }
+        : {})}
+      {...mergedFormItemProps}
+      label={
+        field?.label && (
+          <Space direction="horizontal" size={6}>
+            <div
+              className={classnames(
+                'f-pro-form-field-label',
+                {
+                  'f-pro-form-field-label-font-bold': labelFontBold,
+                },
+                labelClassName,
               )}
-            </Space>
-          )
-        }
-        {...(fieldItemProps ?? {})}
-        className={classnames('f-pro-form-field', mergedFormItemProps?.className)}
-        {...(isFunction(children)
-          ? {
-              name: undefined,
-            }
-          : {})}
-      >
-        {content}
-      </FormItem>
-    )
+              style={labelStyle}
+            >
+              {field?.label}
+            </div>
+            {isExist(tooltip) && (
+              <Tooltip config={tooltip} content={isString(tooltip) ? <QuestionCircleOutlined /> : null} />
+            )}
+          </Space>
+        )
+      }
+      {...(fieldItemProps ?? {})}
+      className={classnames('f-pro-form-field f-pro-form-field-view', mergedFormItemProps?.className)}
+      {...(isFunction(children)
+        ? {
+            name: undefined,
+          }
+        : {})}
+    >
+      <>{content}</>
+      {/* <Hook>
+        {function useNode() {
+          React.useEffect(() => {
+            console.log('didMount')
+          }, [])
+          return null
+        }}
+      </Hook> */}
+    </FormItem>
+  )
+}
+
+export const ReadonlyField = memo(
+  function ReadonlyField(props: ReadonlyFieldProps) {
+    const content = useReadonlyField(props)
+    useUpdateAfterValueTypeAdd()
+
+    return content
   },
   // (prevProps, nextProps) => compare(getObjectValues(prevProps?.field), getObjectValues(nextProps?.field)),
 )

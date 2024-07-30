@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useEffect, useMemo } from 'react'
-import { Form, message } from 'antd'
-import { classnames, run, isString, delay, isArray, isObject, intersection, isExist } from '@fexd/tools'
+import { message } from 'antd'
+import { classnames, run, isNumber, delay, isArray, isObject, intersection, isExist, isFunction } from '@fexd/tools'
 
-import { useRequest, useGetState, useMemoizedFn, useLatest, useSafeState } from 'ahooks'
+import { useGetState, useMemoizedFn, useLatest, useSafeState } from 'ahooks'
 import { Result } from 'ahooks/es/useRequest/src/types'
 import 'ahooks/es/useRequest/src/types'
 
-import { catchPromise, useProState, Hook } from '@fexd/pro-utils'
+import { catchPromise, useProState, Hook, useRequest } from '@fexd/pro-utils'
 import { ProFieldValueTypes, ProForm } from '@fexd/pro-form'
 
 import useValueTypePlugin from '../valueType'
@@ -18,28 +18,30 @@ import QueryFieldForm from './QueryField'
 import usePersistForm from './usePersistForm'
 import usePaginationParams from './usePaginationParams'
 import handleAsyncActionResponse from '../actions/handleAsyncActionResponse'
+import useMockDataSource from './useMockDataSource'
 
 export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
   const { types } = useValueTypePlugin(() => [])
   const {
-    pure = false,
+    pure,
     queryWrapperStyle = pure ? { padding: 0 } : {},
-    queryFieldFilterEmptyParam = false,
-    queryFieldTriggerOnEnter = true,
+    queryFieldFilterEmptyParam,
+    queryFieldTriggerOnEnter,
     onQuery,
     pagination,
-    defaultPaginationParams = {},
-    initialPaginationParams = {},
-    queryFieldLayout = 'vertical',
-    defaultPageSize = 10,
-    queryFieldServiceOptions = {},
+    defaultPaginationParams,
+    initialPaginationParams,
+    queryFieldLayout,
+    defaultPageSize,
+    queryFieldServiceOptions,
     manualQuery,
-    normalizeFieldValue = true,
+    normalizeFieldValue,
     rowSelection,
-    rowKey = 'id',
+    rowKey,
     dataSource: propDataSource,
+    mockDataSource: needMockDataSource,
   } = props
-  const [form] = Form.useForm()
+  const [form] = ProForm.useForm()
   const persistFormProState = usePersistForm(form)
   const [selectedItems, setSelectedItems, getSelectedItems] = useGetState<any[]>([])
   const {
@@ -102,9 +104,28 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
       extraParams: currentExtraParams,
     }
   })
+  const { mockDataSource, updateMockDataSource, createMockDataSource } = useMockDataSource()
   const innerService = useRequest(
     async (params = {}, extra = {}) => {
       const { params: currentParams, extraParams: currentExtraParams } = getQueryParams(params, extra)
+
+      if (!isFunction(onQuery) && needMockDataSource !== false) {
+        queryingParamsRef.current = { ...currentParams }
+        queryingExtraParamsRef.current = { ...currentExtraParams }
+
+        const { page, pageSize } = currentParams as any
+
+        const mockDataSource = updateMockDataSource()
+
+        return {
+          success: true,
+          data: [page, pageSize].every(isNumber)
+            ? mockDataSource.slice((page - 1) * pageSize, page * pageSize)
+            : mockDataSource,
+          total: mockDataSource?.length,
+        }
+      }
+
       const response = await run<any>(onQuery, undefined, currentParams, currentExtraParams)
 
       const success = response?.success ?? true
@@ -275,6 +296,9 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
       service: queryService,
       loading: queryService.loading,
       dataSource,
+      mockDataSource,
+      createMockDataSource,
+      updateMockDataSource,
       paginationParams,
       setPaginationParams,
       getPaginationParams,
@@ -291,6 +315,7 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
       isSearched,
       normalizeFormValues,
       getQueryParams,
+      proFormRef,
     }),
     [
       hasQueryFields,
@@ -299,6 +324,9 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
       queryService,
       queryService.loading,
       dataSource,
+      mockDataSource,
+      createMockDataSource,
+      updateMockDataSource,
       paginationParams,
       setPaginationParams,
       getPaginationParams,

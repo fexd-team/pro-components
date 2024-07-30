@@ -17,15 +17,47 @@ order: 2
 
 插件之间，通过类似 hox 的机制实现了上下文共享，可相互调用彼此
 
+## 使用 `controller` 内部常用方法
+
+可以通过 `useProTableController` 或者 `ProTable.useController` 使用内部插件的常用方法
+
+```jsx | pure
+import { ProTable, useProTableController } from '@fexd/pro-components'
+
+export default () => {
+  const controller = useProTableController() // 或者使用 ProTable.useController()
+
+  useEffect(() => {
+    controller.refresh() // 刷新请求（携带当前参数）
+    controller.search() // 触发搜索，可指定参数
+    controller.getDataSource() // 获取内部数据集
+    controller.setPaginationParams() // 设置分页参数
+    controller.getPaginationParams() // 获取分页参数（穿透闭包）
+    controller.setSelectedItems() // 设置多选项
+    controller.getSelectedItems() // 获取多选项（穿透闭包）
+    controller.getQueryingParams() // 获取当前使用中的查询参数
+    controller.getQueryingExtraParams() // 获取当前使用中的额外的查询参数，如表格的排序、筛选参数等
+    controller.setExtraParams() // 设置额外参数，如表格的排序、筛选参数等，好像也可以塞一些其他的数据
+    controller.showModal() // 命令式唤起弹窗，默认绑定了内部
+    controller.showDrawer() // 命令式唤起抽屉，默认绑定了内部
+    controller.confirmPromise() // 命令式确认交互（返回
+    controller.showAddModal() // 展示新增弹窗
+    controller.showEditModal() // 展示编辑弹窗
+  }, [])
+
+  return <ProTable ref={controller.ref} />
+}
+```
+
 ## 访问内部插件
 
-可以通过 `useProTableRef` 访问到内部各个插件，具体内部方法文档可参考下方，暂时可通过 `TS` 提示查看
+可以通过 `useProTableRef` 或者 `ProTable.useRef` 访问到内部各个插件，具体内部方法文档可参考下方，暂时可通过 `TS` 提示查看
 
 ```jsx | pure
 import { ProTable, useProTableRef } from '@fexd/pro-components'
 
 export default () => {
-  const proTableRef = useProTableRef()
+  const proTableRef = useProTableRef() // 或者使用 ProTable.useRef()
 
   useEffect(() => {
     console.log(proTableRef?.current?.config)
@@ -103,7 +135,7 @@ proTableRef?.current?.modal?.showModal // 命令式唤起弹窗，默认绑定�
 proTableRef?.current?.modal?.showDrawer // 命令式唤起抽屉，默认绑定了内部 station
 proTableRef?.current?.modal?.confirmPromise // 命令式确认交互（返回 Promise 格式）
 proTableRef?.current?.modal?.renderStation // 内部方法，勿用
-proTableRef?.current?.modal?.modalStationRef, // modalStation Ref
+proTableRef?.current?.modal?.modalStationRef // modalStation Ref
 ```
 
 ## editField
@@ -115,6 +147,10 @@ proTableRef?.current?.modal?.modalStationRef, // modalStation Ref
 ```jsx | pure
 // 编辑、新增、详情弹窗的 modal 控制器，有 { close, promise, update } 几个方法
 proTableRef?.current?.editField?.modalController
+// 展示新增弹窗
+proTableRef?.current?.editField?.showAddModal
+// 展示编辑弹窗
+proTableRef?.current?.editField?.showEditModal
 ```
 
 ## 自定义插件示例

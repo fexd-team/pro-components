@@ -16,4 +16,6 @@ export * from './useThrottle'
 export { default as useForceUpdate } from './useForceUpdate'
 
 export { default as useLazyRender } from './useLazyRender'
+export { default as useRequest } from './useRequest'
 export * from './useLazyRender'
+export * from './useCoverable'

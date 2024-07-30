@@ -24,69 +24,67 @@ order: 1
  */
 import React from 'react'
 import { Space } from 'antd'
-import { ConfigProvider, ProForm, Action, Tooltip } from '@fexd/pro-components'
+import { ProForm, Action, Tooltip } from '@fexd/pro-components'
 
 export default () => (
-  <ConfigProvider localeKey="zh-CN">
-    <div className="flex gap-6 p-6 bg-gray-100">
-      <div className="p-6 flex-1 bg-white">
-        <h2 className="mb-6">
-          顶对齐{' '}
-          <Tooltip
-            title={
-              <ul className="m-0 p-2 pl-7">
-                <li>适配国际化长文案</li>
-                <li>观感整齐、舒适</li>
-              </ul>
-            }
-            config={{
-              color: '#87d068',
-            }}
-            className="text-base"
-          >
-            ✔️
-          </Tooltip>
-        </h2>
-        <ProForm
-          gridColumns={1}
-          fields={[
-            { label: '长标签', name: 'test1' },
-            { label: '标签', name: 'test2' },
-          ]}
-        />
-      </div>
-      <div className="p-6 flex-1 bg-white">
-        <h2 className="mb-6">右对齐</h2>
-        <ProForm
-          gridColumns={1}
-          fields={[
-            { label: '长标签', name: 'test1' },
-            { label: '标签', name: 'test2' },
-            { label: '标签', name: 'test3' },
-          ]}
-          layout="horizontal"
-          colon={false}
-          labelCol={{ span: 5 }}
-          labelAlign="right"
-        />
-      </div>
-      <div className="p-6 flex-1 bg-white">
-        <h2 className="mb-6">左对齐</h2>
-        <ProForm
-          gridColumns={1}
-          fields={[
-            { label: '长标签', name: 'test1' },
-            { label: '标签', name: 'test2' },
-            { label: '标签', name: 'test3' },
-          ]}
-          layout="horizontal"
-          colon={false}
-          labelCol={{ span: 5 }}
-          labelAlign="left"
-        />
-      </div>
+  <div className="flex gap-6 p-6 bg-gray-100">
+    <div className="p-6 flex-1 bg-white">
+      <h2 className="mb-6">
+        顶对齐{' '}
+        <Tooltip
+          title={
+            <ul className="m-0 p-2 pl-7">
+              <li>适配国际化长文案</li>
+              <li>观感整齐、舒适</li>
+            </ul>
+          }
+          config={{
+            color: '#87d068',
+          }}
+          className="text-base"
+        >
+          ✔️
+        </Tooltip>
+      </h2>
+      <ProForm
+        gridColumns={1}
+        fields={[
+          { label: '长标签', name: 'test1' },
+          { label: '标签', name: 'test2' },
+        ]}
+      />
     </div>
-  </ConfigProvider>
+    <div className="p-6 flex-1 bg-white">
+      <h2 className="mb-6">右对齐</h2>
+      <ProForm
+        gridColumns={1}
+        fields={[
+          { label: '长标签', name: 'test1' },
+          { label: '标签', name: 'test2' },
+          { label: '标签', name: 'test3' },
+        ]}
+        layout="horizontal"
+        colon={false}
+        labelCol={{ span: 5 }}
+        labelAlign="right"
+      />
+    </div>
+    <div className="p-6 flex-1 bg-white">
+      <h2 className="mb-6">左对齐</h2>
+      <ProForm
+        gridColumns={1}
+        fields={[
+          { label: '长标签', name: 'test1' },
+          { label: '标签', name: 'test2' },
+          { label: '标签', name: 'test3' },
+        ]}
+        layout="horizontal"
+        colon={false}
+        labelCol={{ span: 5 }}
+        labelAlign="left"
+      />
+    </div>
+  </div>
 )
 ```
 

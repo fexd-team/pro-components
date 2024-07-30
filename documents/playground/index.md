@@ -12,4 +12,6 @@ contentMaxWidth: 100%
 
 <code src="./playground.tsx"></code>
 
-<!-- <code src="./test/index.tsx"></code> -->
+<!-- <code src="./initialFiles/App.tsx"></code> -->
+
+<!-- <code src="./test/useCoverable.tsx"></code> -->

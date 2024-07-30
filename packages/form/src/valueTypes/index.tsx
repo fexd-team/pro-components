@@ -28,7 +28,10 @@ const mergedBuiltInTypes: typeof type_input_box &
   ...type_other,
 }
 
+// window.mergedBuiltInTypes = mergedBuiltInTypes
+
 export type BuiltInValueTypeKeys = keyof typeof mergedBuiltInTypes
+// export enum BuiltInValueTypeKeyEnum = BuiltInValueTypeKeys
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 interface ValueTypes extends Record<BuiltInValueTypeKeys, ProFormValueTypeMapConfig> {
@@ -52,10 +55,13 @@ const valueTypes = Object.fromEntries(
 ) as ValueTypes
 
 export const valueTypeEventBus = new EventBus()
-export function useUpdateAfterValueTypeAdd() {
+export function useUpdateAfterValueTypeAdd(avalid = true) {
   const update = useUpdate()
 
   useEffect(() => {
+    if (!avalid) {
+      return
+    }
     const listener = () => {
       update()
     }
@@ -64,7 +70,7 @@ export function useUpdateAfterValueTypeAdd() {
     return () => {
       valueTypeEventBus.off('add', listener)
     }
-  }, [])
+  }, [avalid])
 }
 
 export function registerValueType(key: string, config: ProFormValueTypeMapConfig) {

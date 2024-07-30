@@ -1,9 +1,3 @@
-export default function obj2formdata(obj: any) {
-  const formData = new FormData()
+import { obj2formdata } from '@fexd/tools'
 
-  Object.entries(obj).forEach(([key, value]: any) => {
-    formData.append(key, value)
-  })
-
-  return formData
-}
+export default obj2formdata

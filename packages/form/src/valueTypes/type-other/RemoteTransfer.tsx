@@ -22,6 +22,9 @@ export default function RemoteTransfer({ options: propOptions, ...props }: Trans
         locale={{
           searchPlaceholder: t('form.searchHere'),
         }}
+        listStyle={{
+          height: 266,
+        }}
         {...props}
         dataSource={options.map((item: any) => ({
           ...item,

@@ -14,6 +14,7 @@ export default {
   },
   queryField: {
     query: 'Auery',
+    refresh: 'Segar Semula',
     reset: 'Tetap Semula',
     fold: 'Stow',
     more: 'lebih',

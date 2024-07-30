@@ -8,6 +8,7 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosRequestTransformer,
   AxiosRequestHeaders,
+  CreateAxiosDefaults,
 } from 'axios'
 import {
   setupCache,
@@ -15,11 +16,18 @@ import {
   CacheAxiosResponse as AxiosResponse,
   CacheRequestConfig,
   InternalCacheRequestConfig,
+  CacheOptions,
+  defaultRequestInterceptor,
+  AxiosCacheInstance,
 } from 'axios-cache-interceptor'
 import { qs, isString, isObject, isArray, isExist, isFunction, run } from '@fexd/tools'
+// import { useCoverable, CoverableValue } from 'react-coverable'
+import { useCoverable, CoverableValue } from '../hooks/useCoverable'
+import { DeepPartial, Optional, DeepRequired } from 'utility-types'
 
 import catchPromise from './catchPromise'
 import deepMerge from './deepMerge'
+import { DeepPartialObject } from './type-tools'
 
 type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> & CacheRequestConfig<T>
 
@@ -104,28 +112,58 @@ export const builtInRequestConfig = {
   }) as AxiosRequestTransformer,
 }
 
-const request = setupCache(
-  axios.create({
-    timeout: 60 * 1000,
-    // @ts-ignore
-    transformRequest: [(...args: any[]) => builtInRequestConfig?.transformRequest?.(...args)],
-  }),
-  {
-    ttl: 0,
-    interpretHeader: false,
-  },
-) as ServerRequest
+const getCacheRequestInterceptor = (axios: AxiosCacheInstance) => {
+  const defaultRequestInterceptorResult = defaultRequestInterceptor(axios)
+  const onFulfilled = ((config, ...args) => {
+    if (!isExist(config?.cache) || (config?.cache as any)?.ttl <= 0) {
+      config.cache = false
+    }
+
+    return defaultRequestInterceptorResult.onFulfilled(config, ...args)
+  }) as typeof defaultRequestInterceptorResult.onFulfilled
+  const apply = (() => axios.interceptors.request.use(onFulfilled)) as typeof defaultRequestInterceptorResult.apply
+
+  return {
+    ...defaultRequestInterceptorResult,
+    onFulfilled,
+    apply,
+  }
+}
+
+const rawRequest = axios.create({
+  timeout: 60 * 1000,
+  // @ts-ignore
+  transformRequest: [(...args: any[]) => builtInRequestConfig?.transformRequest?.(...args)],
+})
+
+const defaultCacheOptions: CacheOptions = {
+  ttl: -1,
+  interpretHeader: false,
+  methods: ['get', 'post', 'head'],
+}
+
+const request = setupCache(rawRequest, {
+  requestInterceptor: getCacheRequestInterceptor(rawRequest as AxiosCacheInstance),
+  ...defaultCacheOptions,
+}) as ServerRequest
 
 export default request
 
 export const cloneAxiosInstance = <NR extends Record<string, any> = ServerResponse>(
   request: ServerRequest<NR>,
-  { keepInterceptors = true } = {},
+  {
+    keepInterceptors = true,
+    cloneOptions = {},
+    cacheSetupOptions = defaultCacheOptions,
+  }: { keepInterceptors?: boolean; cloneOptions?: CreateAxiosDefaults; cacheSetupOptions?: CacheOptions } = {},
 ) => {
-  const rawClonedRequest = request.create()
+  const rawClonedRequest = request.create(cloneOptions)
   // @ts-ignore
   rawClonedRequest.defaults.cache = undefined
-  const clonedRequest = setupCache(rawClonedRequest, { ttl: 0, interpretHeader: false }) as ServerRequest<NR>
+  const clonedRequest = setupCache(rawClonedRequest, {
+    requestInterceptor: getCacheRequestInterceptor(rawClonedRequest as AxiosCacheInstance),
+    ...cacheSetupOptions,
+  }) as ServerRequest<NR>
 
   if (keepInterceptors) {
     // @ts-ignore
@@ -146,6 +184,10 @@ export const cloneAxiosInstance = <NR extends Record<string, any> = ServerRespon
 
 request.clone = cloneAxiosInstance.bind(null, request) as any
 request.define = defineApi as any
+request.coverable = coverable as any
+request.setConfig = (config: CreateAxiosDefaults<any>) => {
+  Object.assign(request.defaults, config)
+}
 
 request.interceptors.response.use(
   (response, ...args) => builtInRequestConfig?.responseInterceptors?.onFulfilled!?.(response, ...args) ?? response,
@@ -171,6 +213,8 @@ export type ServerRequest<R extends Record<string, any> = ServerResponse> = {
   clone<NR extends Record<string, any> = R>(config?: Parameters<typeof cloneAxiosInstance>['1']): ServerRequest<NR>
   create<NR extends Record<string, any> = R>(...args: Parameters<typeof axios.create>): ServerRequest<NR>
   define<T extends DefineApiConfig<R>>(config: T): DefinedApi<R, T>
+  coverable: typeof coverable
+  setConfig(config: AxiosRequestConfig<any>): void
   <T = R>(config: AxiosRequestConfig<any>): Promise<BuiltInServerResponse<T, R>>
   <T = R>(url: string, config?: AxiosRequestConfig<any>): Promise<BuiltInServerResponse<T, R>>
   request<T = R>(config: AxiosRequestConfig<any>): Promise<BuiltInServerResponse<T, R>>
@@ -236,6 +280,7 @@ export type DefinedApi<
     override: <OT extends DefineApiConfig>(
       config: OT,
     ) => DefinedApi<
+      R,
       Omit<OT & T, 'handleParams' | 'handleResponse'> & {
         handleParams: OT extends { handleParams: (...args: any) => any } ? OT['handleParams'] : T['handleParams']
         handleResponse: OT extends { handleResponse: (...args: any) => any }
@@ -276,11 +321,12 @@ async function runApi(apiConfig: any, ...restArgs: any[]) {
     params,
   )
   const requestConfig = {
+    url,
     ...restConfig,
     ...(isObject(overrideConfig) ? overrideConfig : {}),
   }
   const rawResponse = await request!?.[method as 'post']?.(
-    url,
+    requestConfig?.url ?? url,
     isGetMethod
       ? {
           ...(isObject(params?.params) ? params : { params }),
@@ -348,7 +394,7 @@ function overrideApi(paramRawConfig: DefinedApi, paramOverrideConfig: DefineApiC
 }
 
 export function defineApi<T extends DefineApiConfig>({ ...config }: T) {
-  const rawConfig = config as DefinedApi<T>
+  const rawConfig = config as DefinedApi<ServerResponse, T>
   rawConfig.requestInstance = rawConfig.requestInstance ?? request
   // @ts-ignore
   rawConfig.__isDefinedApi = true
@@ -362,11 +408,41 @@ export function defineApi<T extends DefineApiConfig>({ ...config }: T) {
   config.__rawConfig = rawConfig
 
   Object.assign(config, rawConfig)
-  return config as DefinedApi<T>
+  return config as DefinedApi<ServerResponse, T>
+}
+
+type DefinedApiConfig<T extends DefinedApi> =
+  | ((
+      ...params: T extends { handleParams: (...args: any) => any } ? Parameters<T['handleParams']> : any[]
+    ) => T extends { handleResponse: (...args: any) => any }
+      ?
+          | (void | DeepPartialObject<ReturnType<T['handleResponse']>>)
+          | Promise<void | DeepPartialObject<ReturnType<T['handleResponse']>>>
+      : (void | Optional<ServerResponse<any>>) | Promise<void | Optional<ServerResponse<any>>>)
+  | DeepPartialObject<T>
+
+// @ts-ignore
+export function coverable<T extends DefinedApi<ServerResponse, any> | DefineApiConfig>(
+  apiConfig: T | DefineApiConfig,
+): T extends DefinedApi<ServerResponse, any>
+  ? CoverableValue<T, DefinedApiConfig<T>>
+  : T extends DefineApiConfig
+    ? // @ts-ignore
+      CoverableValue<DefinedApi<ServerResponse, T>, DefinedApiConfig<DefinedApi<ServerResponse, T>>>
+    : never {
+  const api = isFunction(apiConfig) ? apiConfig : defineApi(apiConfig)
+
+  return useCoverable.value({
+    default: api,
+    config: {},
+    onCovered: (current: any, next) => {
+      return current.override(next as any)
+    },
+  }) as any
 }
 
 // type TT = {
-//   url: string
+//   url: <string></string>
 //   method: string
 //   handleParams: (params: any) => any
 //   handleResponse: (

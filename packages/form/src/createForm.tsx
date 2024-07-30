@@ -1,16 +1,21 @@
 import React from 'react'
-import { FormInstance } from 'antd'
 import { NamePath, InternalNamePath } from 'antd/es/form/interface'
 import { getFieldId, toArray } from 'antd/es/form/util'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { FormStore } from 'rc-field-form/es/useForm'
+import { InternalFormInstance } from 'rc-field-form/es/interface'
+
+import { ProFormInstance } from './types'
+import { validateFormGroups } from './useForm'
 
 function toNamePathStr(name: NamePath) {
   const namePath = toArray(name)
   return namePath.join('_')
 }
 
-export default function createForm<T = any>(form?: FormInstance<T>): FormInstance<T> {
+export default function createForm<T = any>(
+  form?: ProFormInstance<T> & InternalFormInstance,
+): ProFormInstance<T> & InternalFormInstance {
   if (form) {
     return form
   }
@@ -45,13 +50,14 @@ export default function createForm<T = any>(form?: FormInstance<T>): FormInstanc
           scrollMode: 'if-needed',
           block: 'nearest',
           ...options,
-        })
+        } as any)
       }
     },
     getFieldInstance: (name: NamePath) => {
       const namePathStr = toNamePathStr(name)
       return itemsRef.current[namePathStr]
     },
+    validateGroups: (groups: string[]) => validateFormGroups(rcForm, groups),
   }
 
   return wrapForm

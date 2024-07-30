@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { FormInstance } from 'antd'
-import { createForm, ProFieldValueTypes } from '@fexd/pro-form'
+import { createForm, ProFieldValueTypes, ProFormInstance } from '@fexd/pro-form'
 import { run, set, EventBus } from '@fexd/tools'
 import { useSafeState, useMemoizedFn } from 'ahooks'
 
@@ -22,7 +21,7 @@ export default function useEditableRow() {
     const form = itemFormsRef.current?.[rowKey] ?? createForm()
     itemFormsRef.current[rowKey] = form
 
-    return form as FormInstance<any>
+    return form as ProFormInstance<any>
   })
 
   const isEditable = useMemoizedFn((rowKey: any) => !!editableRowKeyRef.current?.[rowKey])

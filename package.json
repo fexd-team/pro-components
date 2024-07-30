@@ -29,13 +29,15 @@
     "unpublish": "node ./scripts/unpublish",
     "link:project": "node ./scripts/symlink",
     "size": "node ./scripts/size/index.js",
-    "new:component": "node ./scripts/new-component/index.js"
+    "new:component": "node ./scripts/new-component/index.js",
+    "patch": "patch-package code-kitchen --use-yarn --patch-dir ./scripts/patches",
+    "postinstall": "patch-package --patch-dir ./scripts/patches"
   },
   "devDependencies": {
     "@cjy0208/import-cost": "^2.2.1",
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",
-    "@fexd/tools": "^0.1.0",
+    "@fexd/tools": "^0.1.6",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^7.0.0",
@@ -61,6 +63,7 @@
     "lint-staged": "^10.0.7",
     "ora": "^5.1.0",
     "particles-bg": "^2.5.5",
+    "patch-package": "^6.4.7",
     "prettier": "^3.1.0",
     "qrcode.react": "^1.0.1",
     "react": "^16.8.0",

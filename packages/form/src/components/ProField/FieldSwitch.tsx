@@ -1,20 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { memo, useEffect, useMemo, useRef } from 'react'
+import React, { Fragment, memo, useState } from 'react'
 import { useUpdate, useUpdateEffect } from 'ahooks'
-import { isString, isExist, run } from '@fexd/tools'
+import { isString, isExist, run, random } from '@fexd/tools'
 import { Form, FormInstance } from 'antd'
 
 import { ProFieldValueFieldType } from '../../types'
-import EditableField from './EditableField'
-import ReadonlyField from './ReadonlyField'
+import EditableField, { useEditableField } from './EditableField'
+import ReadonlyField, { useReadonlyField } from './ReadonlyField'
+import { useUpdateAfterValueTypeAdd } from '../../valueTypes'
 import FormItem from '../FormItem'
 
 const genFieldKey = (field: ProFieldValueFieldType) =>
   isString(field?.key) ? `${field?.key}:${field?.type}` : field?.key ?? field?.type
 
-const FieldSwitch = memo(function FieldSwitch(props: ProFieldValueFieldType) {
+const FieldSwitch = memo(function FieldSwitch({
+  legacyRender = false,
+  ...props
+}: ProFieldValueFieldType & { legacyRender?: boolean }) {
   const { mode = 'edit' } = props!
-  const key = genFieldKey(props!)
+  const [randomKey] = useState(() => random(0, 999999))
+  const fieldKey = genFieldKey(props!) ?? '(?)'
+  const key = `pf_${randomKey}_${fieldKey}`
+
   const Field = mode === 'view' ? ReadonlyField : EditableField
   const update = useUpdate()
 
@@ -22,7 +29,15 @@ const FieldSwitch = memo(function FieldSwitch(props: ProFieldValueFieldType) {
     update() // key 变化后多触发一次渲染，修复 rc-field-form 未能及时应用最新值的问题
   }, [key])
 
-  const content = <Field key={key} {...props} />
+  const readonlyFieldNode = useReadonlyField(props)
+  const editableFieldNode = useEditableField(props)
+  useUpdateAfterValueTypeAdd(!legacyRender)
+
+  const content = legacyRender ? (
+    <Field key={key} {...props} />
+  ) : (
+    <Fragment key={key}>{mode === 'view' ? readonlyFieldNode : editableFieldNode}</Fragment>
+  )
 
   // if (props?.name) {
   //   console.log('props?.name', props?.name)
