@@ -43,6 +43,9 @@ export default () => {
     controller.confirmPromise() // 命令式确认交互（返回
     controller.showAddModal() // 展示新增弹窗
     controller.showEditModal() // 展示编辑弹窗
+    controller.getMockDataSource() // 获取模拟数据集
+    controller.createMockDataSource() // 创建模拟数据集
+    controller.updateMockDataSource() // 更新模拟数据集
   }, [])
 
   return <ProTable ref={controller.ref} />

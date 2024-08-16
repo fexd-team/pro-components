@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-form",
-  "version": "0.2.35",
+  "version": "0.2.39",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -22,7 +22,7 @@
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
     "@fexd/pro-provider": "^0.1.12",
-    "@fexd/pro-utils": "^0.2.9",
+    "@fexd/pro-utils": "^0.2.15",
     "@fexd/tools": "^0.1.6",
     "@types/bignumber.js": "^5.0.0",
     "@types/hoist-non-react-statics": "^3.3.1",

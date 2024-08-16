@@ -277,6 +277,7 @@ export type DefinedApi<
     ) => T extends { handleResponse: (...args: any) => any }
       ? Promise<BuiltInServerResponse<R, R> & ReturnType<T['handleResponse']>>
       : Promise<BuiltInServerResponse<R, R>>
+    runWithConfig: (apiConfig: DefineApiConfig, ...restArgs: any[]) => Promise<R>
     override: <OT extends DefineApiConfig>(
       config: OT,
     ) => DefinedApi<
@@ -386,6 +387,11 @@ function overrideApi(paramRawConfig: DefinedApi, paramOverrideConfig: DefineApiC
     overrideConfig.runApi = runApi.bind(null, overrideConfig)
   }
   const tempConfig = { ...overrideConfig }
+  tempConfig.override = overrideApi.bind(null, tempConfig as any)
+  tempConfig.runWithConfig = async (config, ...rest) => {
+    const overridedApi = tempConfig.override(config)
+    return run(overridedApi, undefined, ...rest)
+  }
   tempConfig.requestInstance = request
   overrideConfig = tempConfig.runApi as any
   tempConfig.__rawConfig = tempConfig
@@ -402,6 +408,10 @@ export function defineApi<T extends DefineApiConfig>({ ...config }: T) {
   rawConfig.runApi = runApi.bind(null, rawConfig)
   // @ts-ignore
   rawConfig.override = overrideApi.bind(null, rawConfig as any)
+  rawConfig.runWithConfig = async (config, ...rest) => {
+    const overridedApi = rawConfig.override(config)
+    return run(overridedApi, undefined, ...rest)
+  }
   config = rawConfig.runApi as any
 
   // @ts-ignore

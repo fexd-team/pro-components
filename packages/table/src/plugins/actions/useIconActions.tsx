@@ -10,7 +10,7 @@ import useQueryFieldPlugin from '../queryField'
 import useModalPlugin from '../modal'
 import useConfigPlugin from '../config'
 import QueryFieldForm from '../queryField/QueryField'
-import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInIconActionNames } from '../../types'
+import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInIconActionNames } from './types'
 import Actions from './Actions'
 import Action from '../actions/Action'
 
@@ -93,11 +93,6 @@ export default function useIconActions(): {
   const [iconActions, setIconActions] = useSetState<Record<string, ProTableBuiltInActionType>>({
     refresh: <RefreshButton key="icon-refresh" />,
     search: <QueryButton key="icon-query" />,
-    settings: {
-      key: 'icon-settings',
-      icon: <SettingOutlined />,
-      onClick: () => message.info('还没做'),
-    },
     ...(builtInActions?.iconActions ?? {}),
   } as Record<string, ProTableBuiltInActionType>)
   const latestIconActions = useLatest(iconActions)

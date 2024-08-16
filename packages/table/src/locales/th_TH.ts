@@ -35,6 +35,7 @@ export default {
     save: 'บันทึก',
     cancel: 'ยกเลิก',
     cancelConfirm: 'คุณแน่ใจว่าต้องการยกเลิกหรือไม่?',
+    columnSetting: 'ตั้งค่าคอลัมน์',
     density: 'ความหนาแน่นของตาราง',
     densityLarger: 'ห่างกัน',
     densityMiddle: 'ปกติ',

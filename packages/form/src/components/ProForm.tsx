@@ -58,6 +58,8 @@ import {
 } from '../types'
 import types from '../valueTypes'
 import defineCoverableProps from '../defineCoverableProps'
+import useCoverableProps from '../useCoverableProps'
+import coloringOptions from '../coloringOptions'
 
 const CoreProForm = memo(
   forwardRef(function ProForm(
@@ -635,6 +637,8 @@ interface ProFormType extends CoreProFormType {
   createForm: typeof createForm
   defaultProps: ProFormProps
   defineCoverableProps: typeof defineCoverableProps
+  useCoverableProps: typeof useCoverableProps
+  coloringOptions: typeof coloringOptions
 }
 
 interface ProFormType extends Omit<FormType, 'useForm'> {
@@ -650,6 +654,8 @@ Object.assign(ProForm, {
   createForm,
   useForm,
   defineCoverableProps,
+  useCoverableProps,
+  coloringOptions,
 })
 
 ProForm.defaultProps = {

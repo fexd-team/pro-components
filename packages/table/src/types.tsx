@@ -38,4 +38,5 @@ export interface ProTableProps<R = any> extends ProTablePluginConfig<R> {}
 export interface ProTableProps<R = any> {
   rawProps?: ProTableProps<R>
   tableRef?: React.Ref<ProTableBuiltInPlugins> | undefined
+  __EXTRA_PROPS__?: any
 }

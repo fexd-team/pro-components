@@ -72,7 +72,7 @@ type _CoverableConfig<V extends Record<string, [any, any]>, T extends Record<str
   [K in keyof V]?: CoverableObjectConfig<T[K], V[K][0]> | V[K][1]
 }
 
-type CoverableObjectConfig<V, T> = V extends Record<string, any>
+export type CoverableObjectConfig<V, T> = V extends Record<string, any>
   ?
       | Record<keyof V, T>
       | {
@@ -100,9 +100,9 @@ type _CoverableProTablePropsMap = {
 
 type _CoverableProTableProps = _CoverableProps<_CoverableProTablePropsMap>
 
-type CoverableProTableProps = _CoverableProTableProps & Omit<ProTableProps, keyof _CoverableProTablePropsMap>
+export type CoverableProTableProps = _CoverableProTableProps & Omit<ProTableProps, keyof _CoverableProTablePropsMap>
 
 type _CoverableProTableConfig<T extends CoverableProTableProps> = _CoverableConfig<_CoverableProTablePropsMap, T>
 
-type CoverableProTableConfig<T extends CoverableProTableProps> = Omit<T, keyof _CoverableProTablePropsMap> &
+export type CoverableProTableConfig<T extends CoverableProTableProps> = Omit<T, keyof _CoverableProTablePropsMap> &
   (Omit<CoverableProTableProps, keyof _CoverableProTablePropsMap> & _CoverableProTableConfig<T>)

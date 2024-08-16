@@ -3,7 +3,7 @@
 import { delay, isArray, isObject } from '@fexd/tools'
 import { useCoverable, CoverableValue } from '@fexd/pro-utils'
 
-import { ProFormProps, ProFieldValueFieldType } from '../types'
+import { ProFormProps, ProFieldValueFieldType } from './types'
 
 export default function defineCoverableProps<T extends CoverableProFormProps>(
   value: T & CoverableProFormProps,
@@ -67,9 +67,9 @@ type _CoverableProFormPropsMap = {
 
 type _CoverableProFormProps = _CoverableProps<_CoverableProFormPropsMap>
 
-type CoverableProFormProps = _CoverableProFormProps & Omit<ProFormProps, keyof _CoverableProFormPropsMap>
+export type CoverableProFormProps = _CoverableProFormProps & Omit<ProFormProps, keyof _CoverableProFormPropsMap>
 
 type _CoverableProFormConfig<T extends CoverableProFormProps> = _CoverableConfig<_CoverableProFormPropsMap, T>
 
-type CoverableProFormConfig<T extends CoverableProFormProps> = Omit<T, keyof _CoverableProFormPropsMap> &
+export type CoverableProFormConfig<T extends CoverableProFormProps> = Omit<T, keyof _CoverableProFormPropsMap> &
   (Omit<CoverableProFormProps, keyof _CoverableProFormPropsMap> & _CoverableProFormConfig<T>)

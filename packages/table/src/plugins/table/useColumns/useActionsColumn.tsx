@@ -113,7 +113,7 @@ export default function useActionsColumn({
           }, 300)
 
           editableRowController.setRowEditable(key, false)
-          return true
+          return
         },
       }),
       'table-edit-cancel': (record: any) => ({

@@ -97,6 +97,7 @@ export default function useProps<T = ProTablePropsContext>(): T {
     selectable,
     rowSelection,
     columns,
+    id,
   } = (props ?? {}) as ProTableProps
   const dynamicProps: ProTableProps = {
     mini,
@@ -124,6 +125,8 @@ export default function useProps<T = ProTablePropsContext>(): T {
     renderModalAddFields: props?.renderModalEditFields,
     addFieldFormProps: props?.editFieldFormProps,
     viewFieldFormProps: props?.editFieldFormProps,
+    queryFieldPersistKey: id,
+    columnSettingPersistType: 'localStorage',
     queryFieldPersistPaginationParams: !!props?.queryFieldPersistKey,
     queryFieldPersistForm: !!props?.queryFieldPersistKey,
     batchActions: props?.multipleActions ?? [],

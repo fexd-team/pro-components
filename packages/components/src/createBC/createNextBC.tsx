@@ -56,7 +56,9 @@ export default function createNextBC<Props extends object, CProps extends object
 ) {
   type BCProps = ConfigurableProps<() => CProps> & Props
 
-  const Comp: React.FC<BCProps> = React.memo(
+  const Comp: React.FC<BCProps> & {
+    propTypes: BCProps
+  } = React.memo(
     React.forwardRef((props: BCProps, forwardRef) => (
       <propsContext.Provider value={props}>
         <Hook>

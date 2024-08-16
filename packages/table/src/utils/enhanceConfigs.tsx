@@ -5,6 +5,7 @@ import { ProTableEditFieldType, ProTableQueryFieldType, ProTableColumnType, ProT
 import { DefinedProTableColumns, DefinedProTableFields } from './enhanceConfigs.types'
 
 export { default as defineCoverableProps } from './defineCoverableProps'
+export { default as useCoverableProps } from './useCoverableProps'
 
 export const extendColumn = (
   columnValue: any, // ProTableColumnType | ((...args: any[]) => ProTableColumnType),

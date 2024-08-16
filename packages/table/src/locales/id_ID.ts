@@ -35,6 +35,7 @@ export default {
     save: 'Save',
     cancel: 'Batalkan',
     cancelConfirm: 'Apakah Anda yakin untuk membatalkan?',
+    columnSetting: 'Pengaturan kolom',
     density: 'Kepadatan tabel',
     densityLarger: 'Lebih besar',
     densityMiddle: 'Tengah',

@@ -6,7 +6,7 @@ import { SetState } from 'ahooks/es/useSetState'
 
 import { useProps } from '../../utils'
 import useQueryFieldPlugin from '../queryField'
-import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInColumnActionNames } from '../../types'
+import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInColumnActionNames } from './types'
 import { I18nText } from '../config'
 import Actions, { getActionNodes } from './Actions'
 import Action from '../actions/Action'

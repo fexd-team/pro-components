@@ -35,6 +35,7 @@ export default {
     save: 'Penyimpanan',
     cancel: 'Batalkan',
     cancelConfirm: 'Adakah anda pasti untuk membatalkan?',
+    columnSetting: 'Tetapan Kolom',
     density: 'Densitas Jadual',
     densityLarger: 'Mudah',
     densityMiddle: 'Normal',

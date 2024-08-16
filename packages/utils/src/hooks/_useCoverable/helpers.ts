@@ -1,6 +1,7 @@
 import { isArray, isObject, run } from '@fexd/tools'
 import React, { isValidElement, useCallback, useMemo, useRef, useState } from 'react'
-import lodashCloneDeep from 'lodash/cloneDeep'
+import lodashCloneDeepWith from 'lodash/cloneDeepWith'
+// import lodashCloneDeep from 'lodash/cloneDeep'
 
 export function deepItemFilter(item) {
   if (isArray(item)) {
@@ -25,6 +26,10 @@ export function deepMap<T>(
   ) => [true, item],
   keyPath: (string | number)[] = [],
 ): T {
+  if (!deepItemFilter(input)) {
+    return input
+  }
+
   if (Array.isArray(input)) {
     const newArray: any[] = []
     for (let i = 0; i < input.length; i++) {
@@ -84,11 +89,11 @@ export const builtInMerge = (obj1: any, obj2: any, filter: (value: any, key: str
   deepMerge(obj1, obj2, filter)
 
 export function cloneDeep<T>(value: T): T {
-  if (React.isValidElement(value)) {
-    return React.cloneElement(value) as T
-  }
-
-  return lodashCloneDeep(value) as T
+  return lodashCloneDeepWith(value, (value) => {
+    if (React.isValidElement(value)) {
+      return React.cloneElement(value) as T
+    }
+  }) as T
 }
 
 export const useUpdate = () => {

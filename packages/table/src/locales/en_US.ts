@@ -35,6 +35,7 @@ export default {
     save: 'Save',
     cancel: 'Cancel',
     cancelConfirm: 'Are you sure to cancel?',
+    columnSetting: 'Column setting',
     density: 'Table density',
     densityLarger: 'Larger',
     densityMiddle: 'Middle',

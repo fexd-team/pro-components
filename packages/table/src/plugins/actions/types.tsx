@@ -32,7 +32,7 @@ export type ProTableBuiltInActionNames = 'add'
 
 export type ProTableBuiltInColumnActionNames = 'view' | 'edit' | 'edit-icon' | 'table-edit'
 
-export type ProTableBuiltInIconActionNames = 'refresh' | 'table-size' | 'fullscreen' // | 'search' | 'setting'
+export type ProTableBuiltInIconActionNames = 'refresh' | 'table-size' | 'fullscreen' | 'search' | 'settings'
 
 export type ProTableBuiltInBatchActionNames = 'delete'
 

@@ -6,7 +6,7 @@ import { SetState } from 'ahooks/es/useSetState'
 
 import { useProps } from '../../utils'
 import useQueryFieldPlugin from '../queryField'
-import { ProTableBuiltInActionType, ProTableTableActionType, BuiltInBatchActionNames } from '../../types'
+import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInBatchActionNames } from './types'
 import useConfigPlugin, { I18nText } from '../config'
 import Actions from './Actions'
 import Action from '../actions/Action'
@@ -14,7 +14,7 @@ import Action from '../actions/Action'
 // 多选动作
 export default function useBatchActions(): {
   batchActions: Record<string, ProTableBuiltInActionType>
-  batchActionConfigs: ProTableTableActionType<BuiltInBatchActionNames>[]
+  batchActionConfigs: ProTableTableActionType<ProTableBuiltInBatchActionNames>[]
   setBatchActions: SetState<Record<string, ProTableBuiltInActionType>>
   renderBatchActions: () => JSX.Element
 } {
@@ -80,7 +80,9 @@ export default function useBatchActions(): {
       () =>
         (batchActionConfigs ?? [])
           .filter(Boolean)
-          .filter((action) => (action as any)?.hidden !== false) as ProTableTableActionType<BuiltInBatchActionNames>[],
+          .filter(
+            (action) => (action as any)?.hidden !== false,
+          ) as ProTableTableActionType<ProTableBuiltInBatchActionNames>[],
       [batchActionConfigs],
     ),
     setBatchActions,

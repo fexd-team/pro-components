@@ -2,7 +2,7 @@ import { get, isFunction, run } from '@fexd/tools'
 import React, { forwardRef, useMemo, useRef } from 'react'
 // import ReactDOM from 'react-dom/server'
 
-import { deepMap, useMemoizedFn, useUpdate } from './helpers'
+import { deepItemFilter, deepMap, useMemoizedFn, useUpdate } from './helpers'
 import { CoverableMark, CoverableProps, DefaultCoverableConfig } from './types'
 
 export default function createComponent<Props extends Record<string, any> & { coverable?: never }, Ref, T>(
@@ -25,19 +25,19 @@ export default function createComponent<Props extends Record<string, any> & { co
   const Comp = React.memo(
     forwardRef(({ coverable: getCoverableProps, ...props }: any, ref: any) => {
       const triggerRender = useUpdate()
-      const updateKeyPathMapRef = useRef<any>([])
-      const getCoverableConfigRef = useRef<any>(() => null)
+      const updateKeyPathMapRef = useRef<any>({})
+      // const getCoverableConfigRef = useRef<any>(() => null)
       const getDefaultCoverableConfigRef = useRef<any>(() => null)
       const updateConfig = useMemoizedFn(() => {
         const defaultCoverableConfig = run(getDefaultCoverableConfigRef.current)
-        const fullCoverableConfig = run(getCoverableConfigRef.current)
-        if ([defaultCoverableConfig, fullCoverableConfig].includes(null)) {
+        // const fullCoverableConfig = run(getCoverableConfigRef.current)
+        if ([defaultCoverableConfig].includes(null)) {
           return
         }
         const coverableProps = run(getCoverableProps, undefined, defaultCoverableConfig)
 
-        updateKeyPathMapRef.current.map((keyPath) => {
-          const coverableConfig = keyPath?.length === 0 ? fullCoverableConfig : get(fullCoverableConfig, keyPath)
+        Object.entries(updateKeyPathMapRef.current).map(([key, [coverableConfig, keyPath]]: any) => {
+          // const coverableConfig = keyPath?.length === 0 ? fullCoverableConfig : get(fullCoverableConfig, keyPath)
 
           const overrideConfig = get(coverableProps, keyPath)
           if (overrideConfig) {
@@ -49,27 +49,37 @@ export default function createComponent<Props extends Record<string, any> & { co
       const { content, coverableConfig, getDefaultCoverableConfig } = useContent(props as Props, ref)
 
       useMemo(() => {
-        let isConfigReaded = false
-        deepMap(coverableConfig, (item, key, keyPath) => {
-          if (key && item?.__isCoverableProps) {
-            updateKeyPathMapRef.current.push(keyPath)
-            if (run(item?.__isConfigReaded)) {
-              isConfigReaded = true
-            }
+        const readUpdateKeyPath = (item, keyPath) => {
+          if (!item?.__isCoverableProps) {
+            return true
           }
 
-          return [true, item]
+          updateKeyPathMapRef.current[keyPath.join('.')] = [item, keyPath]
+
+          const itemUpdateKeyPathMapRef = item?.__getUpdateKeyPathMapRef?.()?.current ?? {}
+          Object.assign(updateKeyPathMapRef.current, itemUpdateKeyPathMapRef)
+          return false
+        }
+        deepMap(coverableConfig, (item, key, keyPath) => {
+          if (!key) {
+            const canContinue = deepItemFilter(item)
+            return [canContinue, item]
+          }
+
+          const canContinue = deepItemFilter(readUpdateKeyPath(item, keyPath))
+          return [canContinue, item]
         })
 
-        if ((coverableConfig as any)?.__isCoverableProps) {
-          updateKeyPathMapRef.current.push([])
-          if (run((coverableConfig as any)?.__isConfigReaded)) {
-            isConfigReaded = true
+        readUpdateKeyPath(coverableConfig, [])
+
+        const isConfigReaded = Object.values(updateKeyPathMapRef.current).some(([item]: any) => {
+          if (run(item?.__isConfigReaded)) {
+            return true
           }
-        }
+          return false
+        })
 
         getDefaultCoverableConfigRef.current = getDefaultCoverableConfig
-        getCoverableConfigRef.current = () => coverableConfig
         updateConfig()
         if (!isFunction(content) || isConfigReaded) {
           triggerRender()

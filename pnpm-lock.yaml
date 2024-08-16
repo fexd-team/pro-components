@@ -129,10 +129,10 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.35
+      '@fexd/pro-form': ^0.2.39
       '@fexd/pro-provider': ^0.1.12
-      '@fexd/pro-table': ^0.5.43
-      '@fexd/pro-utils': ^0.2.10
+      '@fexd/pro-table': ^0.5.49
+      '@fexd/pro-utils': ^0.2.15
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -167,7 +167,7 @@ importers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
       '@fexd/pro-provider': ^0.1.12
-      '@fexd/pro-utils': ^0.2.9
+      '@fexd/pro-utils': ^0.2.15
       '@fexd/tools': ^0.1.6
       '@types/bignumber.js': ^5.0.0
       '@types/hoist-non-react-statics': ^3.3.1
@@ -236,9 +236,9 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.34
+      '@fexd/pro-form': ^0.2.39
       '@fexd/pro-provider': ^0.1.12
-      '@fexd/pro-utils': ^0.2.8
+      '@fexd/pro-utils': ^0.2.15
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -253,6 +253,7 @@ importers:
       react: ^16.8.0
       react-dom: ^16.8.0
       react-resizable: ^3.0.4
+      react-sortable-hoc: ^2.0.0
       utility-types: ^3.10.0
     dependencies:
       '@ant-design/icons': 4.7.0_react-dom@16.14.0+react@16.14.0
@@ -270,6 +271,7 @@ importers:
       hoist-non-react-statics: 3.3.2
       mockjs: 1.1.0
       react-resizable: 3.0.4_react-dom@16.14.0+react@16.14.0
+      react-sortable-hoc: 2.0.0_react-dom@16.14.0+react@16.14.0
       utility-types: 3.10.0
     devDependencies:
       '@types/lodash': 4.14.184
@@ -18063,7 +18065,7 @@ packages:
       react: ^16.3.0 || ^17.0.0
       react-dom: ^16.3.0 || ^17.0.0
     dependencies:
-      '@babel/runtime': 7.18.9
+      '@babel/runtime': 7.21.0
       invariant: 2.2.4
       prop-types: 15.8.1
       react: 16.14.0

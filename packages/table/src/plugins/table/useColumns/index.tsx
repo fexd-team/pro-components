@@ -2,14 +2,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useMemo, isValidElement, useRef } from 'react'
-import { Table, Space, Badge, Tag, Typography, Image, Progress, Avatar, Rate } from 'antd'
-// import { useLatest, useMemoizedFn, useWhyDidYouUpdate } from 'ahooks'
+import { Table, Space, Badge, Tag, Typography, Image, Progress, Avatar, Rate, Checkbox, Divider, Popover } from 'antd'
+import { SettingOutlined, HolderOutlined, CloseOutlined } from '@ant-design/icons'
+import { useMount } from 'ahooks'
 import { isExist, run, isObject, isArray, isFunction, classnames, isString } from '@fexd/tools'
-import { Tooltip, Hook, EllipsisTooltip, useTranslation, useLazyRender, Action, ErrorBoundary } from '@fexd/pro-utils'
-import { ProFieldValueFieldType, ProFieldValueTypes, ProField, CopyButton, ReadonlyProField } from '@fexd/pro-form'
+import {
+  Tooltip,
+  Hook,
+  EllipsisTooltip,
+  useTranslation,
+  useLazyRender,
+  Action,
+  ErrorBoundary,
+  Grid,
+  useProState,
+} from '@fexd/pro-utils'
+import {
+  ProFieldValueFieldType,
+  ProFieldValueTypes,
+  ProField,
+  CopyButton,
+  ReadonlyProField,
+  ProForm,
+} from '@fexd/pro-form'
+import {
+  SortableContainer as sortableContainer,
+  SortableElement as sortableElement,
+  arrayMove,
+} from 'react-sortable-hoc'
 
 import { useProps } from '../../../utils'
+import useActionsPlugin from '../../actions'
+import useModalPlugin from '../../modal'
 import useQueryFieldPlugin from '../../queryField'
+import useConfigPlugin from '../../config'
 import useValueTypePlugin, { getAllFieldFromColumn } from '../../valueType'
 import {
   ProTableEditFieldType,
@@ -53,9 +79,14 @@ export default function useColumns(): ProTableColumnType[] {
     hideColumnsWhenNoData,
     lazyRenderCell: getLazyRenderCell,
     lightweightRenderCell,
+    id: tableId,
+    columnSettingPersistType,
   } = useProps()
+  const { setIconActions } = useActionsPlugin(({}) => [])
+  const { showModal } = useModalPlugin(({}) => [])
   const { types } = useValueTypePlugin(() => [])
   const queryField = useQueryFieldPlugin(({ dataSource }) => [dataSource])
+  const { t } = useConfigPlugin(() => [])
   const { dataSource: tableDataSource } = queryField
   const dataSource = propDataSource ?? tableDataSource
   const editableRowController = useEditableRow()
@@ -83,249 +114,258 @@ export default function useColumns(): ProTableColumnType[] {
       // width: 80,
       align: defaultAlignConfig[valueType as 'money'] as any,
       ...column,
-      render: (value: any, record: any, recordIndex: number, ...args) => {
-        if (isFunction(column?.render)) {
-          const columnRenderResult = run(column, 'render', value, record, recordIndex, ...args)
+      render: (value: any, record: any, recordIndex: number, ...args) => (
+        <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
+          {() => {
+            const { editField, viewField } = useMemo(() => {
+              const { editField, viewField } = getAllFieldFromColumn({
+                ...column,
+                viewField: !column?.viewField ? true : column?.viewField,
+              })
 
-          if (isObject(columnRenderResult) && 'builtIn' in columnRenderResult) {
-            const config = columnRenderResult as ProTableColumnBuiltInRenderConfig
+              return {
+                editField,
+                viewField: {
+                  ...viewField,
+                  props: {
+                    ...({
+                      image: {
+                        imageProps: {
+                          width: 50,
+                          height: 50,
+                        },
+                      },
+                      slider: {
+                        style: {
+                          width: 100,
+                        },
+                      },
+                    }[viewField?.type as any] ?? {}),
+                    ...viewField?.props,
+                  },
+                  label: undefined,
+                },
+              }
+            }, [column])
+
+            const key = record?.[String(run<string>(rowKey, undefined, record))]
+            const rowEditable = editableRowController.useEditable(key)
+            const editable = !!editField && rowEditable
+
+            if (!editable && isFunction(column?.render)) {
+              const columnRenderResult = run(column, 'render', value, record, recordIndex, ...args)
+
+              if (isObject(columnRenderResult) && 'builtIn' in columnRenderResult) {
+                const config = columnRenderResult as ProTableColumnBuiltInRenderConfig
+
+                return (
+                  <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
+                    {() => {
+                      const props: any = config?.props ?? {}
+                      return (
+                        (
+                          {
+                            text: <Typography.Text {...props}>{value}</Typography.Text>,
+                            link: <Typography.Link {...props}>{value}</Typography.Link>,
+                            tag: <Tag {...props}>{value}</Tag>,
+                            button: (
+                              <Action size="small" {...props}>
+                                {value}
+                              </Action>
+                            ),
+                            avatar: <Avatar src={value} {...props} />,
+                            badge: <Badge status="default" text={value} {...props} />,
+                            image: <Image height={60} src={value} {...props} />,
+                            progress: <Progress percent={value} showInfo={false} {...props} />,
+                            rate: <Rate allowHalf disabled value={value} {...props} />,
+                            field: <ProField mode="view" value={value} {...props} />,
+                          } as Record<ProTableColumnBuiltInRenderType, any>
+                        )[(config?.builtIn as ProTableColumnBuiltInRenderType) ?? 'text'] ?? <>{value}</>
+                      )
+                    }}
+                  </Hook>
+                )
+              }
+
+              return columnRenderResult
+            }
 
             return (
               <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
                 {() => {
-                  const props: any = config?.props ?? {}
-                  return (
-                    (
-                      {
-                        text: <Typography.Text {...props}>{value}</Typography.Text>,
-                        link: <Typography.Link {...props}>{value}</Typography.Link>,
-                        tag: <Tag {...props}>{value}</Tag>,
-                        button: (
-                          <Action size="small" {...props}>
-                            {value}
-                          </Action>
-                        ),
-                        avatar: <Avatar src={value} {...props} />,
-                        badge: <Badge status="default" text={value} {...props} />,
-                        image: <Image height={60} src={value} {...props} />,
-                        progress: <Progress percent={value} showInfo={false} {...props} />,
-                        rate: <Rate allowHalf disabled value={value} {...props} />,
-                        field: <ProField mode="view" value={value} {...props} />,
-                      } as Record<ProTableColumnBuiltInRenderType, any>
-                    )[(config?.builtIn as ProTableColumnBuiltInRenderType) ?? 'text'] ?? <>{value}</>
+                  const { t } = useTranslation()
+
+                  const fieldConfig = (editable ? editField : viewField) ?? viewField
+                  const needEllipsisTooltip =
+                    column?.ellipsis ??
+                    ((!editable && defaultEllipsisTypes.includes(valueType as any)) || (!valueType && isExist(value)))
+
+                  const lazyRenderCell = useMemo(
+                    () =>
+                      run(getLazyRenderCell, undefined, {
+                        dataSource, // any[];
+                        column, // ProTableColumnType<any>;
+                        item: record, // any;
+                        field: fieldConfig, // ProTableEditFieldType<any>;
+                        xIndex: columnIndex,
+                        yIndex: recordIndex,
+                        isActionColumn: false,
+                      }),
+                    [getLazyRenderCell, dataSource, column, record, fieldConfig, columnIndex, recordIndex],
                   )
+
+                  const content = useMemo(() => {
+                    function getFieldConfig(extendFieldConfig: ProFieldValueFieldType) {
+                      const fieldEditable = editable && extendFieldConfig?.mode !== 'view'
+                      const fieldTypeName: ProFieldValueTypes = extendFieldConfig?.type ?? 'text'
+                      const fieldType: any = types?.[fieldTypeName] ?? types.text
+                      const initialValue = run(fieldType, 'normalizeFieldValue', value) ?? value
+                      const fieldNamePath = fieldEditable ? extendFieldConfig?.name : undefined
+                      const form = fieldEditable ? editableRowController.getForm(key) : false
+
+                      const field: ProFieldValueFieldType = {
+                        ...extendFieldConfig,
+                        fromNowTooltip: extendFieldConfig?.fromNowTooltip ?? false,
+                        copyable: false, // needEllipsisTooltip ? false : extendFieldConfig?.copyable,
+                        form,
+                        initialValue,
+                        label: undefined,
+                        style: { margin: 0 },
+                        name: fieldNamePath,
+                      }
+
+                      editableRowController.setFieldConfig(key, column?.dataIndex, {
+                        type: fieldTypeName,
+                        name: fieldNamePath,
+                      })
+
+                      return field
+                    }
+
+                    const fieldProps: ProFieldValueFieldType = {
+                      preserve: false,
+                      mode: editable ? 'edit' : 'view',
+                      copyable: false,
+                      initialValue: value,
+                      label: undefined,
+                      ...getFieldConfig(fieldConfig as any),
+                    }
+
+                    const fieldNode =
+                      lightweightRenderCell && !editable ? (
+                        <ReadonlyProField static {...fieldProps} />
+                      ) : (
+                        <ProField
+                          {...fieldProps}
+                          // @ts-ignore
+                          // static={!editable}
+                          hook={
+                            isFunction(fieldConfig?.hook)
+                              ? () => {
+                                  const dynamicField = run<ProTableEditFieldType | false>(
+                                    fieldConfig?.hook,
+                                    undefined,
+                                    {
+                                      item: record,
+                                      form: editableRowController.getForm(key),
+                                      mode: !editable ? 'view' : 'edit',
+                                      inTable: true,
+                                    },
+                                  )
+
+                                  if (dynamicField === false) {
+                                    return getFieldConfig({ mode: 'view', key: 'view', ...viewField } as any)
+                                  }
+
+                                  if (!isValidElement(dynamicField) && isObject(dynamicField)) {
+                                    dynamicField.label = undefined
+                                    delete dynamicField.name
+                                    delete dynamicField.hook
+                                    delete dynamicField.copyable // 单元格内已额外处理复制图标，此处不需处理
+                                  }
+
+                                  return dynamicField
+                                }
+                              : undefined
+                          }
+                        />
+                      )
+
+                    return fieldNode
+                  }, [key, value, record, editable, t, fieldConfig?.options, ellipsis, needEllipsisTooltip])
+
+                  const lazyContent = useLazyRender(
+                    fieldConfig?.lazyRender ?? {
+                      forceVisible: !lazyRenderCell || editable,
+                      ...(isObject(lazyRenderCell) ? (lazyRenderCell as any) : {}),
+                      placeholderWrapperClassName: 'f-pro-table-cell-placeholder',
+                      placeholder: (
+                        <ErrorBoundary mode="inline">
+                          <span className="f-pro-table-cell-placeholder-content">
+                            {isValidElement(value) ? value : '--'}
+                          </span>
+                        </ErrorBoundary>
+                      ),
+                      content,
+                    },
+                  )
+
+                  const fieldParamsContext = useMemo(
+                    () => ({ mode: 'view', viewType: 'table', form: editableRowController.getForm(key) }),
+                    [],
+                  )
+
+                  const wrapperedContent = (
+                    <useColumnConfig.Provider value={column}>
+                      <useItem.Provider value={record}>
+                        <useFieldParams.Provider value={fieldParamsContext}>
+                          <>{lazyContent}</>
+                        </useFieldParams.Provider>
+                      </useItem.Provider>
+                    </useColumnConfig.Provider>
+                  )
+
+                  if (needEllipsisTooltip) {
+                    return (
+                      <div className="f-pro-table-ellipsis-cell">
+                        {isExist(value) && fieldConfig?.copyable && (
+                          <CopyButton
+                            text={String(value)}
+                            {...(isObject(fieldConfig?.copyable) ? fieldConfig?.copyable : {})}
+                          />
+                        )}
+                        <EllipsisTooltip tooltipContent={content}>{wrapperedContent}</EllipsisTooltip>
+                      </div>
+                    )
+                  }
+
+                  // const startRenderTime = React.useRef(0)
+                  // useMemo(() => {
+                  //   startRenderTime.current = Date.now()
+                  // }, [Math.random()])
+                  // React.useEffect(() => {
+                  //   const currentTime = Date.now()
+                  //   const timeSpend = currentTime - startRenderTime.current
+
+                  //   globalRenderTime += timeSpend
+                  //   renderTimes++
+                  // }, [Math.random()])
+
+                  if (!isExist(value) && !editable) {
+                    return '--'
+                  }
+
+                  return <>{wrapperedContent}</>
+
+                  // return '--'
+
+                  // return editable ? content : lazyContent
                 }}
               </Hook>
             )
-          }
-
-          return columnRenderResult
-        }
-
-        return (
-          <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
-            {() => {
-              const { editField, viewField } = useMemo(() => {
-                const { editField, viewField } = getAllFieldFromColumn({
-                  ...column,
-                  viewField: !column?.viewField ? true : column?.viewField,
-                })
-
-                return {
-                  editField,
-                  viewField: {
-                    ...viewField,
-                    props: {
-                      ...({
-                        image: {
-                          imageProps: {
-                            width: 50,
-                            height: 50,
-                          },
-                        },
-                        slider: {
-                          style: {
-                            width: 100,
-                          },
-                        },
-                      }[viewField?.type as any] ?? {}),
-                      ...viewField?.props,
-                    },
-                    label: undefined,
-                  },
-                }
-              }, [column])
-
-              const key = record?.[String(run<string>(rowKey, undefined, record))]
-              const rowEditable = editableRowController.useEditable(key)
-              const editable = !!editField && rowEditable
-              const { t } = useTranslation()
-
-              const fieldConfig = (editable ? editField : viewField) ?? viewField
-              const needEllipsisTooltip =
-                column?.ellipsis ??
-                ((!editable && defaultEllipsisTypes.includes(valueType as any)) || (!valueType && isExist(value)))
-
-              const lazyRenderCell = useMemo(
-                () =>
-                  run(getLazyRenderCell, undefined, {
-                    dataSource, // any[];
-                    column, // ProTableColumnType<any>;
-                    item: record, // any;
-                    field: fieldConfig, // ProTableEditFieldType<any>;
-                    xIndex: columnIndex,
-                    yIndex: recordIndex,
-                    isActionColumn: false,
-                  }),
-                [getLazyRenderCell, dataSource, column, record, fieldConfig, columnIndex, recordIndex],
-              )
-
-              const content = useMemo(() => {
-                function getFieldConfig(extendFieldConfig: ProFieldValueFieldType) {
-                  const fieldEditable = editable && extendFieldConfig?.mode !== 'view'
-                  const fieldTypeName: ProFieldValueTypes = extendFieldConfig?.type ?? 'text'
-                  const fieldType: any = types?.[fieldTypeName] ?? types.text
-                  const initialValue = run(fieldType, 'normalizeFieldValue', value) ?? value
-                  const fieldNamePath = fieldEditable ? extendFieldConfig?.name : undefined
-                  const form = fieldEditable ? editableRowController.getForm(key) : false
-
-                  const field: ProFieldValueFieldType = {
-                    ...extendFieldConfig,
-                    fromNowTooltip: extendFieldConfig?.fromNowTooltip ?? false,
-                    copyable: false, // needEllipsisTooltip ? false : extendFieldConfig?.copyable,
-                    form,
-                    initialValue,
-                    label: undefined,
-                    style: { margin: 0 },
-                    name: fieldNamePath,
-                  }
-
-                  editableRowController.setFieldConfig(key, column?.dataIndex, {
-                    type: fieldTypeName,
-                    name: fieldNamePath,
-                  })
-
-                  return field
-                }
-
-                const fieldProps: ProFieldValueFieldType = {
-                  preserve: false,
-                  mode: editable ? 'edit' : 'view',
-                  copyable: false,
-                  initialValue: value,
-                  label: undefined,
-                  ...getFieldConfig(fieldConfig as any),
-                }
-
-                const fieldNode =
-                  lightweightRenderCell && !editable ? (
-                    <ReadonlyProField static {...fieldProps} />
-                  ) : (
-                    <ProField
-                      {...fieldProps}
-                      // @ts-ignore
-                      // static={!editable}
-                      hook={
-                        isFunction(fieldConfig?.hook)
-                          ? () => {
-                              const dynamicField = run<ProTableEditFieldType | false>(fieldConfig?.hook, undefined, {
-                                item: record,
-                                form: editableRowController.getForm(key),
-                                mode: !editable ? 'view' : 'edit',
-                                inTable: true,
-                              })
-
-                              if (dynamicField === false) {
-                                return getFieldConfig({ mode: 'view', key: 'view', ...viewField } as any)
-                              }
-
-                              if (!isValidElement(dynamicField) && isObject(dynamicField)) {
-                                dynamicField.label = undefined
-                                delete dynamicField.name
-                                delete dynamicField.hook
-                                delete dynamicField.copyable // 单元格内已额外处理复制图标，此处不需处理
-                              }
-
-                              return dynamicField
-                            }
-                          : undefined
-                      }
-                    />
-                  )
-
-                return fieldNode
-              }, [key, value, record, editable, t, fieldConfig?.options, ellipsis, needEllipsisTooltip])
-
-              const lazyContent = useLazyRender(
-                fieldConfig?.lazyRender ?? {
-                  forceVisible: !lazyRenderCell || editable,
-                  ...(isObject(lazyRenderCell) ? (lazyRenderCell as any) : {}),
-                  placeholderWrapperClassName: 'f-pro-table-cell-placeholder',
-                  placeholder: (
-                    <ErrorBoundary mode="inline">
-                      <span className="f-pro-table-cell-placeholder-content">
-                        {isValidElement(value) ? value : '--'}
-                      </span>
-                    </ErrorBoundary>
-                  ),
-                  content,
-                },
-              )
-
-              const fieldParamsContext = useMemo(
-                () => ({ mode: 'view', viewType: 'table', form: editableRowController.getForm(key) }),
-                [],
-              )
-
-              const wrapperedContent = (
-                <useColumnConfig.Provider value={column}>
-                  <useItem.Provider value={record}>
-                    <useFieldParams.Provider value={fieldParamsContext}>
-                      <>{lazyContent}</>
-                    </useFieldParams.Provider>
-                  </useItem.Provider>
-                </useColumnConfig.Provider>
-              )
-
-              if (needEllipsisTooltip) {
-                return (
-                  <div className="f-pro-table-ellipsis-cell">
-                    {isExist(value) && fieldConfig?.copyable && (
-                      <CopyButton
-                        text={String(value)}
-                        {...(isObject(fieldConfig?.copyable) ? fieldConfig?.copyable : {})}
-                      />
-                    )}
-                    <EllipsisTooltip tooltipContent={content}>{wrapperedContent}</EllipsisTooltip>
-                  </div>
-                )
-              }
-
-              // const startRenderTime = React.useRef(0)
-              // useMemo(() => {
-              //   startRenderTime.current = Date.now()
-              // }, [Math.random()])
-              // React.useEffect(() => {
-              //   const currentTime = Date.now()
-              //   const timeSpend = currentTime - startRenderTime.current
-
-              //   globalRenderTime += timeSpend
-              //   renderTimes++
-              // }, [Math.random()])
-
-              if (!isExist(value) && !editable) {
-                return '--'
-              }
-
-              return <>{wrapperedContent}</>
-
-              // return '--'
-
-              // return editable ? content : lazyContent
-            }}
-          </Hook>
-        )
-      },
+          }}
+        </Hook>
+      ),
       dataIndex: column?.dataIndex ?? column?.name,
       ellipsis,
       onCell:
@@ -349,7 +389,7 @@ export default function useColumns(): ProTableColumnType[] {
     }
   }
 
-  const columns: ProTableColumnType<any>[] = useMemo(
+  const allColumns: ProTableColumnType<any>[] = useMemo(
     () =>
       (propColumns ?? [])
         .filter(Boolean)
@@ -357,6 +397,184 @@ export default function useColumns(): ProTableColumnType[] {
         .map(getSingleConfig) as ProTableColumnType<any>[],
     [propColumns],
   )
+
+  const persistFormProState = useProState<any>(
+    {
+      showingColumns: allColumns.map((column, idx) => idx),
+      columnSort: allColumns.map((column, idx) => idx),
+    },
+    {
+      key: tableId ? `t@${tableId}:column-setting` : undefined,
+      persist: columnSettingPersistType,
+      autoMergeObject: false,
+      sync: false,
+      // beforeStatePersist: excludePersistFormKey,
+      // beforeStateRecovery: excludePersistFormKey,
+    },
+  )
+
+  const columns: ProTableColumnType<any>[] = useMemo(
+    () => (allColumns ?? []).filter((column, idx) => persistFormProState.state.showingColumns.includes(idx)),
+    [allColumns, persistFormProState.state.showingColumns],
+  )
+
+  useMount(() => {
+    setIconActions({
+      settings: (
+        <Popover
+          title={t('table.columnSetting')}
+          trigger="click"
+          overlayClassName="f-pro-table-column-setting-popover"
+          content={
+            <ProField
+              noStyle
+              initialValue={persistFormProState.state.showingColumns as any}
+              props={{
+                onChange: (value) => {
+                  console.log(value)
+                  // setShowingColumns(value)
+                  persistFormProState.setState({
+                    showingColumns: value,
+                  })
+                },
+              }}
+              type="checkbox"
+              options={allColumns.map((column, idx) => ({
+                label: column.title ?? column.label,
+                value: idx,
+              }))}
+            />
+            // <Checkbox.Group
+            //   style={{ width: '100%' }}
+            //   defaultValue={persistFormProState.state.showingColumns}
+            //   onChange={(value) => {
+            //     // setShowingColumns(value)
+            //     persistFormProState.setState({
+            //       showingColumns: value,
+            //     })
+            //   }}
+            // >
+            //   <Grid
+            //     columns={1}
+            //     // gutter={[16, 16]}
+            //     layout={columns
+            //       .map((column, idx) => ({
+            //         label: column.title ?? column.label,
+            //         value: idx,
+            //       }))
+            //       .map((option: any) => ({
+            //         content: (
+            //           <Checkbox key={option?.value} value={option?.value}>
+            //             {option?.label}
+            //           </Checkbox>
+            //         ),
+            //       }))}
+            //   />
+            // </Checkbox.Group>
+          }
+          placement="bottomRight"
+        >
+          <Action actionType="button" icon={<SettingOutlined />} type="text" />
+        </Popover>
+      ),
+
+      // {
+      //   key: 'icon-settings',
+      //   icon: <SettingOutlined />,
+      //   onClick: async () => {
+      //     await showModal({
+      //       title: '显示字段配置',
+      //       width: 600,
+      //       content: (
+      //         <Hook>
+      //           {() => {
+      //             const [showingColumns, setShowingColumns] = React.useState(persistFormProState.state.showingColumns)
+      //             // const [columnTab, setColumnTab] = React.useState<any[]>(
+      //             //   columns.filter((column, idx) => showingColumns.includes(idx)),
+      //             // )
+
+      //             // const SortableContainer = useMemo(
+      //             //   () =>
+      //             //     sortableContainer(({ children }) => {
+      //             //       return <div className="f-pro-table-column-setting-dragable-container">{children}</div>
+      //             //     }),
+      //             //   [],
+      //             // )
+
+      //             // const SortableItem = useMemo(
+      //             //   () =>
+      //             //     sortableElement(function ListItem({ name }) {
+      //             //       return (
+      //             //         <div className="f-pro-table-column-setting-dragable-item">
+      //             //           <div>
+      //             //             <HolderOutlined />
+      //             //             {name}
+      //             //           </div>
+      //             //           <div>
+      //             //             <CloseOutlined />
+      //             //           </div>
+      //             //         </div>
+      //             //       )
+      //             //     }),
+      //             //   [],
+      //             // )
+
+      //             return (
+      //               <div className="f-pro-table-column-setting-container">
+      //                 <Checkbox.Group
+      //                   style={{ width: '100%' }}
+      //                   value={showingColumns}
+      //                   onChange={(value) => {
+      //                     console.log(value)
+      //                     setShowingColumns(value)
+      //                   }}
+      //                 >
+      //                   <Grid
+      //                     columns={1}
+      //                     // gutter={[16, 16]}
+      //                     layout={columns
+      //                       .map((column, idx) => ({
+      //                         label: column.title ?? column.label,
+      //                         value: idx,
+      //                       }))
+      //                       .map((option: any) => ({
+      //                         content: (
+      //                           <Checkbox key={option?.value} value={option?.value}>
+      //                             {option?.label}
+      //                           </Checkbox>
+      //                         ),
+      //                       }))}
+      //                   />
+      //                 </Checkbox.Group>
+      //                 {/* <Divider type="vertical" />
+      //                 <SortableContainer
+      //                   axis="y"
+      //                   lockAxis="y"
+      //                   distance={20}
+      //                   // pressDelay={200}
+      //                   // transitionDuration={0}
+      //                   onSortEnd={({ oldIndex, newIndex }) => {
+      //                     setColumnTab((columnTab) => arrayMove(columnTab, oldIndex, newIndex))
+      //                   }}
+      //                 >
+      //                   {columnTab.map((column, idx) => (
+      //                     <SortableItem
+      //                       key={`${column.title ?? column.label}:${idx}`}
+      //                       index={idx}
+      //                       name={column.title ?? column.label}
+      //                     />
+      //                   ))}
+      //                 </SortableContainer> */}
+      //               </div>
+      //             )
+      //           }}
+      //         </Hook>
+      //       ),
+      //     }).promise
+      //   },
+      // },
+    })
+  })
 
   const hasWidth = useMemo(() => (columns ?? []).some((col) => isExist(col?.width)), [columns])
 

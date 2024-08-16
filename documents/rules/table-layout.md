@@ -147,8 +147,9 @@ export default () => {
   return (
     <ProTable
       title="表格标题"
+      tableKey="test-rule-table"
       bordered
-      iconActions={['refresh', 'table-size', 'fullscreen']}
+      iconActions={['search', 'refresh', 'table-size', 'fullscreen', 'settings']}
       actions={['add', { content: '导出', icon: <UploadOutlined /> }]}
       columnActions={['view', 'edit', 'delete']}
       batchActions={['delete', { content: '导出选中数据', icon: <UploadOutlined /> }]}

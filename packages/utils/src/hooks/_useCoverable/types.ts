@@ -62,9 +62,9 @@ export type DeepCoverable<T> = {
         : T[K]
 }
 
-export type Coverable<T> = {
-  getConfig: () => DeepCoverable<T>
-} & CoverableMark<T>
+export type Coverable<T, O = T> = {
+  getConfig: () => T extends CoverableValue<any, any> ? Required<T>['default'] : DeepCoverable<T>
+} & CoverableMark<O>
 
 export type CoverableProps<T> = {
   // @ts-ignore

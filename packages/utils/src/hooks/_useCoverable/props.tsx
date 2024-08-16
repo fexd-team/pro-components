@@ -19,7 +19,8 @@ export default function createPropsRender<T>(coverableConfig: T) {
             defaultProps = set(defaultProps, keyPath, run(item?.__getRawConfig))
           }
 
-          return [true, item]
+          const canContinue = deepItemFilter(item)
+          return [canContinue, item]
         })
 
         // return defaultProps
@@ -37,8 +38,8 @@ export default function createPropsRender<T>(coverableConfig: T) {
             return [false, item?.default]
           }
 
-          const canMerge = deepItemFilter(item)
-          return [canMerge, item]
+          const canContinue = deepItemFilter(item)
+          return [canContinue, item]
         })
       },
     }),

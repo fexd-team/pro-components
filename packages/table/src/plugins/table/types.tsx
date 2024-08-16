@@ -14,7 +14,7 @@ import { LinkProps } from 'antd/es/typography/Link'
 import { RenderedCell as RcRenderedCell } from 'rc-table/lib/interface'
 import { ProFieldValueFieldType, ProFormProps, ProFormRenderDescriptionParams, ProFieldProps } from '@fexd/pro-form'
 import { ProLocaleValue } from '@fexd/pro-provider'
-import { TooltipConfig, ButtonActionType, UniteOmit, ActionProps } from '@fexd/pro-utils'
+import { TooltipConfig, ButtonActionType, UniteOmit, ActionProps, UseProStateOptions } from '@fexd/pro-utils'
 import { Random } from 'mockjs'
 
 import { ProTableQueryFieldType } from '../queryField/types'
@@ -241,6 +241,9 @@ export interface ProTablePluginConfig<R = any>
       endTime?: ProLocaleValue
     }
   }
+
+  /** column 配置持久化类型，默认为 sessionStorage */
+  columnSettingPersistType?: UseProStateOptions<any>['persist']
 
   localeKey?: UniteOmit<
     'zh-CN' | 'zh_CN' | 'en-US' | 'en_US' | 'id-ID' | 'id_ID' | 'ms-MY' | 'ms_MY' | 'th-TH' | 'th_TH'

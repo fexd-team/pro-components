@@ -1,17 +1,32 @@
 import { get, isExist, memoize, run, isObject } from '@fexd/tools'
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 
 import { cloneDeep, deepItemFilter, deepMap, isIterable, shallowMerge, useLatest, useMemoizedFn } from './helpers'
 import { Coverable } from './types'
 
-export default function useCoverable<T extends Record<string, any>>(
+export default function useCoverable<T extends Record<string, any>, O = T>(
   config: T | ((options: { getConfig: () => Record<string, any> }) => T),
-) {
+): Coverable<T, O> {
   const configRef = useLatest(config)
+  const updateKeyPathMapRef = useRef<any>({})
   const getFinalConfigRef = useRef<any>({})
   const useConfig = run(configRef.current, undefined, {
     getConfig: () => run(getFinalConfigRef.current),
   }) as T
+  useMemo(() => {
+    deepMap(useConfig, (item, key, keyPath) => {
+      if (key && item?.__isCoverableProps) {
+        updateKeyPathMapRef.current[keyPath.join('.')] = [item, keyPath]
+        const itemUpdateKeyPathMapRef = item?.__getUpdateKeyPathMapRef?.()?.current ?? {}
+        Object.assign(updateKeyPathMapRef.current, itemUpdateKeyPathMapRef)
+
+        return [false, item]
+      }
+
+      const canContinue = deepItemFilter(item)
+      return [canContinue, item]
+    })
+  }, [])
   const getDefaultConfigRef = useRef<any>({})
   getDefaultConfigRef.current = useMemoizedFn(
     memoize(() => {
@@ -24,6 +39,13 @@ export default function useCoverable<T extends Record<string, any>>(
   const override = (config) => (overridedConfigRef.current = config)
   getFinalConfigRef.current = memoize(() => {
     const defaultConfig = getDefaultConfigRef.current()
+
+    if (defaultConfig?.__isCoverableValue) {
+      const result = !override
+        ? defaultConfig?.default
+        : run(defaultConfig, 'onCovered', defaultConfig?.default, overridedConfigRef.current)
+      return result
+    }
 
     const handledCoverableMark = new Map()
     const mergedConfig = deepMap(defaultConfig, handleItem)
@@ -67,5 +89,6 @@ export default function useCoverable<T extends Record<string, any>>(
     __isCoverableProps: () => true,
     __isConfigReaded: () => configReadedRef.current,
     __cover: override,
-  } as any as Coverable<T>
+    __getUpdateKeyPathMapRef: () => updateKeyPathMapRef,
+  } as any as Coverable<T, O>
 }

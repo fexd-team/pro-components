@@ -3,13 +3,13 @@ import { useSetState, useMemoizedFn, useLatest } from 'ahooks'
 import { SetState } from 'ahooks/es/useSetState'
 
 import { useProps } from '../../utils'
-import { ProTableBuiltInActionType, ProTableTableActionType, BuiltInActionNames } from '../../types'
+import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInActionNames } from './types'
 import Actions from './Actions'
 
 // 表格动作
 export default function useTableActions(): {
   tableActions: Record<string, ProTableBuiltInActionType>
-  tableActionConfigs: ProTableTableActionType<BuiltInActionNames>[]
+  tableActionConfigs: ProTableTableActionType<ProTableBuiltInActionNames>[]
   setTableActions: SetState<Record<string, ProTableBuiltInActionType>>
   renderTableActions: () => JSX.Element
 } {
@@ -32,7 +32,9 @@ export default function useTableActions(): {
       () =>
         (tableActionConfigs ?? [])
           .filter(Boolean)
-          .filter((action) => (action as any)?.hidden !== false) as ProTableTableActionType<BuiltInActionNames>[],
+          .filter(
+            (action) => (action as any)?.hidden !== false,
+          ) as ProTableTableActionType<ProTableBuiltInActionNames>[],
       [tableActionConfigs],
     ),
     setTableActions,

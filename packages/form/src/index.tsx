@@ -14,3 +14,4 @@ export { default as createForm } from './createForm'
 
 export * from './types'
 export { default as useProFormLocales } from './locales'
+export { default as coloringOptions } from './coloringOptions'

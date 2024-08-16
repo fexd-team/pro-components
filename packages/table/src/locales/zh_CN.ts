@@ -35,6 +35,7 @@ export default {
     save: '保存',
     cancel: '取消',
     cancelConfirm: '确认取消吗？',
+    columnSetting: '字段设置',
     density: '表格密度',
     densityLarger: '宽松',
     densityMiddle: '正常',

@@ -47,6 +47,7 @@ const PluginTable = memo(
       components: propComponents,
       resizableHeader,
       noTableHeaderEllipsis,
+      __EXTRA_PROPS__,
       ...restProps
     } = useProps()
     const { size, t } = useConfigPlugin(({ size, t }) => [size, t])
