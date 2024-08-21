@@ -42,7 +42,10 @@ export default function createLegacyBC<Props extends object, CProps extends obje
         defineProTableColumns: ProTable.defineColumns,
         getFinalConfig: getConfig as any,
       })
-      const config = useConfigurable(configurable)
+      const config = useConfigurable((helpers, ...args) => {
+        _getFinalConfig = () => helpers.getConfig()
+        return run(configurable, undefined, helpers, ...args)
+      })
 
       return {
         content: render(

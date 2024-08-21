@@ -5,7 +5,8 @@ import { request, ProTable, createBC, useConfigurable } from '@fexd/pro-componen
 
 const OldDemo = createBC({
   defaultProps: {} as { test?: string },
-  configurable: (props, { createApi, defineProTableColumns }) => {
+  configurable: (props, { createApi, defineProTableColumns, getFinalConfig }) => {
+    console.log('getFinalConfig', getFinalConfig())
     return {
       apis: {
         test: createApi({

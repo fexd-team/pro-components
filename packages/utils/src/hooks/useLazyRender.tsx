@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useMemo, useRef, useState, ReactNode } from 'react'
-import { isObject, FrameProcess, debounce } from '@fexd/tools'
+import { isObject, FrameProcess, debounce, run } from '@fexd/tools'
 import { useInViewport, useUnmount, useDebounceFn, useSafeState } from 'ahooks'
 import { Options as UseInViewportOptions } from 'ahooks/es/useInViewport'
 import { DebounceOptions } from 'ahooks/es/useDebounce/debounceOptions'
@@ -14,7 +14,7 @@ export interface UseLazyRenderOptions {
   forceVisible?: boolean
   placeholder?: ReactNode
   placeholderWrapperClassName?: string
-  content?: ReactNode
+  content?: ReactNode | (() => ReactNode)
   debugLog?: boolean
 }
 
@@ -90,5 +90,5 @@ export default function useLazyRender({
     </Hook>
   )
 
-  return visible || forceVisible ? content : placeholder
+  return visible || forceVisible ? run(content) : placeholder
 }

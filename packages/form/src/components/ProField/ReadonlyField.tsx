@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, isValidElement, useMemo, memo, Fragment } from 'react'
 import { Space, Form } from 'antd'
-import { useSafeState } from 'ahooks'
+import { useSafeState, useMemoizedFn } from 'ahooks'
 import { QuestionCircleOutlined, CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import { run, isString, isObject, isFunction, copy, isExist, classnames, pickBy, isUndefined } from '@fexd/tools'
 import { Action, Hook, Tooltip, useLazyRender } from '@fexd/pro-utils'
@@ -73,129 +73,149 @@ export function useReadonlyField(props: ReadonlyFieldProps) {
   } = props
 
   // const form = Form.useFormInstance()
-  const value =
-    run(() => {
-      if (!isExist(field?.name) || !form) {
-        return
-      }
-      try {
-        return form?.getFieldValue(field?.name as any)
-      } catch (err) {
-        return
-      }
-    }) ??
-    field?.value ??
-    field?.initialValue
 
-  const valueContent =
-    run<any>(renderView, undefined, value, {
-      options: fieldOptions,
-
-      ...pickBy(
-        {
-          fromNowTooltip,
-          format,
-          unit,
-          builtInRule,
-          numberLocale,
-          currencyLocale,
-        },
-        (value) => !isUndefined(value),
-      ),
-      ...props,
-    }) ?? '--'
-
-  const lazyContent = useLazyRender({
-    forceVisible: !lazyRender,
-    content: valueContent,
-    ...(isObject(lazyRender) ? (lazyRender as any) : {}),
+  const getValue = useMemoizedFn(() => {
+    return (
+      run(() => {
+        if (!isExist(field?.name) || !form) {
+          return
+        }
+        try {
+          return form?.getFieldValue(field?.name as any)
+        } catch (err) {
+          return
+        }
+      }) ??
+      field?.value ??
+      field?.initialValue
+    )
   })
 
-  if (isObject(valueContent) && !isValidElement(valueContent)) {
-    console.warn('ProTable.valueType.renderField error! not a valid element', valueContent, { field })
-    return null
-  }
+  const getValueContent = useMemoizedFn(() => {
+    const value = getValue()
+    const valueContent = run(() => {
+      try {
+        return (
+          run<any>(renderView, undefined, value, {
+            options: fieldOptions,
 
-  // return '--'
+            ...pickBy(
+              {
+                fromNowTooltip,
+                format,
+                unit,
+                builtInRule,
+                numberLocale,
+                currencyLocale,
+              },
+              (value) => !isUndefined(value),
+            ),
+            ...props,
+          }) ?? '--'
+        )
+      } catch (err) {
+        console.error('ProTable.valueType.renderField error!', err, { field })
+      }
+    })
 
-  const content =
-    isValidElement(children) || isFunction(children) ? (
-      run(children)
-    ) : (
-      <>
-        {!!value && copyable && (
-          <CopyButton
-            className="f-pro-form-field-copy-button"
-            text={String(value)}
-            {...((isObject(copyable) ? copyable : {}) as any)}
-          />
-        )}
-        {lazyContent}
-      </>
-    )
-
-  // 如果不需要展示 label，且不需要 form，则认为是纯粹的内容展示，不需要 form.item 包裹
-  if (staticMode || (!form && !field?.name && !field?.label)) {
-    if (field?.hidden) {
+    if (isObject(valueContent) && !isValidElement(valueContent)) {
+      console.warn('ProTable.valueType.renderField error! not a valid element', valueContent, { field })
       return null
     }
 
-    return content
-  }
+    return valueContent
+  })
 
-  const mergedFormItemProps = {
-    ...fieldItemProps,
-    ...field,
-  }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const lazyContent = useLazyRender({
+    forceVisible: !lazyRender,
+    content: () => getValueContent(),
+    ...(isObject(lazyRender) ? (lazyRender as any) : {}),
+  })
 
-  return (
-    <FormItem
-      {...(isFunction(children) && !mergedFormItemProps?.dependencies
-        ? {
-            shouldUpdate: true,
-          }
-        : {})}
-      {...mergedFormItemProps}
-      label={
-        field?.label && (
-          <Space direction="horizontal" size={6}>
-            <div
-              className={classnames(
-                'f-pro-form-field-label',
-                {
-                  'f-pro-form-field-label-font-bold': labelFontBold,
-                },
-                labelClassName,
-              )}
-              style={labelStyle}
-            >
-              {field?.label}
-            </div>
-            {isExist(tooltip) && (
-              <Tooltip config={tooltip} content={isString(tooltip) ? <QuestionCircleOutlined /> : null} />
-            )}
-          </Space>
-        )
+  return useMemoizedFn<() => JSX.Element>(() => {
+    const value = getValue()
+    const content =
+      isValidElement(children) || isFunction(children) ? (
+        run(children)
+      ) : (
+        <>
+          {!!value && copyable && (
+            <CopyButton
+              className="f-pro-form-field-copy-button"
+              text={String(value)}
+              {...((isObject(copyable) ? copyable : {}) as any)}
+            />
+          )}
+          {lazyContent}
+        </>
+      )
+
+    // 如果不需要展示 label，且不需要 form，则认为是纯粹的内容展示，不需要 form.item 包裹
+    if (staticMode || (!form && !field?.name && !field?.label)) {
+      if (field?.hidden) {
+        return null
       }
-      {...(fieldItemProps ?? {})}
-      className={classnames('f-pro-form-field f-pro-form-field-view', mergedFormItemProps?.className)}
-      {...(isFunction(children)
-        ? {
-            name: undefined,
-          }
-        : {})}
-    >
-      <>{content}</>
-      {/* <Hook>
-        {function useNode() {
-          React.useEffect(() => {
-            console.log('didMount')
-          }, [])
-          return null
-        }}
-      </Hook> */}
-    </FormItem>
-  )
+
+      return content
+    }
+
+    const mergedFormItemProps = {
+      ...fieldItemProps,
+      ...field,
+    }
+
+    return (
+      <FormItem
+        {...(isFunction(children) && !mergedFormItemProps?.dependencies
+          ? {
+              shouldUpdate: true,
+            }
+          : {})}
+        {...mergedFormItemProps}
+        label={
+          field?.label && (
+            <Space direction="horizontal" size={6}>
+              <div
+                className={classnames(
+                  'f-pro-form-field-label',
+                  {
+                    'f-pro-form-field-label-font-bold': labelFontBold,
+                  },
+                  labelClassName,
+                )}
+                style={labelStyle}
+              >
+                {field?.label}
+              </div>
+              {isExist(tooltip) && (
+                <Tooltip config={tooltip} content={isString(tooltip) ? <QuestionCircleOutlined /> : null} />
+              )}
+            </Space>
+          )
+        }
+        {...(fieldItemProps ?? {})}
+        className={classnames('f-pro-form-field f-pro-form-field-view', mergedFormItemProps?.className)}
+        {...(isFunction(children)
+          ? {
+              name: undefined,
+            }
+          : {})}
+      >
+        <>{content}</>
+        {/* <Hook>
+          {function useNode() {
+            React.useEffect(() => {
+              console.log('didMount')
+            }, [])
+            return null
+          }}
+        </Hook> */}
+      </FormItem>
+    )
+  })
+
+  // return '--'
 }
 
 export const ReadonlyField = memo(
@@ -203,7 +223,7 @@ export const ReadonlyField = memo(
     const content = useReadonlyField(props)
     useUpdateAfterValueTypeAdd()
 
-    return content
+    return content()
   },
   // (prevProps, nextProps) => compare(getObjectValues(prevProps?.field), getObjectValues(nextProps?.field)),
 )

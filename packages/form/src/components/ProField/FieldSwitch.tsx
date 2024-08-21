@@ -4,7 +4,7 @@ import { useUpdate, useUpdateEffect } from 'ahooks'
 import { isString, isExist, run, random } from '@fexd/tools'
 import { Form, FormInstance } from 'antd'
 
-import { ProFieldValueFieldType } from '../../types'
+import { ProFieldValueFieldType, ProFormInstance } from '../../types'
 import EditableField, { useEditableField } from './EditableField'
 import ReadonlyField, { useReadonlyField } from './ReadonlyField'
 import { useUpdateAfterValueTypeAdd } from '../../valueTypes'
@@ -29,14 +29,14 @@ const FieldSwitch = memo(function FieldSwitch({
     update() // key 变化后多触发一次渲染，修复 rc-field-form 未能及时应用最新值的问题
   }, [key])
 
-  const readonlyFieldNode = useReadonlyField(props)
-  const editableFieldNode = useEditableField(props)
+  const getReadonlyFieldNode = useReadonlyField(props)
+  const getEditableFieldNode = useEditableField(props)
   useUpdateAfterValueTypeAdd(!legacyRender)
 
   const content = legacyRender ? (
     <Field key={key} {...props} />
   ) : (
-    <Fragment key={key}>{mode === 'view' ? readonlyFieldNode : editableFieldNode}</Fragment>
+    <Fragment key={key}>{mode === 'view' ? run(getReadonlyFieldNode) : run(getEditableFieldNode)}</Fragment>
   )
 
   // if (props?.name) {
@@ -56,7 +56,7 @@ const FieldSwitch = memo(function FieldSwitch({
 
 const ProFieldSwitch = memo(function ProFieldSwitch({ form: propForm, ...props }: ProFieldValueFieldType): JSX.Element {
   const ctxForm = Form.useFormInstance()
-  const form = (propForm ?? ctxForm) as any as FormInstance
+  const form = (propForm ?? ctxForm) as any as ProFormInstance
 
   if (!isExist(form)) {
     return <FieldSwitch {...props} />
