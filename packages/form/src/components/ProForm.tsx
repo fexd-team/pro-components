@@ -18,7 +18,7 @@ import React, {
 import { Form, FormProps, RowProps, FormItemProps, Descriptions, Space, DescriptionsProps } from 'antd'
 import { DescriptionsItemProps } from 'antd/es/descriptions/Item'
 import { QuestionCircleOutlined } from '@ant-design/icons'
-import { useDebounceFn, useMemoizedFn, useUpdate, useUpdateEffect } from 'ahooks'
+import { useDebounceFn, useMemoizedFn, useUnmount, useUpdate, useUpdateEffect } from 'ahooks'
 import {
   run,
   flatten,
@@ -208,7 +208,13 @@ const CoreProForm = memo(
                         useMemo(() => {
                           fieldHooksRef.current.set(field, dynamicField)
                           run(setFieldHooksStateRef, 'current', fieldHooksRef.current)
-                        }, [dynamicField])
+                        }, [dynamicField, field])
+
+                        useEffect(() => {
+                          return () => {
+                            fieldHooksRef.current.delete(field)
+                          }
+                        }, [field])
 
                         return null
                       }}

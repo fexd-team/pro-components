@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-form",
-  "version": "0.2.40",
+  "version": "0.2.41",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
