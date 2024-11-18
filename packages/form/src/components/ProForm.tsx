@@ -572,14 +572,16 @@ const CoreProForm = memo(
     useImperativeHandle(ref, () => getProFormInternalParams())
     useImperativeHandle(formRef, () => getProFormInternalParams())
 
+    const preserve = restProps?.preserve ?? false
+
     const content = (
       <Form
         ref={antdFormRef as any}
         form={form}
         layout={layout}
-        preserve={false}
         size={size}
         {...restProps}
+        preserve={preserve}
         className={classnames('f-pro-form-grid-field', restProps?.className)}
       >
         {isValidElement(children) || isArray(children) ? (
@@ -612,7 +614,15 @@ const CoreProForm = memo(
       <ErrorBoundary>
         <ConfigProvider parentContextFirst numberLocale={{ toFixed: 2 }}>
           <useLocales.Provider>
-            <formSharedContext.Provider value={{ sharedFieldProps, groupRegisterMap }}>
+            <formSharedContext.Provider
+              value={{
+                sharedFieldProps: {
+                  preserve,
+                  ...sharedFieldProps,
+                },
+                groupRegisterMap,
+              }}
+            >
               {content}
             </formSharedContext.Provider>
           </useLocales.Provider>

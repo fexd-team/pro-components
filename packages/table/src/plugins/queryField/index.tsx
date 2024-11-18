@@ -307,6 +307,7 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
       getSelectedItems,
       getQueryingParams,
       getQueryingExtraParams,
+      getDataSource,
       refresh,
       search,
       setExtraParams,

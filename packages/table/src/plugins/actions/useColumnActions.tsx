@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { isBoolean, run } from '@fexd/tools'
+import { delay, isBoolean, run } from '@fexd/tools'
 import { DeleteOutlined } from '@ant-design/icons'
 import { useSetState, useMemoizedFn, useLatest } from 'ahooks'
 import { SetState } from 'ahooks/es/useSetState'
@@ -48,7 +48,15 @@ export default function useColumnActions(): {
         }
 
         if (success) {
-          queryField.search()
+          await queryField.search()
+          await delay(100)
+          if ((queryField?.getDataSource?.()?.length ?? 0) <= 0) {
+            queryField?.setPaginationParams?.({ page: 1 })
+            await delay(100)
+            await queryField?.search?.({
+              page: 1,
+            })
+          }
         }
       },
     }),
