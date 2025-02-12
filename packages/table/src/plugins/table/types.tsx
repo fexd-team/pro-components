@@ -37,6 +37,9 @@ export interface ProTableColumnType<R = any>
     | 'lazyRender'
     | 'fromNowTooltip'
   > {
+  /** 可隐藏的 */
+  hideable?: boolean
+  columnSettingKey?: any
   valueType?: ProFieldValueFieldType['type']
   valueEnum?: ProFieldValueFieldType['options']
   queryField?: boolean | ProTableQueryFieldType | ProTableQueryFieldType['hook']

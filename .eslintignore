@@ -7,7 +7,7 @@
 /**/dist
 /**/es
 /**/lib
-/docs
+/docs-dist
 
 # misc
 .DS_Store

@@ -5,13 +5,10 @@ module.exports = {
   maxWorkers: '80%',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   collectCoverage: true,
-  collectCoverageFrom: [
-    'packages/*/src/**/*.{ts,tsx}',
-    '!packages/*/src/**/style.ts',
-    '!packages/mmf-shared/src/**/*.{ts,tsx}', // 暂时排除 mmf-shared
-  ],
+  collectCoverageFrom: ['packages/*/src/**/*.{ts,tsx}', '!packages/*/src/**/style.ts'],
   transform: {
     '^.+\\.(ts|tsx)?$': 'ts-jest',
+    '^.+\\.js$': 'ts-jest',
   },
   setupFiles: ['<rootDir>/jest-setup.ts'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],

@@ -11,7 +11,7 @@
     },
     "build": {
       "outputs": ["es/**", "lib/**"],
-      "inputs": ["src/**", "scripts/**", "package.json"]
+      "inputs": ["src/**", "scripts/**", "package.json", ".father.ts"]
     }
   },
   "globalDependencies": [".father.ts", "package.json"]

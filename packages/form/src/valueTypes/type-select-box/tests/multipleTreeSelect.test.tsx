@@ -53,11 +53,11 @@ describe('type="multipleTreeSelect" 编辑模式', () => {
   // 初始值能正确赋值
   it('初始值能正确赋值', async () => {
     const { container } = render(
-      <ProField className="test-field" type="multipleTreeSelect" initialValue={[2, 3]} options={mockOptions} />,
+      <ProField className="test-field" type="multipleTreeSelect" initialValue={[1, 2]} options={mockOptions} />,
     )
     expect(container.querySelectorAll('.test-field .ant-select-selection-item').length).toBe(2)
-    expect(container.querySelector('.test-field .ant-select-selection-item:nth-child(1)')!.textContent).toBe('选项2')
-    expect(container.querySelector('.test-field .ant-select-selection-item:nth-child(2)')!.textContent).toBe('选项3')
+    expect(container.querySelectorAll('.test-field .ant-select-selection-item')!?.[0]?.textContent).toBe('选项1')
+    expect(container.querySelectorAll('.test-field .ant-select-selection-item')!?.[1]?.textContent).toBe('选项2')
   })
 
   // 能够正确选择值
@@ -72,7 +72,17 @@ describe('type="multipleTreeSelect" 编辑模式', () => {
       />,
     )
     fireEvent.click(screen.getByText('选项2'))
-    expect(onChange).toBeCalledWith([2], [{ label: '选项2', value: 2 }])
+    expect(onChange).toBeCalledWith(
+      [2, '2-1'],
+      [
+        {
+          label: '选项2',
+          value: 2,
+        },
+        '选项2-1',
+      ],
+      { checked: true, preValue: [], triggerValue: '2' },
+    )
   })
 })
 
@@ -87,15 +97,17 @@ describe('type="multipleTreeSelect" 浏览模式', () => {
 
   // 初始值能正确显示
   it('初始值能正确显示', async () => {
-    const node = render(<ProField mode="view" type="multipleTreeSelect" initialValue={[2, 3]} options={mockOptions} />)
-    expect(node.getByText('选项2, 选项3')).toBeInTheDocument()
+    const node = render(<ProField mode="view" type="multipleTreeSelect" initialValue={[1, 2]} options={mockOptions} />)
+    expect(node.getByText('选项1')).toBeInTheDocument()
+    expect(node.getByText('选项2')).toBeInTheDocument()
   })
 
   // 初始值可以类型模糊
   it('初始值可以类型模糊', async () => {
     const node = render(
-      <ProField mode="view" type="multipleTreeSelect" initialValue={['2', '3']} options={mockOptions} />,
+      <ProField mode="view" type="multipleTreeSelect" initialValue={['1', '2']} options={mockOptions} />,
     )
-    expect(node.getByText('选项2, 选项3')).toBeInTheDocument()
+    expect(node.getByText('选项1')).toBeInTheDocument()
+    expect(node.getByText('选项2')).toBeInTheDocument()
   })
 })

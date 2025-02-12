@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-utils",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",

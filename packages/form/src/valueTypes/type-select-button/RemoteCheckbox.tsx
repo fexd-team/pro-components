@@ -8,7 +8,11 @@ import useLocales from '../../locales'
 
 import useRemoteOptions from '../type-select-box/useRemoteOptions'
 
-export default function RemoteCheckbox(props: CheckboxGroupProps) {
+export interface RemoteCheckboxProps extends CheckboxGroupProps {
+  renderOption?: (option: any, index: number) => React.ReactNode
+}
+
+export default function RemoteCheckbox({ renderOption, ...props }: RemoteCheckboxProps) {
   const { loading, options: rawOptions } = useRemoteOptions(props?.options)
 
   const { t } = useLocales(({ t }) => [t])
@@ -28,13 +32,13 @@ export default function RemoteCheckbox(props: CheckboxGroupProps) {
     return <LoadingOutlined />
   }
 
-  return (
-    <Checkbox.Group {...props} options={options!}>
-      {(options ?? []).map((option: any) => (
-        <Checkbox key={option?.value} value={option?.value}>
-          {option?.label}
-        </Checkbox>
-      ))}
-    </Checkbox.Group>
-  )
+  if (renderOption) {
+    return (
+      <Checkbox.Group {...props} options={undefined}>
+        {(options ?? []).map((option: any, index: number) => renderOption(option, index))}
+      </Checkbox.Group>
+    )
+  }
+
+  return <Checkbox.Group {...props} options={options!} />
 }

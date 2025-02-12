@@ -103,7 +103,7 @@ describe('Action', () => {
         Test
       </Action>,
     )
-    expect(node.container.querySelector('.ant-btn-group.ant-dropdown-button')).toBeInTheDocument()
+    expect(node.container.querySelector('.ant-dropdown-button')).toBeInTheDocument()
     expect(node.container.querySelector('.ant-dropdown-trigger')).toBeInTheDocument()
     expect(document.querySelector('.test-Action-menu-container')).not.toBeInTheDocument()
     expect(document.querySelector('.test-Action-menu-node1')).not.toBeInTheDocument()
@@ -179,7 +179,7 @@ describe('Action', () => {
         ]}
       />,
     )
-    expect(node.container.querySelector('.ant-btn-group.ant-dropdown-button')).not.toBeInTheDocument()
+    expect(node.container.querySelector('.ant-dropdown-button')).not.toBeInTheDocument()
     expect(node.container.querySelector('.ant-dropdown-trigger')).toBeInTheDocument()
     expect(document.querySelector('.test-Action-menu-container')).not.toBeInTheDocument()
     expect(document.querySelector('.test-Action-menu-node1')).not.toBeInTheDocument()

@@ -2,40 +2,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useMemo, isValidElement, useRef } from 'react'
-import { Table, Space, Badge, Tag, Typography, Image, Progress, Avatar, Rate, Checkbox, Divider, Popover } from 'antd'
-import { SettingOutlined, HolderOutlined, CloseOutlined } from '@ant-design/icons'
-import { useMount } from 'ahooks'
-import { isExist, run, isObject, isArray, isFunction, classnames, isString } from '@fexd/tools'
-import {
-  Tooltip,
-  Hook,
-  EllipsisTooltip,
-  useTranslation,
-  useLazyRender,
-  Action,
-  ErrorBoundary,
-  Grid,
-  useProState,
-} from '@fexd/pro-utils'
-import {
-  ProFieldValueFieldType,
-  ProFieldValueTypes,
-  ProField,
-  CopyButton,
-  ReadonlyProField,
-  ProForm,
-} from '@fexd/pro-form'
-import {
-  SortableContainer as sortableContainer,
-  SortableElement as sortableElement,
-  arrayMove,
-} from 'react-sortable-hoc'
+import { Table, Space, Badge, Tag, Typography, Image, Progress, Avatar, Rate } from 'antd'
+
+import { isExist, run, isObject, isArray, isFunction } from '@fexd/tools'
+import { Tooltip, Hook, EllipsisTooltip, useTranslation, useLazyRender, Action, ErrorBoundary } from '@fexd/pro-utils'
+import { ProFieldValueFieldType, ProFieldValueTypes, ProField, CopyButton, ReadonlyProField } from '@fexd/pro-form'
 
 import { useProps } from '../../../utils'
-import useActionsPlugin from '../../actions'
-import useModalPlugin from '../../modal'
 import useQueryFieldPlugin from '../../queryField'
-import useConfigPlugin from '../../config'
 import useValueTypePlugin, { getAllFieldFromColumn } from '../../valueType'
 import {
   ProTableEditFieldType,
@@ -50,6 +24,8 @@ import useActionsColumn from './useActionsColumn'
 import useItem from '../useItem'
 import useFieldParams from '../../editField/useFieldParams'
 import useColumnConfig from '../useColumnConfig'
+import useColumnSettings from './useColumnSettings'
+import { useMemoizedFn } from 'ahooks'
 // import useLazyRenderCell from './useLazyRenderCell'
 
 const defaultEllipsisTypes = ['input', 'text', 'number', 'digit', 'money', 'percent']
@@ -79,21 +55,17 @@ export default function useColumns(): ProTableColumnType[] {
     hideColumnsWhenNoData,
     lazyRenderCell: getLazyRenderCell,
     lightweightRenderCell,
-    id: tableId,
-    columnSettingPersistType,
   } = useProps()
-  const { setIconActions } = useActionsPlugin(({}) => [])
-  const { showModal } = useModalPlugin(({}) => [])
   const { types } = useValueTypePlugin(() => [])
   const queryField = useQueryFieldPlugin(({ dataSource }) => [dataSource])
-  const { t } = useConfigPlugin(() => [])
+
   const { dataSource: tableDataSource } = queryField
   const dataSource = propDataSource ?? tableDataSource
   const editableRowController = useEditableRow()
 
   const columnIndexRef = useRef(0)
   columnIndexRef.current = 0
-  const getSingleConfig = (column: ProTableColumnType<any>): ProTableColumnType<any> => {
+  const getSingleConfig = useMemoizedFn((column: ProTableColumnType<any>, arrIdx): ProTableColumnType<any> => {
     if ([Table.EXPAND_COLUMN, Table.SELECTION_COLUMN].some((builtInColumn) => builtInColumn === column)) {
       return column
     }
@@ -108,12 +80,17 @@ export default function useColumns(): ProTableColumnType[] {
     const valueType = column?.valueType ?? column?.type
     const ellipsis = column?.ellipsis ?? (defaultEllipsisTypes.includes(valueType as any) || !valueType)
     const columnIndex = columnIndexRef.current++ - 1
+    const columnSettingKey =
+      column?.key ??
+      (`${arrIdx}:${column?.dataIndex ?? column?.name}:${column?.type ?? column?.valueType ?? 'text'}` as any)
 
     return {
       showSorterTooltip: !!column?.tooltip ? false : true,
       // width: 80,
       align: defaultAlignConfig[valueType as 'money'] as any,
+      key: columnSettingKey,
       ...column,
+      columnSettingKey,
       render: (value: any, record: any, recordIndex: number, ...args) => (
         <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
           {() => {
@@ -387,7 +364,7 @@ export default function useColumns(): ProTableColumnType[] {
         </Space>
       ),
     }
-  }
+  })
 
   const allColumns: ProTableColumnType<any>[] = useMemo(
     () =>
@@ -398,183 +375,9 @@ export default function useColumns(): ProTableColumnType[] {
     [propColumns],
   )
 
-  const persistFormProState = useProState<any>(
-    {
-      showingColumns: allColumns.map((column, idx) => idx),
-      columnSort: allColumns.map((column, idx) => idx),
-    },
-    {
-      key: tableId ? `t@${tableId}:column-setting` : undefined,
-      persist: columnSettingPersistType,
-      autoMergeObject: false,
-      sync: false,
-      // beforeStatePersist: excludePersistFormKey,
-      // beforeStateRecovery: excludePersistFormKey,
-    },
-  )
+  const applyColumnSettings = useColumnSettings({ allColumns })
 
-  const columns: ProTableColumnType<any>[] = useMemo(
-    () => (allColumns ?? []).filter((column, idx) => persistFormProState.state.showingColumns.includes(idx)),
-    [allColumns, persistFormProState.state.showingColumns],
-  )
-
-  useMount(() => {
-    setIconActions({
-      settings: (
-        <Popover
-          title={t('table.columnSetting')}
-          trigger="click"
-          overlayClassName="f-pro-table-column-setting-popover"
-          content={
-            <ProField
-              noStyle
-              initialValue={persistFormProState.state.showingColumns as any}
-              props={{
-                onChange: (value) => {
-                  console.log(value)
-                  // setShowingColumns(value)
-                  persistFormProState.setState({
-                    showingColumns: value,
-                  })
-                },
-              }}
-              type="checkbox"
-              options={allColumns.map((column, idx) => ({
-                label: column.title ?? column.label,
-                value: idx,
-              }))}
-            />
-            // <Checkbox.Group
-            //   style={{ width: '100%' }}
-            //   defaultValue={persistFormProState.state.showingColumns}
-            //   onChange={(value) => {
-            //     // setShowingColumns(value)
-            //     persistFormProState.setState({
-            //       showingColumns: value,
-            //     })
-            //   }}
-            // >
-            //   <Grid
-            //     columns={1}
-            //     // gutter={[16, 16]}
-            //     layout={columns
-            //       .map((column, idx) => ({
-            //         label: column.title ?? column.label,
-            //         value: idx,
-            //       }))
-            //       .map((option: any) => ({
-            //         content: (
-            //           <Checkbox key={option?.value} value={option?.value}>
-            //             {option?.label}
-            //           </Checkbox>
-            //         ),
-            //       }))}
-            //   />
-            // </Checkbox.Group>
-          }
-          placement="bottomRight"
-        >
-          <Action actionType="button" icon={<SettingOutlined />} type="text" />
-        </Popover>
-      ),
-
-      // {
-      //   key: 'icon-settings',
-      //   icon: <SettingOutlined />,
-      //   onClick: async () => {
-      //     await showModal({
-      //       title: '显示字段配置',
-      //       width: 600,
-      //       content: (
-      //         <Hook>
-      //           {() => {
-      //             const [showingColumns, setShowingColumns] = React.useState(persistFormProState.state.showingColumns)
-      //             // const [columnTab, setColumnTab] = React.useState<any[]>(
-      //             //   columns.filter((column, idx) => showingColumns.includes(idx)),
-      //             // )
-
-      //             // const SortableContainer = useMemo(
-      //             //   () =>
-      //             //     sortableContainer(({ children }) => {
-      //             //       return <div className="f-pro-table-column-setting-dragable-container">{children}</div>
-      //             //     }),
-      //             //   [],
-      //             // )
-
-      //             // const SortableItem = useMemo(
-      //             //   () =>
-      //             //     sortableElement(function ListItem({ name }) {
-      //             //       return (
-      //             //         <div className="f-pro-table-column-setting-dragable-item">
-      //             //           <div>
-      //             //             <HolderOutlined />
-      //             //             {name}
-      //             //           </div>
-      //             //           <div>
-      //             //             <CloseOutlined />
-      //             //           </div>
-      //             //         </div>
-      //             //       )
-      //             //     }),
-      //             //   [],
-      //             // )
-
-      //             return (
-      //               <div className="f-pro-table-column-setting-container">
-      //                 <Checkbox.Group
-      //                   style={{ width: '100%' }}
-      //                   value={showingColumns}
-      //                   onChange={(value) => {
-      //                     console.log(value)
-      //                     setShowingColumns(value)
-      //                   }}
-      //                 >
-      //                   <Grid
-      //                     columns={1}
-      //                     // gutter={[16, 16]}
-      //                     layout={columns
-      //                       .map((column, idx) => ({
-      //                         label: column.title ?? column.label,
-      //                         value: idx,
-      //                       }))
-      //                       .map((option: any) => ({
-      //                         content: (
-      //                           <Checkbox key={option?.value} value={option?.value}>
-      //                             {option?.label}
-      //                           </Checkbox>
-      //                         ),
-      //                       }))}
-      //                   />
-      //                 </Checkbox.Group>
-      //                 {/* <Divider type="vertical" />
-      //                 <SortableContainer
-      //                   axis="y"
-      //                   lockAxis="y"
-      //                   distance={20}
-      //                   // pressDelay={200}
-      //                   // transitionDuration={0}
-      //                   onSortEnd={({ oldIndex, newIndex }) => {
-      //                     setColumnTab((columnTab) => arrayMove(columnTab, oldIndex, newIndex))
-      //                   }}
-      //                 >
-      //                   {columnTab.map((column, idx) => (
-      //                     <SortableItem
-      //                       key={`${column.title ?? column.label}:${idx}`}
-      //                       index={idx}
-      //                       name={column.title ?? column.label}
-      //                     />
-      //                   ))}
-      //                 </SortableContainer> */}
-      //               </div>
-      //             )
-      //           }}
-      //         </Hook>
-      //       ),
-      //     }).promise
-      //   },
-      // },
-    })
-  })
+  const columns: ProTableColumnType<any>[] = useMemo(() => applyColumnSettings(allColumns ?? []), [applyColumnSettings])
 
   const hasWidth = useMemo(() => (columns ?? []).some((col) => isExist(col?.width)), [columns])
 

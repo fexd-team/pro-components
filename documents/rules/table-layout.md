@@ -146,8 +146,9 @@ const mockData = Array(260).fill('').map(getMockData)
 export default () => {
   return (
     <ProTable
+      id="test-rule-table"
       title="表格标题"
-      tableKey="test-rule-table"
+      columnSettingPersistType="sessionStorage"
       bordered
       iconActions={['search', 'refresh', 'table-size', 'fullscreen', 'settings']}
       actions={['add', { content: '导出', icon: <UploadOutlined /> }]}
@@ -177,7 +178,7 @@ export default () => {
         { label: '时间范围', name: 'timeRange', type: 'timeRange' },
       ]}
       columns={[
-        { title: '名称', dataIndex: 'name', editField: true },
+        { title: '名称', dataIndex: 'name', editField: true, hideable: false },
         { title: '数字', dataIndex: 'number', valueType: 'number', editField: true },
         {
           title: '百分比',

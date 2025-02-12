@@ -42,11 +42,11 @@ export const useEditFieldPlugin = createPlugin(() => {
       title: t('editField.add'),
       maskClosable: false,
       okText: t('modal.confirm'),
-      ...modalProps,
       content: <EditField ref={editFieldRef} mode="add" />,
       onOk: () => run(editFieldRef.current, 'submit'),
       onCancel: () => run(editFieldRef.current, 'cancel'),
       destroyOnClose: true,
+      ...modalProps,
     })
 
     await modalController.current?.promise
@@ -82,7 +82,6 @@ export const useEditFieldPlugin = createPlugin(() => {
       title: readonly ? t('editField.details') : t('editField.edit'),
       maskClosable: readonly,
       okText: readonly ? t('modal.okText') : t('modal.confirm'),
-      ...modalProps,
       content: (
         <EditField ref={editFieldRef} initialValues={details ?? item ?? {}} item={details ?? item} mode={mode} />
       ),
@@ -90,6 +89,7 @@ export const useEditFieldPlugin = createPlugin(() => {
       onCancel: () => run(editFieldRef.current, 'cancel'),
       cancelButtonProps: readonly ? { style: { display: 'none' } } : undefined,
       destroyOnClose: true,
+      ...modalProps,
     })
 
     await modalController.current?.promise

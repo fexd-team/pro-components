@@ -19,7 +19,7 @@ describe('type="dateTime" 编辑模式', () => {
 
   // 初始值能正确赋值
   it('initialValue can be set correctly', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
     const { container } = render(<ProField className="test-picker" initialValue={value} type="dateTime" />)
     expect(container.querySelector('.test-picker .ant-picker-input > input')!.getAttribute('value')).toBe(
       run(dayjs(value), 'format', 'YYYY-MM-DD HH:mm:ss'),
@@ -28,14 +28,30 @@ describe('type="dateTime" 编辑模式', () => {
 
   // 能够正确选择日期
   it('can select date correctly', async () => {
-    const value = Date.now()
+    const testDate = dayjs('2025-01-16 11:43:00') // 使用固定的测试日期
     const { container } = render(<ProField className="test-picker" type="dateTime" props={{ open: true }} />)
-    const valueFormat = run(dayjs(Date.now()), 'format', 'YYYY-MM-DD HH:mm:ss')
-    fireEvent.click(document.querySelector(`.ant-picker-cell[title="${run(dayjs(value), 'format', 'YYYY-MM-DD')}"]`)!)
+
+    // 等待日期选择器打开
     await delay(100)
-    fireEvent.click(document.querySelector('.ant-picker-ok')!)
+
+    // 点击日期
+    const dateCell = document.querySelector(`.ant-picker-cell[title="${testDate.format('YYYY-MM-DD')}"]`)
+    expect(dateCell).toBeInTheDocument()
+    fireEvent.click(dateCell!)
     await delay(100)
-    expect(container.querySelector('.test-picker .ant-picker-input > input')!.getAttribute('value')).toBe(valueFormat)
+
+    // 点击确定按钮
+    const okButton = document.querySelector('.ant-picker-ok button')
+    expect(okButton).toBeInTheDocument()
+    fireEvent.click(okButton!)
+    await delay(100)
+
+    // 验证结果
+    // 由于时间部分可能会使用当前时间，我们只验证日期部分
+    const input = container.querySelector('.test-picker .ant-picker-input > input')
+    expect(input).toBeInTheDocument()
+    const inputValue = input!.getAttribute('value')
+    expect(inputValue?.startsWith(testDate.format('YYYY-MM-DD'))).toBe(true)
   })
 
   // 能够通过上下文配置正确的语言
@@ -58,7 +74,7 @@ describe('type="dateTime" 编辑模式', () => {
 
   // format 属性能够正确的渲染
   it('format can be set correctly', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
     const valueFormat = run(dayjs(value), 'format', 'YYYY~MM~DD HH/mm/ss')
     const { container } = render(
       <ProField className="test-picker" initialValue={value} type="dateTime" format="YYYY~MM~DD HH/mm/ss" />,
@@ -68,7 +84,7 @@ describe('type="dateTime" 编辑模式', () => {
 
   // value 能够正确随时区变化
   it('value can be set correctly with timezone', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
     dayjsTZ.setDefault('Etc/GMT-7')
     await delay(100)
     const valueFormat = run(dayjs(value), 'format', 'YYYY-MM-DD HH:mm:ss')
@@ -89,7 +105,7 @@ describe('type="dateTime" 浏览模式', () => {
 
   // 初始值能正确显示
   it('initialValue can be set correctly', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
     const valueFormat = run(dayjs(value), 'format', 'YYYY-MM-DD HH:mm:ss')
     const node = render(
       <div className="test-picker">
@@ -102,7 +118,7 @@ describe('type="dateTime" 浏览模式', () => {
 
   // format 属性能够正确的渲染
   it('format can be set correctly', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
     const valueFormat = run(dayjs(value), 'format', 'YYYY~MM~DD HH/mm/ss')
     const node = render(
       <div className="test-picker">
@@ -152,7 +168,7 @@ describe('type="dateTime" 浏览模式', () => {
   })
 
   it('value can be set correctly with timezone', async () => {
-    const value = Date.now()
+    const value = dayjs('2025-01-16 11:43:00').valueOf()
 
     dayjsTZ.setDefault('Etc/GMT-7')
     await delay(100)

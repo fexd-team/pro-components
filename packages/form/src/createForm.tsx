@@ -2,11 +2,15 @@ import React from 'react'
 import { NamePath, InternalNamePath } from 'antd/es/form/interface'
 import { getFieldId, toArray } from 'antd/es/form/util'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import { FormStore } from 'rc-field-form/es/useForm'
+// import { FormStore } from 'rc-field-form/es/useForm'
+
 import { InternalFormInstance } from 'rc-field-form/es/interface'
 
 import { ProFormInstance } from './types'
 import { validateFormGroups } from './useForm'
+
+// 为确保 jest 正常执行，调整该类的导出方式
+const { FormStore } = require('rc-field-form/lib/useForm')
 
 function toNamePathStr(name: NamePath) {
   const namePath = toArray(name)

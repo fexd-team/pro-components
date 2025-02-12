@@ -32,7 +32,8 @@ import {
   RowProps,
 } from 'antd'
 import { DescriptionsItemProps } from 'antd/es/descriptions/Item'
-import { CheckboxGroupProps } from 'antd/es/checkbox'
+// import { CheckboxGroupProps } from 'antd/es/checkbox'
+import { RemoteCheckboxProps } from './valueTypes/type-select-button/RemoteCheckbox'
 import { TextAreaProps } from 'antd/es/input/TextArea'
 import { PresetColorType, PresetStatusColorType } from 'antd/es/_util/colors'
 import { SliderSingleProps, SliderRangeProps } from 'antd/es/slider'
@@ -64,16 +65,16 @@ export interface ProFieldItemProps extends FormItemProps {
   key?: any
 }
 
-type BuiltInRule = UniteOmit<'same-month' | 'days-span', string>
+export type BuiltInRule = UniteOmit<'same-month' | 'days-span', string>
 
-interface ModalSelectProps {
+export interface ModalSelectProps {
   getModalConfig: (params: {
     setValue: (value: ProFieldOptionObjectType | ProFieldOptionObjectType[]) => any
     destroy: () => void
   }) => ShowModalConfig
 }
 
-interface BuiltInHookParams {
+export interface BuiltInHookParams {
   [key: string]: any
   form: ProFormInstance<any>
 }
@@ -106,7 +107,7 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
     | TransferProps<any>
     | CascaderProps<any>
     | RateProps
-    | CheckboxGroupProps
+    | RemoteCheckboxProps
     | TextAreaProps
     | SliderSingleProps
     | SliderRangeProps
