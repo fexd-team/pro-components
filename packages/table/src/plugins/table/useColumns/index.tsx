@@ -139,15 +139,16 @@ export default function useColumns(): ProTableColumnType[] {
                   <Hook key={column?.key ?? String(column?.dataIndex)} value={value}>
                     {() => {
                       const props: any = config?.props ?? {}
+                      const content = props?.children ?? props?.content ?? value
                       return (
                         (
                           {
-                            text: <Typography.Text {...props}>{value}</Typography.Text>,
-                            link: <Typography.Link {...props}>{value}</Typography.Link>,
+                            text: <Typography.Text {...props}>{content}</Typography.Text>,
+                            link: <Typography.Link {...props}>{content}</Typography.Link>,
                             tag: <Tag {...props}>{value}</Tag>,
                             button: (
                               <Action size="small" {...props}>
-                                {value}
+                                {content}
                               </Action>
                             ),
                             avatar: <Avatar src={value} {...props} />,
@@ -377,7 +378,10 @@ export default function useColumns(): ProTableColumnType[] {
 
   const applyColumnSettings = useColumnSettings({ allColumns })
 
-  const columns: ProTableColumnType<any>[] = useMemo(() => applyColumnSettings(allColumns ?? []), [applyColumnSettings])
+  const columns: ProTableColumnType<any>[] = useMemo(
+    () => applyColumnSettings(allColumns ?? []),
+    [applyColumnSettings, allColumns],
+  )
 
   const hasWidth = useMemo(() => (columns ?? []).some((col) => isExist(col?.width)), [columns])
 

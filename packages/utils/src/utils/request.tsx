@@ -9,13 +9,13 @@ import axios, {
   AxiosRequestTransformer,
   AxiosRequestHeaders,
   CreateAxiosDefaults,
+  AxiosError,
 } from 'axios'
 import {
   setupCache,
   AxiosCacheInstance as AxiosInstance,
   CacheAxiosResponse as AxiosResponse,
   CacheRequestConfig,
-  InternalCacheRequestConfig,
   CacheOptions,
   defaultRequestInterceptor,
   AxiosCacheInstance,
@@ -24,12 +24,17 @@ import { qs, isString, isObject, isArray, isExist, isFunction, run } from '@fexd
 // import { useCoverable, CoverableValue } from 'react-coverable'
 import { useCoverable, CoverableValue } from '../hooks/useCoverable'
 import { DeepPartial, Optional, DeepRequired } from 'utility-types'
+import JSONbig from 'json-bigint'
 
 import catchPromise from './catchPromise'
 import deepMerge from './deepMerge'
 import { DeepPartialObject } from './type-tools'
 
-type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> & CacheRequestConfig<T>
+type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> &
+  CacheRequestConfig<T> & {
+    /** 是否处理大数字（转为字符串） */
+    bigIntJSONParsing?: boolean
+  }
 
 export const builtInRequestConfig = {
   responseInterceptors: {
@@ -88,7 +93,7 @@ export const builtInRequestConfig = {
       }
     }) as Parameters<typeof request.interceptors.response.use>['1'],
   },
-  transformRequest: ((params, headers = {} as AxiosRequestHeaders) => {
+  transformRequest: function transformRequest(params, headers = {} as AxiosRequestHeaders) {
     switch (headers?.['Content-Type']) {
       case 'application/x-www-form-urlencoded':
         return qs.stringify(params)
@@ -109,7 +114,39 @@ export const builtInRequestConfig = {
         return params
       }
     }
-  }) as AxiosRequestTransformer,
+  } as AxiosRequestTransformer,
+  transformResponse: function transformResponse(data) {
+    const self = this as any
+    const transitional = self.transitional || {
+      silentJSONParsing: true,
+      forcedJSONParsing: true,
+      clarifyTimeoutError: false,
+    }
+    const forcedJSONParsing = transitional && transitional.forcedJSONParsing
+    const JSONRequested = self.responseType === 'json'
+
+    if (data && isString(data) && ((forcedJSONParsing && !self.responseType) || JSONRequested)) {
+      const silentJSONParsing = transitional && transitional.silentJSONParsing
+      const strictJSONParsing = !silentJSONParsing && JSONRequested
+
+      try {
+        const bigIntJSONParsing = self.bigIntJSONParsing
+        if (bigIntJSONParsing) {
+          return JSONbig.parse(data)
+        }
+        return JSON.parse(data)
+      } catch (e: any) {
+        if (strictJSONParsing) {
+          if (e.name === 'SyntaxError') {
+            throw AxiosError.from(e, AxiosError.ERR_BAD_RESPONSE, self, null, self.response)
+          }
+          throw e
+        }
+      }
+    }
+
+    return data
+  },
 }
 
 const getCacheRequestInterceptor = (axios: AxiosCacheInstance) => {
@@ -132,8 +169,20 @@ const getCacheRequestInterceptor = (axios: AxiosCacheInstance) => {
 
 const rawRequest = axios.create({
   timeout: 60 * 1000,
-  // @ts-ignore
-  transformRequest: [(...args: any[]) => builtInRequestConfig?.transformRequest?.(...args)],
+  // @ts-ignore bigIntJSONParsing 是自定义配置项
+  bigIntJSONParsing: true, // 默认开启大数字处理
+  transformRequest: [
+    function transformRequest(...args: any[]) {
+      // @ts-ignore
+      return builtInRequestConfig?.transformRequest?.apply?.(this, args)
+    },
+  ],
+  transformResponse: [
+    function transformResponse(...args: any[]) {
+      // @ts-ignore
+      return builtInRequestConfig?.transformResponse?.apply?.(this, args)
+    },
+  ],
 })
 
 const defaultCacheOptions: CacheOptions = {

@@ -24,14 +24,18 @@
     "eslint:error": "npm run eslint -- --quiet",
     "stylelint": "stylelint \"./{packages,documents}/**/*.{css,less}\"",
     "tsc:lint": "tsc --noEmit",
-    "release:public": "pnpm -r publish --no-git-checks --force --access=public",
-    "release": "pnpm -r publish --no-git-checks --force",
+    "version:check": "node ./scripts/checkVersionAndMarkPrivate.js check",
+    "version:mark-private": "node ./scripts/checkVersionAndMarkPrivate.js mark-private",
+    "version:restore": "node ./scripts/checkVersionAndMarkPrivate.js restore",
+    "release:public": "npm run version:check && pnpm -r publish --no-git-checks --force --access=public && npm run version:restore",
+    "release": "npm run version:check && pnpm -r publish --no-git-checks --force && npm run version:restore",
     "unpublish": "node ./scripts/unpublish",
     "link:project": "node ./scripts/symlink",
     "size": "node ./scripts/size/index.js",
     "new:component": "node ./scripts/new-component/index.js",
     "patch": "patch-package code-kitchen --use-yarn --patch-dir ./scripts/patches",
-    "postinstall": "patch-package --patch-dir ./scripts/patches"
+    "postinstall": "patch-package --patch-dir ./scripts/patches",
+    "version:auto-update": "node ./scripts/autoUpdateVersions.js"
   },
   "devDependencies": {
     "@cjy0208/import-cost": "^2.2.1",
@@ -57,6 +61,7 @@
     "father": "^4.1.6",
     "filesize": "^8.0.3",
     "husky": "4.x",
+    "ignore": "^7.0.3",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "less": "4.x",
@@ -75,7 +80,8 @@
     "ts-jest": "^28.0.5",
     "turbo": "1.2.14",
     "typescript": "^4.4.4",
-    "yargs": "^17.2.1"
+    "yargs": "^17.2.1",
+    "glob": "^7.1.6"
   },
   "resolutions": {
     "react": "^16.8.0",

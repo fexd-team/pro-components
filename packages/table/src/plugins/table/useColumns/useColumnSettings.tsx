@@ -48,6 +48,9 @@ export default function useColumnSettings({ allColumns }) {
     },
   )
 
+  const allColumnsRef = React.useRef(allColumns)
+  allColumnsRef.current = allColumns
+
   useMount(() => {
     setIconActions({
       settings: (
@@ -59,6 +62,7 @@ export default function useColumnSettings({ allColumns }) {
           content={
             <Hook>
               {() => {
+                const allColumns = allColumnsRef.current
                 const [{ hiddenColumns, columnSort: initialColumnSort }] = useState(() =>
                   persistColumnSettingProState.getState(),
                 )

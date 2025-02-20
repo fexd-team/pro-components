@@ -1,8 +1,8 @@
 import { useMemo, isValidElement } from 'react'
-
+import { isAhooksUseRequestResult } from '@fexd/pro-utils'
 import { useRequest } from 'ahooks'
 import { Result } from 'ahooks/es/useRequest/src/types'
-import { run, isArray, isString, isObject, intersection, isNumber, isExist, isBoolean } from '@fexd/tools'
+import { run, isArray, isString, isObject, isNumber, isBoolean } from '@fexd/tools'
 
 const adaptOptions = (rawOptions: any[] = []): any[] => {
   let options = rawOptions
@@ -50,33 +50,8 @@ const adaptOptions = (rawOptions: any[] = []): any[] => {
   ]
 }
 
-const useRequestKeys = [
-  'loading',
-  'data',
-  'error',
-  'params',
-  'cancel',
-  'refresh',
-  'refreshAsync',
-  'run',
-  'runAsync',
-  'mutate',
-]
 export default function useRemoteOptions(optionConfigs: any) {
-  const isService = useMemo(() => {
-    if (!isObject(optionConfigs)) {
-      return false
-    }
-    const serviceKeys = useRequestKeys // Object.keys(insideService)
-    if (serviceKeys?.length === 0) {
-      return false
-    }
-    // 取 keys 交集
-    const matchKeys = intersection(serviceKeys, Object.keys(optionConfigs))
-
-    // 判断 keys 重合度大于 50%，认为传入的是 service
-    return matchKeys?.length / serviceKeys?.length >= 0.5
-  }, [optionConfigs])
+  const isService = useMemo(() => isAhooksUseRequestResult(optionConfigs), [optionConfigs])
 
   const isRemote = !((isObject(optionConfigs) && !isService) || Array.isArray(optionConfigs))
 

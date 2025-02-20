@@ -34,20 +34,22 @@ export default function RemoteOptionsView(props: any): any {
 
     return (
       <Space wrap size={3}>
-        {props?.value.filter(isExist).map((value: any, idx: number) => {
-          const target: any = options.find((item: any) => String(item?.value) === String(value))
+        {props?.value
+          .filter((value) => isExist(isExist) && value !== '')
+          .map((value: any, idx: number) => {
+            const target: any = options.find((item: any) => String(item?.value) === String(value))
 
-          return (
-            <Tag
-              style={{ margin: 0 }}
-              color={isString(target?.tag) ? target?.tag : undefined}
-              {...(isObject(target?.tag) ? target?.tag : {})}
-              key={idx}
-            >
-              {target?.label ?? value ?? '--'}
-            </Tag>
-          )
-        })}
+            return (
+              <Tag
+                style={{ margin: 0 }}
+                color={isString(target?.tag) ? target?.tag : undefined}
+                {...(isObject(target?.tag) ? target?.tag : {})}
+                key={idx}
+              >
+                {(target?.label ?? value) || '--'}
+              </Tag>
+            )
+          })}
       </Space>
     )
 
@@ -76,6 +78,10 @@ export default function RemoteOptionsView(props: any): any {
     //   : '--'
   }
 
+  if (props?.value === '') {
+    return '--'
+  }
+
   const target = options.find((item: any) => String(item?.value) === String(props?.value))
 
   // if (!target?.label) {
@@ -101,7 +107,7 @@ export default function RemoteOptionsView(props: any): any {
       color={isString(target?.tag) ? target?.tag : undefined}
       {...(isObject(target?.tag) ? target?.tag : {})}
     >
-      {target?.label ?? props?.value ?? '--'}
+      {(target?.label ?? props?.value) || '--'}
     </Tag>
   )
 }

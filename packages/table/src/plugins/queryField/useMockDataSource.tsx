@@ -6,6 +6,7 @@ import { Table } from 'antd'
 import { run, isObject, flatten, isFunction, isNumber, isArray, sample } from '@fexd/tools'
 import { Random } from 'mockjs'
 import { ProFieldValueTypes } from '@fexd/pro-form'
+import { isAhooksUseRequestResult } from '@fexd/pro-utils'
 import { useMemoizedFn } from 'ahooks'
 import dayjs from 'dayjs'
 
@@ -14,6 +15,10 @@ import { getFieldFromColumn } from '../valueType'
 import { useProps } from '../../utils'
 
 const randomOptionValue = (options: any) => {
+  if (isAhooksUseRequestResult(options)) {
+    return Random.name()
+  }
+
   if (isArray(options) && options?.length > 0) {
     const opt = Random.pick(options)
     return opt?.value ?? opt
