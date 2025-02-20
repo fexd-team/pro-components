@@ -13,7 +13,7 @@ export default defineConfig({
   favicons: [logoPath],
   outputPath: './docs',
   // mode: 'site',
-  // history: { type: 'hash' },
+  history: { type: 'hash' },
   publicPath: process.env.NODE_ENV === 'production' ? '/pro-components/' : '/',
   resolve: {
     docDirs: ['documents'],
