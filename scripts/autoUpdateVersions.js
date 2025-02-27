@@ -17,19 +17,19 @@ function hasSourceChanged(packagePath) {
     const changedFiles = statusResult
       .split('\n')
       .filter(Boolean)
-      .map(line => {
+      .map((line) => {
         const status = line.slice(0, 2)
         const filePath = line.slice(3)
         return {
           status,
-          path: filePath
+          path: filePath,
         }
       })
 
     const hasChanges = changedFiles.length > 0
     if (hasChanges) {
       console.log(`\n检测到 ${path.dirname(packagePath)} 有源码改动:`)
-      changedFiles.forEach(file => {
+      changedFiles.forEach((file) => {
         const status = file.status.trim()
         let statusText = ''
         if (status === 'M') statusText = '修改'
@@ -44,13 +44,13 @@ function hasSourceChanged(packagePath) {
 
     return {
       hasChanges,
-      changedFiles: changedFiles.map(f => f.path)
+      changedFiles: changedFiles.map((f) => f.path),
     }
   } catch (error) {
     console.error(`检查 ${srcPath} 改动时发生错误:`, error.message)
     return {
       hasChanges: false,
-      changedFiles: []
+      changedFiles: [],
     }
   }
 }
@@ -68,19 +68,19 @@ function hasDependenciesChanged(packagePath) {
     const changedFiles = statusResult
       .split('\n')
       .filter(Boolean)
-      .map(line => {
+      .map((line) => {
         const status = line.slice(0, 2)
         const filePath = line.slice(3)
         return {
           status,
-          path: filePath
+          path: filePath,
         }
       })
 
     const hasChanges = changedFiles.length > 0
     if (hasChanges) {
       console.log(`\n检测到 ${packagePath} 有 package.json 改动:`)
-      changedFiles.forEach(file => {
+      changedFiles.forEach((file) => {
         const status = file.status.trim()
         let statusText = ''
         if (status === 'M') statusText = '修改'
@@ -95,13 +95,13 @@ function hasDependenciesChanged(packagePath) {
 
     return {
       hasChanges,
-      changedFiles: changedFiles.map(f => f.path)
+      changedFiles: changedFiles.map((f) => f.path),
     }
   } catch (error) {
     console.error(`检查 ${packagePath} 改动时发生错误:`, error.message)
     return {
       hasChanges: false,
-      changedFiles: []
+      changedFiles: [],
     }
   }
 }
@@ -259,7 +259,7 @@ function processVersionUpdates() {
   Object.entries(packagesInfo).forEach(([pkgName, info]) => {
     const sourceChanges = hasSourceChanged(info.path)
     const dependencyChanges = hasDependenciesChanged(info.path)
-    
+
     if (sourceChanges.hasChanges || dependencyChanges.hasChanges) {
       info.hasChanged = true
       info.changedFiles = [...sourceChanges.changedFiles, ...dependencyChanges.changedFiles]
@@ -308,9 +308,11 @@ function processVersionUpdates() {
         path: info.path,
         currentVersion: info.version,
         newVersion,
-        reason: info.hasChanged 
-          ? `源码改动 (变更文件: ${info.changedFiles.join(', ')})` 
-          : `依赖更新 (${Object.entries(depVersions).map(([dep, ver]) => `${dep}@${ver}`).join(', ')})`,
+        reason: info.hasChanged
+          ? `源码改动 (变更文件: ${info.changedFiles.join(', ')})`
+          : `依赖更新 (${Object.entries(depVersions)
+              .map(([dep, ver]) => `${dep}@${ver}`)
+              .join(', ')})`,
         depVersions,
       })
       return newVersion

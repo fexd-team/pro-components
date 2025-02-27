@@ -243,7 +243,7 @@ function migrateFiles() {
     console.log(`\n迁移完成！共迁移 ${totalFiles} 个文件`)
     console.log(`目标目录: ${normalizedTargetDir}`)
     console.log('\n你可以检查以下目录:')
-    directories.forEach(dir => {
+    directories.forEach((dir) => {
       if (fs.existsSync(dir.target)) {
         console.log(`  - ${dir.target}`)
       }
