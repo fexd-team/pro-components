@@ -15,6 +15,7 @@ package-lock.json
 /**/lib
 /docs-dist
 # /docs
+/packages/components/documents
 
 # misc
 .DS_Store

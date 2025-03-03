@@ -37,6 +37,7 @@ importers:
       esbuild-wasm: 0.14.54
       father: ^4.1.6
       filesize: ^8.0.3
+      fs-extra: ^11.3.0
       glob: ^7.1.6
       husky: 4.x
       ignore: ^7.0.3
@@ -106,6 +107,7 @@ importers:
       esbuild-wasm: 0.14.54
       father: 4.1.6
       filesize: 8.0.7
+      fs-extra: 11.3.0
       glob: 7.2.3
       husky: 4.3.8
       ignore: 7.0.3
@@ -133,9 +135,9 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.44
+      '@fexd/pro-form': ^0.2.45
       '@fexd/pro-provider': ^0.1.13
-      '@fexd/pro-table': ^0.5.55
+      '@fexd/pro-table': ^0.5.56
       '@fexd/pro-utils': ^0.2.18
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
@@ -240,7 +242,7 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.44
+      '@fexd/pro-form': ^0.2.45
       '@fexd/pro-provider': ^0.1.13
       '@fexd/pro-utils': ^0.2.18
       '@fexd/tools': ^0.1.6
@@ -10919,6 +10921,15 @@ packages:
   /fs-extra/10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
     engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
+  /fs-extra/11.3.0:
+    resolution: {integrity: sha512-Z4XaCL6dUDHfP/jT25jJKMmtxvuwbkrD1vNSMFlo9lNLY2c5FHYSQgHPRZUjAB26TpDEoW9HCOgplrdbaPV/ew==}
+    engines: {node: '>=14.14'}
     dependencies:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0

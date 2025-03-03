@@ -46,10 +46,8 @@ export default function useActionsColumn({
 
   const {
     builtInActions,
-    renderColumnsActions,
     setColumnActions,
     hasColumnsActions: checkHasColumnsActions,
-    hasColumnActions: checkHasColumnActions,
   } = useActionsPlugin(({ builtInActions }) => [builtInActions])
 
   const dataSource = (propDataSource ?? tableDataSource) as any[]
@@ -160,23 +158,33 @@ export default function useActionsColumn({
           forceVisible: !lazyRenderCell,
           placeholderWrapperClassName: 'f-pro-table-cell-placeholder',
           placeholder: <span className="f-pro-table-cell-placeholder-content"> -- </span>,
-          content: useMemo(() => {
-            const hasActions = checkHasColumnActions(record, recordIndex, dataSource)
+          content: useMemo(
+            () => (
+              <Hook>
+                {() => {
+                  const { renderColumnsActions, hasColumnActions: checkHasColumnActions } = useActionsPlugin(
+                    ({ builtInActions }) => [builtInActions],
+                  )
+                  const hasActions = checkHasColumnActions(record, recordIndex, dataSource)
 
-            if (!hasActions) {
-              return <div className="f-pro-table-column-action-placeholder">--</div>
-            }
-            return (
-              <div className="f-pro-table-column-action-wrapper">
-                {renderColumnsActions(
-                  record,
-                  recordIndex,
-                  dataSource,
-                  editable ? ['table-edit-save', 'table-edit-cancel'] : undefined,
-                )}
-              </div>
-            )
-          }, [record, recordIndex, dataSource, editable]),
+                  if (!hasActions) {
+                    return <div className="f-pro-table-column-action-placeholder">--</div>
+                  }
+                  return (
+                    <div className="f-pro-table-column-action-wrapper">
+                      {renderColumnsActions(
+                        record,
+                        recordIndex,
+                        dataSource,
+                        editable ? ['table-edit-save', 'table-edit-cancel'] : undefined,
+                      )}
+                    </div>
+                  )
+                }}
+              </Hook>
+            ),
+            [record, recordIndex, dataSource, editable],
+          ),
           debugLog: false,
         })
 

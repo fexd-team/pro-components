@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-components",
-  "version": "0.2.78",
+  "version": "0.2.79",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -23,7 +23,7 @@
     "@babel/runtime": "^7.13.10",
     "@fexd/pro-form": "^0.2.45",
     "@fexd/pro-provider": "^0.1.13",
-    "@fexd/pro-table": "^0.5.56",
+    "@fexd/pro-table": "^0.5.57",
     "@fexd/pro-utils": "^0.2.18",
     "@fexd/tools": "^0.1.6",
     "@types/hoist-non-react-statics": "^3.3.1",
@@ -39,6 +39,7 @@
     "react-dom": "^16.8.0"
   },
   "files": [
+    "documents",
     "es",
     "lib",
     "src",
