@@ -34,6 +34,7 @@ type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> &
   CacheRequestConfig<T> & {
     /** 是否处理大数字（转为字符串） */
     bigIntJSONParsing?: boolean
+    bigIntJSONOptions?: Parameters<typeof JSONbig>[0]
   }
 
 export const builtInRequestConfig = {
@@ -131,8 +132,14 @@ export const builtInRequestConfig = {
 
       try {
         const bigIntJSONParsing = self.bigIntJSONParsing
+        const bigIntJSONOptions = self.bigIntJSONOptions
         if (bigIntJSONParsing) {
-          return JSONbig.parse(data)
+          const parser = bigIntJSONOptions
+            ? JSONbig(bigIntJSONOptions)
+            : JSONbig({
+                storeAsString: true,
+              })
+          return parser.parse(data)
         }
         return JSON.parse(data)
       } catch (e: any) {
@@ -171,6 +178,8 @@ const rawRequest = axios.create({
   timeout: 60 * 1000,
   // @ts-ignore bigIntJSONParsing 是自定义配置项
   bigIntJSONParsing: true, // 默认开启大数字处理
+  // @ts-ignore bigIntJSONOptions 是自定义配置项
+  bigIntJSONOptions: { storeAsString: true },
   transformRequest: [
     function transformRequest(...args: any[]) {
       // @ts-ignore
