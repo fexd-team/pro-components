@@ -1,30 +1,33 @@
 import React from 'react'
+import { FormInstance } from 'antd'
 import { NamePath, InternalNamePath } from 'antd/es/form/interface'
 import { getFieldId, toArray } from 'antd/es/form/util'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import { FormStore } from 'rc-field-form/es/useForm'
-
+import { flatten } from '@fexd/tools'
 import { InternalFormInstance } from 'rc-field-form/es/interface'
 
 import { ProFormInstance } from './types'
-import { validateFormGroups } from './useForm'
-
-// // 为确保 jest 正常执行，调整该类的导出方式
-// const { FormStore } = require('rc-field-form/lib/useForm')
+import ProFormStore from './ProFormStore'
 
 function toNamePathStr(name: NamePath) {
   const namePath = toArray(name)
   return namePath.join('_')
 }
 
-export default function createForm<T = any>(
-  form?: ProFormInstance<T> & InternalFormInstance,
-): ProFormInstance<T> & InternalFormInstance {
+export async function validateFormGroups<T>(form: FormInstance<T> | ProFormInstance<T>, groups: string[]) {
+  // @ts-ignore
+  const groupRegisterMap = form.groupRegisterMap as any
+  const fieldNames = flatten(groups.map((group) => Object.values(groupRegisterMap?.[group] ?? {}) ?? []))
+
+  return await form.validateFields(fieldNames)
+}
+
+export default function createForm<T = any>(form?: ProFormInstance<T>): ProFormInstance<T> {
   if (form) {
     return form
   }
 
-  const formStore = new FormStore(() => {})
+  const formStore = new ProFormStore(() => {})
 
   const itemsRef = {
     current: {},

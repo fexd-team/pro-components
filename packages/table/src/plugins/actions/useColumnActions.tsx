@@ -50,7 +50,7 @@ export default function useColumnActions(): {
         if (success) {
           await queryField.search()
           await delay(100)
-          if ((queryField?.getDataSource?.()?.length ?? 0) <= 0) {
+          if ((queryField?.getDataSource?.()?.length ?? 0) <= 0 && queryField?.getPaginationParams()?.page !== 1) {
             queryField?.setPaginationParams?.({ page: 1 })
             await delay(100)
             await queryField?.search?.({

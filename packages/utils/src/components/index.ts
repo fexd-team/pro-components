@@ -42,3 +42,6 @@ export * from './Portal'
 
 export { default as PreviewImageGroup } from './PreviewImageGroup'
 export * from './PreviewImageGroup'
+
+export { default as showTipsWithResponse } from './showTipsWithResponse'
+export * from './showTipsWithResponse'

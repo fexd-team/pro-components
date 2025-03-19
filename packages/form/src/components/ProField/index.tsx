@@ -35,7 +35,7 @@ export const ProField: React.FC<ProFieldProps> = memo(
     const {
       hook,
       dependencies,
-      shouldUpdate = !dependencies,
+      shouldUpdate,
       group: groupRegisterInfo,
       ...field
     } = {
@@ -78,8 +78,14 @@ export const ProField: React.FC<ProFieldProps> = memo(
     useImperativeHandle(ref, () => fieldRef)
     const rawContent = run(() => {
       if (isFunction(hook)) {
+        const shouldNotUpdate = dependencies?.length === 0 || shouldUpdate === false
+
         return (
-          <FormItem shouldUpdate={shouldUpdate} dependencies={dependencies} noStyle>
+          <FormItem
+            noStyle
+            shouldUpdate={shouldNotUpdate ? () => false : !dependencies ? true : shouldUpdate}
+            dependencies={shouldNotUpdate ? undefined : dependencies}
+          >
             {(form, ...args) => {
               let dynamicField: any = hook({ form } as any, ...args)!
 

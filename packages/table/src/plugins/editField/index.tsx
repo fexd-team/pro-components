@@ -2,7 +2,7 @@ import React, { useRef, createRef, useMemo } from 'react'
 import { PlusOutlined, EditOutlined, ZoomInOutlined } from '@ant-design/icons'
 import { run, delay } from '@fexd/tools'
 import { useMount, useMemoizedFn } from 'ahooks'
-import { ModalControllerType } from '@fexd/pro-utils'
+import { ModalControllerType, ShowModalConfig } from '@fexd/pro-utils'
 import { ProFormInternalParams } from '@fexd/pro-form'
 
 import { createPlugin, useProps } from '../../utils'
@@ -28,7 +28,7 @@ export const useEditFieldPlugin = createPlugin(() => {
     form: ProFormInternalParams['form']
   }>(null)
 
-  const showAddModal = useMemoizedFn(async () => {
+  const showAddModal = useMemoizedFn(async (customizedModalConfig: ShowModalConfig = {}) => {
     if (showingModal.current) {
       return
     }
@@ -47,6 +47,7 @@ export const useEditFieldPlugin = createPlugin(() => {
       onCancel: () => run(editFieldRef.current, 'cancel'),
       destroyOnClose: true,
       ...modalProps,
+      ...customizedModalConfig,
     })
 
     await modalController.current?.promise
@@ -54,47 +55,60 @@ export const useEditFieldPlugin = createPlugin(() => {
   })
 
   // view 与 edit 暂时共用此函数
-  const showEditModal = useMemoizedFn(async (item: any, customizedModalConfig: any = {}) => {
-    const readonly = customizedModalConfig?.readonly ?? false
-    const mode = readonly ? 'view' : 'edit'
+  const showEditModal = useMemoizedFn(
+    async (
+      item: any,
+      customizedModalConfig: ShowModalConfig & {
+        readonly?: boolean
+      } = {},
+    ) => {
+      const readonly = customizedModalConfig?.readonly ?? false
+      const mode = readonly ? 'view' : 'edit'
 
-    if (showingModal.current) {
-      return
-    }
+      if (showingModal.current) {
+        return
+      }
 
-    await delay(100)
-    const { success = true, data: details = item } = ((await run(onView, undefined, item, mode)) as any) ?? {
-      data: item,
-      success: true,
-    }
+      await delay(100)
+      const { success = true, data: details = item } = ((await run(onView, undefined, item, mode)) as any) ?? {
+        data: item,
+        success: true,
+      }
 
-    if (!success) {
-      console.warn('editField plugin onView failed')
-      return
-    }
-    showingModal.current = true
-    // const ref = createRef()
-    const modalProps = run<any>(readonly ? viewFieldModalProps : editFieldModalProps, undefined, details ?? item, mode)
-    const show = modalProps?.drawer ? showDrawer : showModal
+      if (!success) {
+        console.warn('editField plugin onView failed')
+        return
+      }
+      showingModal.current = true
+      // const ref = createRef()
+      const modalProps = run<any>(
+        readonly ? viewFieldModalProps : editFieldModalProps,
+        undefined,
+        details ?? item,
+        mode,
+      )
+      const show = modalProps?.drawer ? showDrawer : showModal
 
-    // @ts-ignore
-    modalController.current = show({
-      title: readonly ? t('editField.details') : t('editField.edit'),
-      maskClosable: readonly,
-      okText: readonly ? t('modal.okText') : t('modal.confirm'),
-      content: (
-        <EditField ref={editFieldRef} initialValues={details ?? item ?? {}} item={details ?? item} mode={mode} />
-      ),
-      onOk: () => run(editFieldRef.current, 'submit'),
-      onCancel: () => run(editFieldRef.current, 'cancel'),
-      cancelButtonProps: readonly ? { style: { display: 'none' } } : undefined,
-      destroyOnClose: true,
-      ...modalProps,
-    })
+      // @ts-ignore
+      modalController.current = show({
+        title: readonly ? t('editField.details') : t('editField.edit'),
+        maskClosable: readonly,
+        okText: readonly ? t('modal.okText') : t('modal.confirm'),
+        content: (
+          <EditField ref={editFieldRef} initialValues={details ?? item ?? {}} item={details ?? item} mode={mode} />
+        ),
+        onOk: () => run(editFieldRef.current, 'submit'),
+        onCancel: () => run(editFieldRef.current, 'cancel'),
+        cancelButtonProps: readonly ? { style: { display: 'none' } } : undefined,
+        destroyOnClose: true,
+        ...modalProps,
+        ...customizedModalConfig,
+      })
 
-    await modalController.current?.promise
-    showingModal.current = false
-  })
+      await modalController.current?.promise
+      showingModal.current = false
+    },
+  )
 
   useMount(() => {
     setTableActions({

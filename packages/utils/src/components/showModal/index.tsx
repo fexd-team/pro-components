@@ -1,6 +1,7 @@
-import React, { ReactNode, useRef } from 'react'
+import React, { ReactNode, useRef, useState, Fragment } from 'react'
 import { useSetState, useSafeState } from 'ahooks'
-import { run, classnames, isUndefined } from '@fexd/tools'
+import { run, classnames, isUndefined, isArray } from '@fexd/tools'
+import { Tabs } from 'antd'
 import { Optional } from 'utility-types'
 
 import showDrawer, { ShowDrawerConfig, DrawerInternalControllerType, DrawerProps } from '../showDrawer'
@@ -8,6 +9,7 @@ import DraggableModal, { DraggableModalProps } from './DraggableModal'
 import { modalControllers, ModalControllerType } from './controller'
 import { stationMap } from './ModalStation'
 import useModalActions, { ActionModalProps } from './useModalActions'
+import Hook from '../Hook'
 
 interface ModalInternalControllerType {
   initialProps: VisibleModalProps
@@ -72,23 +74,74 @@ const VisibleModal = React.forwardRef(function VisibleModal(initialProps: Visibl
   )
 })
 
-export interface ShowModalConfig extends Omit<ShowDrawerConfig, 'footer' | 'children' | 'getContainer'> {}
+export interface ShowModalConfig extends Omit<ShowDrawerConfig, 'footer' | 'children' | 'getContainer' | 'content'> {}
 export interface ShowModalConfig extends VisibleModalProps {
   stationId?: string
   greyBody?: boolean
   drawer?: boolean
-  content:
+  content?:
     | ReactNode
     | ((
         controller: ModalControllerType<Optional<VisibleModalProps & DrawerProps>> &
           ModalInternalControllerType &
           DrawerInternalControllerType,
       ) => ReactNode)
+  tabs?: Pick<ShowModalConfig, 'title' | 'content'>[]
 }
 
-export default function showModal(config: ShowModalConfig): ModalControllerType {
+export default function showModal(rawConfig: ShowModalConfig): ModalControllerType {
+  let config = rawConfig
+  if (isArray(config?.tabs)) {
+    const tabsConfig = [...config?.tabs]
+    const setContentIdxRef = React.createRef<any>()
+
+    config = {
+      // drawer: true,
+      ...config,
+      className: classnames('f-pro-utils-tabs-modal', config?.className),
+      title: (
+        <Hook>
+          {() => {
+            const [tabKey, setTabKey] = useState(0)
+
+            return (
+              <>
+                <Tabs
+                  items={tabsConfig?.map((tab, idx) => ({
+                    label: tab.title,
+                    key: String(idx),
+                  }))}
+                  activeKey={String(tabKey)}
+                  onChange={(key) => {
+                    const nextIndex = Number(key)
+                    setTabKey(nextIndex)
+                    setContentIdxRef.current?.(nextIndex)
+                  }}
+                />
+              </>
+            )
+          }}
+        </Hook>
+      ),
+      content: (...args) => (
+        <Hook>
+          {() => {
+            const [contentIndex, setContentIndex] = useState(0)
+
+            // @ts-ignore
+            setContentIdxRef.current = setContentIndex
+
+            const content = tabsConfig?.[contentIndex]?.content
+
+            return <Fragment key={contentIndex}>{run(content, undefined, ...args)}</Fragment>
+          }}
+        </Hook>
+      ),
+    }
+  }
+
   if (config?.drawer === true) {
-    return showDrawer(config)
+    return showDrawer(config as any)
   }
 
   const {

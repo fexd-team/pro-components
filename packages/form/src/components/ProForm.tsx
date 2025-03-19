@@ -662,7 +662,7 @@ interface ProFormType extends Omit<FormType, 'useForm'> {
   useForm: typeof useForm
 }
 
-const ProForm: ProFormType = hoistStatic(CoreProForm, Form) as ProFormType
+const ProForm: ProFormType = hoistStatic(CoreProForm, Form) as any as ProFormType
 Object.assign(ProForm, {
   Item: FormItem,
   useRef: useProFormRef,

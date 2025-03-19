@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-form",
-  "version": "0.2.47",
+  "version": "0.2.48",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -22,7 +22,7 @@
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
     "@fexd/pro-provider": "^0.1.13",
-    "@fexd/pro-utils": "^0.2.20",
+    "@fexd/pro-utils": "^0.2.21",
     "@fexd/tools": "^0.1.6",
     "@types/bignumber.js": "^5.0.0",
     "@types/hoist-non-react-statics": "^3.3.1",
@@ -31,7 +31,6 @@
     "bignumber.js": "^9.1.1",
     "dayjs": "^1.11.3",
     "hoist-non-react-statics": "^3.3.2",
-    "rc-field-form": "^1.26.1",
     "scroll-into-view-if-needed": "^2.2.25"
   },
   "devDependencies": {

@@ -236,6 +236,32 @@
   }
 }
 
+.f-pro-utils-tabs-modal {
+  .ant-drawer-header,
+  .ant-modal-header {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .ant-drawer-header-title,
+  .ant-modal-header-title {
+    flex-direction: row-reverse;
+
+    .ant-tabs-nav {
+      margin-bottom: 0;
+
+      &::before {
+        content: unset;
+      }
+    }
+  }
+
+  .ant-drawer-close,
+  .ant-modal-close {
+    margin: 0;
+  }
+}
+
 // .f-pro-utils-ellipsis-tooltip {
 //   overflow: hidden;
 //   white-space: nowrap;

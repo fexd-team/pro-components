@@ -12,8 +12,7 @@ const AntdFormItem = Form.Item
 type FormItemType = typeof Form.Item
 
 const FormItem: FormItemType = hoistStatics(
-  forwardRef(function FormItem({ className: propClassName, ...props }: FormItemProps, ref: any) {
-    const { children } = props as any
+  forwardRef(function FormItem({ className: propClassName, children, ...props }: FormItemProps, ref: any) {
     const size = useContextSize()
 
     const className = classnames('f-pro-form-item', propClassName, {
@@ -29,8 +28,12 @@ const FormItem: FormItemType = hoistStatics(
       )
     }
 
-    // @ts-ignore
-    return <AntdFormItem ref={ref} {...props} className={className} />
+    return (
+      // @ts-ignore
+      <AntdFormItem ref={ref} {...props} className={className}>
+        {children}
+      </AntdFormItem>
+    )
   }),
   AntdFormItem,
 ) as FormItemType

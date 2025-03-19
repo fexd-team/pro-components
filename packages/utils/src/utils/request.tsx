@@ -30,7 +30,7 @@ import catchPromise from './catchPromise'
 import deepMerge from './deepMerge'
 import { DeepPartialObject } from './type-tools'
 
-type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> &
+export type AxiosRequestConfig<T = any> = RawAxiosRequestConfig<T> &
   CacheRequestConfig<T> & {
     /** 是否处理大数字（转为字符串） */
     bigIntJSONParsing?: boolean
@@ -139,7 +139,7 @@ export const builtInRequestConfig = {
             : JSONbig({
                 storeAsString: true,
               })
-          return parser.parse(data)
+          return JSON.parse(JSON.stringify(parser.parse(data)))
         }
         return JSON.parse(data)
       } catch (e: any) {
