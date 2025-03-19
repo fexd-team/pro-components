@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-form",
-  "version": "0.2.48",
+  "version": "0.2.49",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -31,6 +31,7 @@
     "bignumber.js": "^9.1.1",
     "dayjs": "^1.11.3",
     "hoist-non-react-statics": "^3.3.2",
+    "rc-field-form": "^1.27.4",
     "scroll-into-view-if-needed": "^2.2.25"
   },
   "devDependencies": {
