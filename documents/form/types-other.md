@@ -23,36 +23,30 @@ const mockOptions = [
 
 const mockTreeOptions = [
   {
-    title: 'Node1',
+    label: 'Node1',
     value: '0-0',
-    key: '0-0',
     children: [
       {
-        title: 'Child Node1',
+        label: 'Child Node1',
         value: '0-0-0',
-        key: '0-0-0',
       },
     ],
   },
   {
-    title: 'Node2',
+    label: 'Node2',
     value: '0-1',
-    key: '0-1',
     children: [
       {
-        title: 'Child Node3',
+        label: 'Child Node3',
         value: '0-1-0',
-        key: '0-1-0',
       },
       {
-        title: 'Child Node4',
+        label: 'Child Node4',
         value: '0-1-1',
-        key: '0-1-1',
       },
       {
-        title: 'Child Node5',
+        label: 'Child Node5',
         value: '0-1-2',
-        key: '0-1-2',
       },
     ],
   },
@@ -100,6 +94,22 @@ export default () => (
                   tooltip: 'type="upload"',
                   name: 'upload',
                   type: 'upload',
+                },
+              ],
+              [
+                {
+                  label: '树形选择器',
+                  tooltip: 'type="tree"',
+                  name: 'tree',
+                  type: 'tree',
+                  options: mockTreeOptions,
+                },
+                {
+                  label: '树形单选器',
+                  tooltip: 'type="singleTree"',
+                  name: 'singleTree',
+                  type: 'singleTree',
+                  options: mockTreeOptions,
                 },
               ],
               [

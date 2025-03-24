@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, forwardRef, useCallback } from 'react'
+import React, { useState, useEffect, forwardRef, useCallback } from 'react'
 import hoistStatics from 'hoist-non-react-statics'
 import { run } from '@fexd/tools'
 import { useSafeState } from 'ahooks'
@@ -10,7 +10,9 @@ export default function reactI18nshell(i18n: any) {
       i18n.t(key, ...args)
 
   function useI18n() {
-    const [t, setT] = useState(genT)
+    const [rawT, setT] = useState(genT)
+    // @ts-ignore
+    const t = useCallback<typeof rawT>((key, ...args) => rawT(key ?? '', ...args), [rawT])
     const jsxT = useCallback((key: string = '', ...args: any[]) => t(`${key}@jsx`, ...args), [t])
 
     useEffect(() => {

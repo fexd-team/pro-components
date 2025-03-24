@@ -1,7 +1,8 @@
+import { isArray, isObject } from '@fexd/tools'
 import { shuffle } from 'lodash'
 
 // 对选项染色
-export function coloringOptions<T extends any[]>(options: T): T {
+export function coloringOptions<T extends any>(rawOptions: T): T {
   const presets = shuffle([
     'magenta',
     'red',
@@ -16,20 +17,40 @@ export function coloringOptions<T extends any[]>(options: T): T {
     'purple',
   ])
 
-  return (options as any).map((opt: any) => {
-    const randomColor = randomRGB(220)
-    return {
-      ...opt,
-      tag: opt?.tag ??
-        presets.pop() ?? {
-          style: {
-            backgroundColor: randomColor,
-            color: darkenColor(randomColor, 60),
-            borderColor: darkenColor(randomColor, (20 * 255) / getBrightness(randomColor)),
+  let options: any = rawOptions
+
+  if (isObject(options)) {
+    options = Object.entries(options)?.map(([key, value]: any) => {
+      if (isObject(value)) {
+        return {
+          value: key,
+          ...value,
+        }
+      }
+
+      return {
+        value: key,
+        label: value,
+      }
+    })
+  }
+
+  return (
+    (options as any).map?.((opt: any) => {
+      const randomColor = randomRGB(220)
+      return {
+        ...opt,
+        tag: opt?.tag ??
+          presets.pop() ?? {
+            style: {
+              backgroundColor: randomColor,
+              color: darkenColor(randomColor, 60),
+              borderColor: darkenColor(randomColor, (20 * 255) / getBrightness(randomColor)),
+            },
           },
-        },
-    } as any
-  }) as any as T
+      } as any
+    }) ?? (options as any as T)
+  )
 }
 export default coloringOptions
 

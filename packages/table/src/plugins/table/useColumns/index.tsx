@@ -140,12 +140,17 @@ export default function useColumns(): ProTableColumnType[] {
                     {() => {
                       const props: any = config?.props ?? {}
                       const content = props?.children ?? props?.content ?? value
+
+                      if (!isExist(value)) {
+                        return '--'
+                      }
+
                       return (
                         (
                           {
                             text: <Typography.Text {...props}>{content}</Typography.Text>,
                             link: <Typography.Link {...props}>{content}</Typography.Link>,
-                            tag: <Tag {...props}>{value}</Tag>,
+                            tag: <Tag {...props}>{content}</Tag>,
                             button: (
                               <Action size="small" {...props}>
                                 {content}

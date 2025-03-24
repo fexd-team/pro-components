@@ -63,7 +63,7 @@ export type ProTableColumnBuiltInRenderType =
   | 'rate'
   | 'field'
 export interface ProTableColumnBuiltInRenderConfig {
-  builtIn: ProTableColumnBuiltInRenderType
+  builtIn: ProTableColumnBuiltInRenderType | Omit<string, ProTableColumnBuiltInRenderType>
   props?:
     | TextProps
     | BadgeProps

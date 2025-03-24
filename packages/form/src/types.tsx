@@ -30,6 +30,7 @@ import {
   DescriptionsProps,
   SpaceProps,
   RowProps,
+  TreeProps,
 } from 'antd'
 import { DescriptionsItemProps } from 'antd/es/descriptions/Item'
 // import { CheckboxGroupProps } from 'antd/es/checkbox'
@@ -114,6 +115,7 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
     | ModalSelectProps
     | UploadProps
     | PreviewImageGroupProps
+    | TreeProps
   form?: ProFormInstance<any> | false
   fromNowTooltip?: boolean
   format?: string
@@ -157,10 +159,12 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
 export type ProFieldOptionValueType = string | number | boolean
 
 export type ProFieldOptionObjectType = {
+  [key: string]: any
   title?: any
   description?: any
-  label: string | ReactNode
-  value: ProFieldOptionValueType
+  label?: string | ReactNode
+  value?: ProFieldOptionValueType
+  key?: any
   disabled?: boolean
   readonly?: boolean
   tag?: UniteOmit<PresetColorType | PresetStatusColorType> | TagProps

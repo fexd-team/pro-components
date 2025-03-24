@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-children-prop */
 import React, { isValidElement, useEffect, useMemo } from 'react'
-import { Rate, Switch, Slider, Upload, Button, Image } from 'antd'
+import { Rate, Switch, Slider, Upload, Button, Image, Tree, Spin } from 'antd'
 import { useSafeState } from 'ahooks'
 import { UploadOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons'
 import { isArray, isUndefined, isString, isObject, isExist } from '@fexd/tools'
 import { Hook, PreviewImageGroup, file2base64, showImages } from '@fexd/pro-utils'
 
 import RemoteTransfer from './RemoteTransfer'
+import useRemoteOptions from '../type-select-box/useRemoteOptions'
 import RemoteOptionsView from '../type-select-box/RemoteOptionsView'
 import { defineTypes, ProFormValueTypeMapConfig } from '../types-define'
 import useLocales from '../../locales'
@@ -208,6 +209,152 @@ const types = defineTypes({
           }
 
           return '--'
+        }}
+      </Hook>
+    ),
+  },
+  singleTree: {
+    // @ts-ignore
+    renderField: ({ fieldProps: { children, ...props } = {} } = {}) => (
+      <Hook {...props}>
+        {(props) => {
+          const { t } = useLocales(({ t }) => [t])
+          const {
+            loading,
+            options: remoteOptions,
+            isRemote,
+          } = useRemoteOptions(props?.options, {
+            keyMap: {
+              label: 'title',
+              value: 'key',
+            },
+          })
+
+          return (
+            <Spin spinning={loading}>
+              <Tree
+                multiple={false}
+                checkable={false}
+                selectable
+                // defaultExpandAll
+                treeData={remoteOptions}
+                // height={266}
+                // style={{
+                //   border: 'solid 1px #e6e6e6',
+                // }}
+                defaultExpandedKeys={[props?.value].filter(isExist)}
+                {...props}
+                selectedKeys={[props?.value].filter(isExist)}
+                onSelect={([value]) => props?.onChange?.(value)}
+              />
+            </Spin>
+          )
+        }}
+      </Hook>
+    ),
+    renderView: (value, config: any = {}) => (
+      <Hook>
+        {() => {
+          const { t } = useLocales(({ t }) => [t])
+          const {
+            loading,
+            options: remoteOptions,
+            isRemote,
+          } = useRemoteOptions(config?.options, {
+            keyMap: {
+              label: 'title',
+              value: 'key',
+            },
+          })
+
+          // console.log(config?.value)
+
+          return (
+            <Spin spinning={loading}>
+              <Tree
+                // disabled
+                multiple={false}
+                checkable={false}
+                selectable
+                treeData={remoteOptions}
+                defaultExpandedKeys={[value].filter(isExist)}
+                {...config}
+                selectedKeys={[value].filter(isExist)}
+              />
+            </Spin>
+          )
+        }}
+      </Hook>
+    ),
+  },
+  tree: {
+    // @ts-ignore
+    renderField: ({ fieldProps: { children, ...props } = {} } = {}) => (
+      <Hook {...props}>
+        {(props) => {
+          const { t } = useLocales(({ t }) => [t])
+          const {
+            loading,
+            options: remoteOptions,
+            isRemote,
+          } = useRemoteOptions(props?.options, {
+            keyMap: {
+              label: 'title',
+              value: 'key',
+            },
+          })
+
+          return (
+            <Spin spinning={loading}>
+              <Tree
+                multiple
+                checkable
+                selectable={false}
+                // defaultExpandAll
+                treeData={remoteOptions}
+                // height={266}
+                // style={{
+                //   border: 'solid 1px #e6e6e6',
+                // }}
+                defaultExpandedKeys={props?.value ?? []}
+                {...props}
+                checkedKeys={props?.value ?? []}
+                onCheck={props?.onChange}
+              />
+            </Spin>
+          )
+        }}
+      </Hook>
+    ),
+    renderView: (value, config: any = {}) => (
+      <Hook>
+        {() => {
+          const { t } = useLocales(({ t }) => [t])
+          const {
+            loading,
+            options: remoteOptions,
+            isRemote,
+          } = useRemoteOptions(config?.options, {
+            keyMap: {
+              label: 'title',
+              value: 'key',
+            },
+          })
+
+          return (
+            <Spin spinning={loading}>
+              <Tree
+                // disabled
+                multiple
+                checkable
+                selectable={false}
+                treeData={remoteOptions}
+                defaultExpandedKeys={value ?? []}
+                {...config}
+                checkedKeys={value ?? []}
+              />
+            </Spin>
+          )
         }}
       </Hook>
     ),

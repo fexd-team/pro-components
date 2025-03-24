@@ -28,9 +28,9 @@ export default function RemoteOptionsView(props: any): any {
   if (isArray(props?.value)) {
     // const targets = props?.value.map((value: any) => options.find((item: any) => item?.value === value))
 
-    // if (targets?.length === 0) {
-    //   return '--'
-    // }
+    if (props?.value?.length === 0) {
+      return '--'
+    }
 
     return (
       <Space wrap size={3}>
@@ -46,7 +46,7 @@ export default function RemoteOptionsView(props: any): any {
                 {...(isObject(target?.tag) ? target?.tag : {})}
                 key={idx}
               >
-                {(target?.label ?? value) || '--'}
+                {target?.label ?? value ?? '--'}
               </Tag>
             )
           })}
@@ -107,7 +107,7 @@ export default function RemoteOptionsView(props: any): any {
       color={isString(target?.tag) ? target?.tag : undefined}
       {...(isObject(target?.tag) ? target?.tag : {})}
     >
-      {(target?.label ?? props?.value) || '--'}
+      {target?.label ?? props?.value ?? '--'}
     </Tag>
   )
 }
