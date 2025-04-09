@@ -278,7 +278,7 @@ const types = defineTypes({
                 selectable
                 treeData={remoteOptions}
                 defaultExpandedKeys={[value].filter(isExist)}
-                {...config}
+                {...config?.props}
                 selectedKeys={[value].filter(isExist)}
               />
             </Spin>
@@ -350,7 +350,7 @@ const types = defineTypes({
                 selectable={false}
                 treeData={remoteOptions}
                 defaultExpandedKeys={value ?? []}
-                {...config}
+                {...config?.props}
                 checkedKeys={value ?? []}
               />
             </Spin>

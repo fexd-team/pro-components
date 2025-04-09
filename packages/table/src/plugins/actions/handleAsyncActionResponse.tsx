@@ -1,3 +1,4 @@
 import { showTipsWithResponse } from '@fexd/pro-utils'
 
-export default showTipsWithResponse
+const handleAsyncActionResponse: typeof showTipsWithResponse = (...args) => showTipsWithResponse(...args)
+export default handleAsyncActionResponse

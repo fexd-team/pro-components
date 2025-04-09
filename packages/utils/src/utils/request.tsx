@@ -156,11 +156,24 @@ export const builtInRequestConfig = {
   },
 }
 
-const getCacheRequestInterceptor = (axios: AxiosCacheInstance) => {
+export const defaultCacheOptions: CacheOptions = {
+  ttl: -1,
+  interpretHeader: false,
+  methods: ['get', 'post', 'head'],
+}
+
+export const getCacheRequestInterceptor = (axios: AxiosCacheInstance) => {
   const defaultRequestInterceptorResult = defaultRequestInterceptor(axios)
   const onFulfilled = ((config, ...args) => {
     if (!isExist(config?.cache) || (config?.cache as any)?.ttl <= 0) {
       config.cache = false
+    }
+
+    if (isObject(config?.cache)) {
+      config.cache = {
+        ...defaultCacheOptions,
+        ...config.cache,
+      }
     }
 
     return defaultRequestInterceptorResult.onFulfilled(config, ...args)
@@ -193,12 +206,6 @@ const rawRequest = axios.create({
     },
   ],
 })
-
-const defaultCacheOptions: CacheOptions = {
-  ttl: -1,
-  interpretHeader: false,
-  methods: ['get', 'post', 'head'],
-}
 
 const request = setupCache(rawRequest, {
   requestInterceptor: getCacheRequestInterceptor(rawRequest as AxiosCacheInstance),

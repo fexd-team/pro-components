@@ -141,7 +141,7 @@ export default function useColumns(): ProTableColumnType[] {
                       const props: any = config?.props ?? {}
                       const content = props?.children ?? props?.content ?? value
 
-                      if (!isExist(value)) {
+                      if (!isExist(content)) {
                         return '--'
                       }
 
