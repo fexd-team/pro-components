@@ -29,6 +29,7 @@
     "version:restore": "node ./scripts/checkVersionAndMarkPrivate.js restore",
     "release:public": "npm run prerelease && pnpm -r publish --no-git-checks --force --access=public && npm run version:restore",
     "release": "npm run prerelease && pnpm -r publish --no-git-checks --force && npm run version:restore",
+    "release:force": "pnpm -r publish --no-git-checks --force",
     "prerelease": "npm run version:check && node ./scripts/bringDocuments.js",
     "postrelease": "npm run version:restore && node ./scripts/bringDocuments.js --delete",
     "unpublish": "node ./scripts/unpublish",

@@ -1,5 +1,9 @@
 import antdLocale from 'antd/es/locale/ms_MY'
 import { Locale } from 'antd/es/locale-provider'
+import 'dayjs/locale/ms-my'
+import 'dayjs/esm/locale/ms-my'
+import 'moment/locale/ms-my'
+import 'moment/dist/locale/ms-my'
 
 export default {
   antdLocale: antdLocale as Locale,

@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-provider",
-  "version": "0.1.16",
+  "version": "0.1.19",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -26,7 +26,8 @@
     "ahooks": "^3.8.1",
     "antd": "^4.24.10",
     "dayjs": "^1.11.3",
-    "hoist-non-react-statics": "^3.3.2"
+    "hoist-non-react-statics": "^3.3.2",
+    "moment": "^2.29.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.178",

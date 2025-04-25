@@ -1,5 +1,7 @@
 import antdLocale from 'antd/es/locale/en_US'
 import { Locale } from 'antd/es/locale-provider'
+// import 'dayjs/locale/en'
+// import 'moment/locale/en'
 
 export default {
   antdLocale: antdLocale as Locale,

@@ -1,6 +1,9 @@
 import antdLocale from 'antd/es/locale/th_TH'
 import { Locale } from 'antd/es/locale-provider'
-
+import 'dayjs/locale/th'
+import 'dayjs/esm/locale/th'
+import 'moment/locale/th'
+import 'moment/dist/locale/th'
 export default {
   antdLocale: antdLocale as Locale,
   table: {

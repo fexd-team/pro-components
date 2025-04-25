@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { FormStore } from 'rc-field-form/es/useForm'
 import { InternalHooks, NamePath } from 'rc-field-form/es/interface'
+import { HOOK_MARK } from 'rc-field-form/es/FieldContext'
 import { isFunction } from '@fexd/tools'
 
 // // 为确保 jest 正常执行，调整该类的导出方式
@@ -47,6 +48,9 @@ export default class ProFormStore extends FormStore {
   }
 
   private getInternalHooks = (key: string): InternalHooks | null => {
+    if (key === HOOK_MARK) {
+      this.formHooked = true
+    }
     return this
   }
 }

@@ -1,5 +1,9 @@
 import antdLocale from 'antd/es/locale/zh_CN'
 import { Locale } from 'antd/es/locale-provider'
+import 'dayjs/locale/zh-cn'
+import 'dayjs/esm/locale/zh-cn'
+import 'moment/locale/zh-cn'
+import 'moment/dist/locale/zh-cn'
 
 export default {
   antdLocale: antdLocale as Locale,

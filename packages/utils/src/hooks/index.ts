@@ -19,3 +19,6 @@ export { default as useLazyRender } from './useLazyRender'
 export { default as useRequest } from './useRequest'
 export * from './useLazyRender'
 export * from './useCoverable'
+
+export { default as useInitializeTasks } from './useInitializeTasks'
+export { default as usePreferredDark } from './usePreferredDark'

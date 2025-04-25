@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { Checkbox, Popover } from 'antd'
 import { SettingOutlined, HolderOutlined } from '@ant-design/icons'
 import { useMount } from 'ahooks'
@@ -32,8 +33,13 @@ const SortableCheckbox = sortableElement(({ ...props }) => {
 })
 
 export default function useColumnSettings({ allColumns }) {
-  const { id: tableId, columnSettingPersistType } = useProps()
+  const { id: tableId, columnSettingPersistType, iconActions } = useProps()
   const { setIconActions } = useActionsPlugin(({}) => [])
+
+  const usingColumnSettings = useMemo(
+    () => (iconActions ?? [])?.some((action: any) => action === 'settings' || action?.builtIn === 'settings'),
+    [iconActions],
+  )
 
   const persistColumnSettingProState = useProState<any>(
     {
@@ -50,6 +56,14 @@ export default function useColumnSettings({ allColumns }) {
 
   const allColumnsRef = React.useRef(allColumns)
   allColumnsRef.current = allColumns
+
+  useEffect(() => {
+    if (persistColumnSettingProState.getState().columnSort?.length !== allColumns?.length) {
+      persistColumnSettingProState.setState({
+        columnSort: allColumns.map((column: any) => column?.columnSettingKey),
+      })
+    }
+  }, [allColumns])
 
   useMount(() => {
     setIconActions({
@@ -139,17 +153,30 @@ export default function useColumnSettings({ allColumns }) {
   })
 
   const applyColumnSettings = useCallback(
-    (allColumns) =>
-      (allColumns ?? [])
-        .filter(
-          (column: any) => !persistColumnSettingProState.state.hiddenColumns?.includes?.(column?.columnSettingKey),
-        )
-        .sort(
+    (allColumns) => {
+      if (!usingColumnSettings) {
+        return allColumns ?? []
+      }
+
+      const filteredColumns = (allColumns ?? []).filter(
+        (column: any) => !persistColumnSettingProState.state.hiddenColumns?.includes?.(column?.columnSettingKey),
+      )
+
+      if (persistColumnSettingProState.state.columnSort?.length === allColumns?.length) {
+        return filteredColumns.sort(
           (a: any, b: any) =>
             persistColumnSettingProState.state.columnSort.indexOf(a?.columnSettingKey) -
             persistColumnSettingProState.state.columnSort.indexOf(b?.columnSettingKey),
-        ),
-    [persistColumnSettingProState.state.hiddenColumns, persistColumnSettingProState.state.columnSort],
+        )
+      }
+
+      return filteredColumns
+    },
+    [
+      persistColumnSettingProState.state.hiddenColumns,
+      persistColumnSettingProState.state.columnSort,
+      usingColumnSettings,
+    ],
   )
 
   return applyColumnSettings
