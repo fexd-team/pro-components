@@ -65,11 +65,11 @@ export default function useEditableRow() {
           key,
           !normalizeFieldValue
             ? value
-            : run(
+            : (run(
                 types?.[tableFormConfigRef.current?.[rowKey]?.[key]?.type as ProFieldValueTypes],
                 'normalizeValue',
                 value,
-              ) ?? value,
+              ) ?? value),
         ]),
       ),
   }

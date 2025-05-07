@@ -89,7 +89,7 @@ export default function useRemoteOptions(optionConfigs: any, adapConfig: { keyMa
   const service: Result<any, any> = isService ? (optionConfigs as Result<any, any>) : insideService
 
   const options = useMemo(
-    () => adaptOptions(!isRemote ? optionConfigs : service?.data ?? [], adapConfig),
+    () => adaptOptions(!isRemote ? optionConfigs : (service?.data ?? []), adapConfig),
     [isRemote, optionConfigs, service?.data],
   )
 

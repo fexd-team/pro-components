@@ -54,7 +54,7 @@ importers:
       ora: ^5.1.0
       particles-bg: ^2.5.5
       patch-package: ^6.4.7
-      prettier: ^3.1.0
+      prettier: ^3.5.3
       qrcode.react: ^1.0.1
       react: ^16.8.0
       react-dom: ^16.8.0
@@ -102,7 +102,7 @@ importers:
       chalk: 2.4.2
       code-kitchen: 1.2.7_77252e3891d35fbb566b47258a543b7a
       cross-env: 7.0.3
-      dumi: 2.1.15_68b05b51417986865c79482d303ab24c
+      dumi: 2.1.15_4ed17e29b3aeb75cecfc7f768f7f75dc
       dumi-theme-antd-style: 0.21.3_22d1897e247e75a2ba360487fcd5897e
       esbuild-wasm: 0.14.54
       father: 4.1.6
@@ -118,7 +118,7 @@ importers:
       ora: 5.4.1
       particles-bg: 2.5.5
       patch-package: 6.5.1
-      prettier: 3.1.0
+      prettier: 3.5.3
       qrcode.react: 1.0.1_react@16.14.0
       react: 16.14.0
       react-dom: 16.14.0_react@16.14.0
@@ -135,10 +135,10 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.56
-      '@fexd/pro-provider': ^0.1.19
-      '@fexd/pro-table': ^0.5.69
-      '@fexd/pro-utils': ^0.2.28
+      '@fexd/pro-form': ^0.2.57
+      '@fexd/pro-provider': ^0.1.20
+      '@fexd/pro-table': ^0.5.70
+      '@fexd/pro-utils': ^0.2.29
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -172,8 +172,8 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-provider': ^0.1.19
-      '@fexd/pro-utils': ^0.2.28
+      '@fexd/pro-provider': ^0.1.20
+      '@fexd/pro-utils': ^0.2.29
       '@fexd/tools': ^0.1.6
       '@types/bignumber.js': ^5.0.0
       '@types/hoist-non-react-statics': ^3.3.1
@@ -221,7 +221,6 @@ importers:
       dayjs: ^1.11.3
       hoist-non-react-statics: ^3.3.2
       less-plugin-import-node-modules: ^1.0.0
-      moment: ^2.29.3
       react: ^16.8.0
       react-dom: ^16.8.0
     dependencies:
@@ -233,7 +232,6 @@ importers:
       antd: 4.24.10_react-dom@16.14.0+react@16.14.0
       dayjs: 1.11.7
       hoist-non-react-statics: 3.3.2
-      moment: 2.29.4
     devDependencies:
       '@types/lodash': 4.14.184
       less-plugin-import-node-modules: 1.0.0
@@ -244,9 +242,9 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.56
-      '@fexd/pro-provider': ^0.1.19
-      '@fexd/pro-utils': ^0.2.28
+      '@fexd/pro-form': ^0.2.57
+      '@fexd/pro-provider': ^0.1.20
+      '@fexd/pro-utils': ^0.2.29
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -9505,7 +9503,7 @@ packages:
       chalk: 4.1.2
       chroma-js: 2.4.2
       copy-to-clipboard: 3.3.2
-      dumi: 2.1.15_68b05b51417986865c79482d303ab24c
+      dumi: 2.1.15_4ed17e29b3aeb75cecfc7f768f7f75dc
       fast-deep-equal: 3.1.3
       lodash: 4.17.21
       polished: 4.2.2
@@ -9523,7 +9521,7 @@ packages:
       - immer
     dev: true
 
-  /dumi/2.1.15_68b05b51417986865c79482d303ab24c:
+  /dumi/2.1.15_4ed17e29b3aeb75cecfc7f768f7f75dc:
     resolution: {integrity: sha512-l8kuUI1mrYIBNWKoGieedoAwPPMhTtfX7Rcdut5PluvPF8h8LhmONZR420N0SQS9P4isP9tpVOBiYh48jJncjA==}
     hasBin: true
     peerDependencies:
@@ -9580,7 +9578,7 @@ packages:
       remark-rehype: 10.1.0
       sass: 1.59.2
       sitemap: 7.1.1
-      umi: 4.0.57_2494e2d3fcc87c6401cb6b9c23a998b8
+      umi: 4.0.57_c3b8b0d29d077d72e5e3d6a59b34c05d
       unified: 10.1.2
       unist-util-visit: 4.1.2
       unist-util-visit-parents: 5.1.3
@@ -16649,7 +16647,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /prettier-plugin-organize-imports/3.2.2_prettier@3.1.0+typescript@4.7.4:
+  /prettier-plugin-organize-imports/3.2.2_prettier@3.5.3+typescript@4.7.4:
     resolution: {integrity: sha512-e97lE6odGSiHonHJMTYC0q0iLXQyw0u5z/PJpvP/3vRy6/Zi9kLBwFAbEGjDzIowpjQv8b+J04PDamoUSQbzGA==}
     peerDependencies:
       '@volar/vue-language-plugin-pug': ^1.0.4
@@ -16662,7 +16660,7 @@ packages:
       '@volar/vue-typescript':
         optional: true
     dependencies:
-      prettier: 3.1.0
+      prettier: 3.5.3
       typescript: 4.7.4
     dev: true
 
@@ -16675,7 +16673,7 @@ packages:
       sort-package-json: 1.57.0
     dev: true
 
-  /prettier-plugin-packagejson/2.4.3_prettier@3.1.0:
+  /prettier-plugin-packagejson/2.4.3_prettier@3.5.3:
     resolution: {integrity: sha512-kPeeviJiwy0BgOSk7No8NmzzXfW4R9FYWni6ziA5zc1kGVVrKnBzMZdu2TUhI+I7h8/5Htt3vARYOk7KKJTTNQ==}
     peerDependencies:
       prettier: '>= 1.16.0'
@@ -16683,7 +16681,7 @@ packages:
       prettier:
         optional: true
     dependencies:
-      prettier: 3.1.0
+      prettier: 3.5.3
       sort-package-json: 2.4.1
       synckit: 0.8.5
     dev: true
@@ -16705,8 +16703,8 @@ packages:
     hasBin: true
     dev: true
 
-  /prettier/3.1.0:
-    resolution: {integrity: sha512-TQLvXjq5IAibjh8EpBIkNKxO749UEWABoiIZehEPiY4GNpVdhaFKqSTu+QrlU6D2dPAfubRmtJTi4K4YkQ5eXw==}
+  /prettier/3.5.3:
+    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
@@ -20276,7 +20274,7 @@ packages:
     hasBin: true
     dev: true
 
-  /umi/4.0.57_2494e2d3fcc87c6401cb6b9c23a998b8:
+  /umi/4.0.57_c3b8b0d29d077d72e5e3d6a59b34c05d:
     resolution: {integrity: sha512-qrbB5hMTXHvJtxog5Wmux1TjHUHLm6ANa7Qj7zwAJxppJAA5r6WoZ/yrVaFKr2R+/cyCoBa7UN5qL+rpC3wLrA==}
     engines: {node: '>=14'}
     hasBin: true
@@ -20291,8 +20289,8 @@ packages:
       '@umijs/server': 4.0.57
       '@umijs/test': 4.0.57
       '@umijs/utils': 4.0.57
-      prettier-plugin-organize-imports: 3.2.2_prettier@3.1.0+typescript@4.7.4
-      prettier-plugin-packagejson: 2.4.3_prettier@3.1.0
+      prettier-plugin-organize-imports: 3.2.2_prettier@3.5.3+typescript@4.7.4
+      prettier-plugin-packagejson: 2.4.3_prettier@3.5.3
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'

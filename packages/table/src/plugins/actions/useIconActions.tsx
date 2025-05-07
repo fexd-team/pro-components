@@ -100,9 +100,9 @@ export default function useIconActions(): {
   const renderIconActions = useMemoizedFn(() => (
     <Actions
       spaceSize={2}
-      configs={() => latestIconActionConfigs?.current}
+      configs={() => latestIconActionConfigs?.current as any}
       getBuiltInActions={() => latestIconActions.current}
-      renderActionConfig={({ ...actionProps }: any = {}) => (
+      renderAction={({ ...actionProps }: any = {}) => (
         <Action
           extraConfirmProps={{
             placement: 'topRight',
@@ -122,7 +122,7 @@ export default function useIconActions(): {
         (iconActionConfigs ?? [])
           .filter(Boolean)
           .filter(
-            (action) => (action as any)?.hidden !== false,
+            (action) => (action as any)?.hidden !== true,
           ) as ProTableTableActionType<ProTableBuiltInIconActionNames>[],
       [iconActionConfigs],
     ),

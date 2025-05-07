@@ -362,7 +362,7 @@ export default function useColumns(): ProTableColumnType[] {
             })
           : undefined),
       title: !column?.tooltip ? (
-        column?.title ?? column?.label
+        (column?.title ?? column?.label)
       ) : (
         <Space size={6}>
           {column?.title ?? column?.label}

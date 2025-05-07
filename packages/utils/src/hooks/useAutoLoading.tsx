@@ -27,5 +27,6 @@ export default function useAutoLoading({ loading: propLoading, action }: UseAuto
     realTimeLoading: propLoading ?? loading,
     loading: propLoading ?? (loading === false ? loading : debouncedLoading),
     onAction,
+    setLoading,
   }
 }

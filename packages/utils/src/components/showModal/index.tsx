@@ -66,7 +66,7 @@ const VisibleModal = React.forwardRef(function VisibleModal(initialProps: Visibl
       visible={visible}
       closeIcon={closeIcon}
       onCancel={handleCancel}
-      footer={run(!isUndefined(propFooter) ? propFooter : actionNodes ?? false, undefined, modalProps)}
+      footer={run(!isUndefined(propFooter) ? propFooter : (actionNodes ?? false), undefined, modalProps)}
     >
       {/*调用时可以content: updateProps => () 暂时问题*/}
       {run(children, undefined, modalProps)}

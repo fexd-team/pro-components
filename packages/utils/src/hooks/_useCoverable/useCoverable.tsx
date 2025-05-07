@@ -67,7 +67,7 @@ export default function useCoverable<T extends Record<string, any>, O = T>(
       const canMerge = deepItemFilter(item) && isIterable(item) && (isObject(override) || !isExist(override))
       const result = canMerge
         ? (shallowMerge as any)(...[item, override, deepMap(item, handleItem, keyPath)].filter(Boolean))
-        : override ?? item
+        : (override ?? item)
 
       return [canMerge, result]
     }

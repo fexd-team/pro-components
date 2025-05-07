@@ -105,13 +105,13 @@ export default function useProps<T = ProTablePropsContext>(): T {
     queryWrapperStyle: props?.pure ? { padding: 0 } : {},
     defaultSize: mini
       ? 'small'
-      : run(() => {
+      : (run(() => {
           if (contextSize === 'middle') {
             return 'large'
           }
 
           return contextSize
-        }) ?? 'large',
+        }) ?? 'large'),
     stickyScrollBar: !!sticky,
     addFieldFilterEmptyParam: props?.editFieldFilterEmptyParam,
     viewFieldLayout: props?.editFieldLayout,

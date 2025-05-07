@@ -23,7 +23,10 @@ export default function useTableActions(): {
   const latestTableActions = useLatest(tableActions)
 
   const renderTableActions = useMemoizedFn(() => (
-    <Actions configs={() => latestTableActionConfigs.current} getBuiltInActions={() => latestTableActions.current} />
+    <Actions
+      configs={() => latestTableActionConfigs.current as any}
+      getBuiltInActions={() => latestTableActions.current}
+    />
   ))
 
   return {
@@ -33,7 +36,7 @@ export default function useTableActions(): {
         (tableActionConfigs ?? [])
           .filter(Boolean)
           .filter(
-            (action) => (action as any)?.hidden !== false,
+            (action) => (action as any)?.hidden !== true,
           ) as ProTableTableActionType<ProTableBuiltInActionNames>[],
       [tableActionConfigs],
     ),

@@ -119,7 +119,7 @@ const VisibleDrawer = React.forwardRef(function VisibleDrawer(initialProps: Draw
       // cancelText={cancelText}
       // onOk={handleOk}
       onClose={handleCancel}
-      footer={run(!isUndefined(propFooter) ? propFooter : actionNodes ?? false, undefined, modalProps)}
+      footer={run(!isUndefined(propFooter) ? propFooter : (actionNodes ?? false), undefined, modalProps)}
     >
       {/*调用时可以content: updateProps => () 暂时问题*/}
       {run(children, undefined, modalProps)}

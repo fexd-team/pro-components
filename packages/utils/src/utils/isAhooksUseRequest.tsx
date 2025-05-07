@@ -5,6 +5,10 @@ export default function isAhooksUseRequestResult(value: any): boolean {
     return false
   }
 
+  if (value?.isUseRequest) {
+    return true
+  }
+
   // 核心特征检查 - ahooks useRequest 的独特标识
   const coreFeatures = [
     'loading', // 加载状态

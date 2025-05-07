@@ -87,7 +87,7 @@ export function useEditableField(props: ProFieldValueFieldType) {
     } as any
 
     const defaultValue = isExist(rawDefaultValue)
-      ? run(fieldType, 'normalizeFieldValue', rawDefaultValue) ?? rawDefaultValue
+      ? (run(fieldType, 'normalizeFieldValue', rawDefaultValue) ?? rawDefaultValue)
       : undefined
 
     const mergedFormItemProps = {

@@ -8,7 +8,8 @@ import { DraggableModalProps } from './DraggableModal'
 
 import catchPromise from '../../utils/catchPromise'
 import { useTranslation } from '../../i18n'
-import Action, { ActionProps, ButtonActionType } from '../Action'
+import { ActionProps, ButtonActionType } from '../Action'
+import Actions from '../Actions'
 
 export interface ActionModalProps
   extends Omit<DraggableModalProps, 'content' | 'okButtonProps' | 'cancelButtonProps' | 'actions'> {
@@ -32,18 +33,40 @@ export default function useModalActions({ props = {}, closeModal, reverse = fals
     // keyboard: keyboardClosable = true,
   } = props as ActionModalProps
   const [cancelLoading, setCancelLoading] = useSafeState(false)
-  const [actionLoading, setActionLoading] = useSafeState(false)
-  const [loadingActionIdx, setLoadingActionIdx] = useSafeState<any>(undefined)
   const debouncedCancelLoading = useDebounce(cancelLoading, {
     wait: 100,
   })
-  const debouncedActionLoading = useDebounce(actionLoading, {
-    wait: 160,
+
+  const handleCancel = useMemoizedFn(() => {
+    if (cancelLoading) {
+      return false
+    }
+    const actionResult = run(onCancel)
+    if (!isPromiseLike(actionResult)) {
+      if (actionResult !== false) {
+        run(closeModal)
+      }
+      return actionResult
+    }
+
+    return run(async () => {
+      setCancelLoading(true)
+      const [error, canClose] = await catchPromise(actionResult)
+      setCancelLoading(false)
+
+      if (error) {
+        return Promise.reject(error)
+      }
+
+      if (canClose !== false) {
+        run(closeModal)
+      }
+    })
   })
 
   // const closable = propClosable || maskClosable
 
-  const builtInAction: ActionProps[] = [
+  const builtInActions: ActionProps[] = [
     // (!closable || isFunction(onOk)) &&
     {
       type: 'primary',
@@ -51,69 +74,37 @@ export default function useModalActions({ props = {}, closeModal, reverse = fals
       onClick: onOk,
       ...(props?.okButtonProps ?? {}),
     },
-    isFunction(onCancel) && { content: cancelText, onClick: onCancel, ...(props?.cancelButtonProps ?? {}) },
+    isFunction(onCancel) && { content: cancelText, onClick: handleCancel, ...(props?.cancelButtonProps ?? {}) },
   ].filter(Boolean)
-  // console.log('builtInAction', builtInAction)
-  const actions = (!isUndefined(propActions) ? propActions : builtInAction) as ActionProps[]
+  // console.log('builtInActions', builtInActions)
+  const actions = (!isUndefined(propActions) ? propActions : builtInActions) as ActionProps[]
 
   return {
     closeIcon: closeIcon ?? (debouncedCancelLoading ? <LoadingOutlined /> : <CloseOutlined />),
     actionNodes:
       (actions?.length ?? 0) === 0 ? undefined : (
-        <Space style={wrapperStyle}>
-          {run<ActionProps[]>([...actions], reverse ? 'reverse' : undefined)?.map(
-            (actionProps: ActionProps, idx: number) => (
-              <Action
-                key={idx}
-                {...actionProps}
-                disabled={debouncedActionLoading && loadingActionIdx !== idx ? true : actionProps?.disabled}
-                onClick={async (...args: any[]) => {
-                  setLoadingActionIdx(idx)
-                  setActionLoading(true)
-                  const [error, canClose] = await catchPromise(run(actionProps, 'onClick', ...args))
-                  setActionLoading(false)
-                  setLoadingActionIdx(undefined)
+        <Actions
+          disabled={cancelLoading}
+          shareAutoLoading
+          renderWrapper={(nodes) => <Space style={wrapperStyle}>{nodes}</Space>}
+          configs={(reverse ? [...actions].reverse() : [...actions]).map((actionProps) => ({
+            ...actionProps,
+            onClick: async (...args: any[]) => {
+              setCancelLoading(true)
+              const [error, canClose] = await catchPromise(run(actionProps, 'onClick', ...args))
+              setCancelLoading(false)
 
-                  if (error) {
-                    return Promise.reject(error)
-                  }
+              if (error) {
+                return Promise.reject(error)
+              }
 
-                  if (canClose !== false) {
-                    run(closeModal)
-                  }
-                }}
-              />
-            ),
-          )}
-        </Space>
+              if (canClose !== false) {
+                run(closeModal)
+              }
+            },
+          }))}
+        />
       ),
-    handleCancel: useMemoizedFn(() => {
-      if (actionLoading || cancelLoading) {
-        return false
-      }
-      const actionResult = run(onCancel)
-      if (!isPromiseLike(actionResult)) {
-        if (actionResult !== false) {
-          run(closeModal)
-        }
-        return actionResult
-      }
-
-      return run(async () => {
-        setActionLoading(true)
-        setCancelLoading(true)
-        const [error, canClose] = await catchPromise(actionResult)
-        setActionLoading(false)
-        setCancelLoading(false)
-
-        if (error) {
-          return Promise.reject(error)
-        }
-
-        if (canClose !== false) {
-          run(closeModal)
-        }
-      })
-    }),
+    handleCancel,
   }
 }

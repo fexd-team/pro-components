@@ -48,10 +48,10 @@ export default function useBatchActions(): {
   const renderBatchActions = useMemoizedFn(() => (
     <Actions
       spaceSize={2}
-      configs={() => latestBatchActionConfigs?.current}
+      configs={() => latestBatchActionConfigs?.current as any}
       getBuiltInActions={() => latestBatchActions.current}
       actionParams={[getSelectedItems()]}
-      renderActionConfig={({ content, onClick, ...actionProps }: any = {}) => (
+      renderAction={({ content, onClick, ...actionProps }: any = {}) => (
         <Action
           type="link"
           size="small"
@@ -81,7 +81,7 @@ export default function useBatchActions(): {
         (batchActionConfigs ?? [])
           .filter(Boolean)
           .filter(
-            (action) => (action as any)?.hidden !== false,
+            (action) => (action as any)?.hidden !== true,
           ) as ProTableTableActionType<ProTableBuiltInBatchActionNames>[],
       [batchActionConfigs],
     ),

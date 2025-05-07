@@ -11,7 +11,7 @@ import { useUpdateAfterValueTypeAdd } from '../../valueTypes'
 import FormItem from '../FormItem'
 
 const genFieldKey = (field: ProFieldValueFieldType) =>
-  isString(field?.key) ? `${field?.key}:${field?.type}` : field?.key ?? field?.type
+  isString(field?.key) ? `${field?.key}:${field?.type}` : (field?.key ?? field?.type)
 
 const FieldSwitch = memo(function FieldSwitch({
   legacyRender = false,

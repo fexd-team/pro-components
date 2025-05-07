@@ -57,7 +57,7 @@ export default function useProState<T>(defaultValue: T | (() => T), options: Use
 
   const syncEventName: string = `${key}::change`
 
-  const [state, rawSetState] = useSafeState<T>(needPersist ? persistedDefaultValue ?? defaultValue! : defaultValue!)
+  const [state, rawSetState] = useSafeState<T>(needPersist ? (persistedDefaultValue ?? defaultValue!) : defaultValue!)
 
   const calcNextState = (prevState: any, getNextValue: any) => {
     const nextState = run<T>(getNextValue, undefined, prevState)

@@ -3,12 +3,13 @@ import { delay, isBoolean, run } from '@fexd/tools'
 import { DeleteOutlined } from '@ant-design/icons'
 import { useSetState, useMemoizedFn, useLatest } from 'ahooks'
 import { SetState } from 'ahooks/es/useSetState'
+import { getActionNodes } from '@fexd/pro-utils'
 
 import { useProps } from '../../utils'
 import useQueryFieldPlugin from '../queryField'
 import { ProTableBuiltInActionType, ProTableTableActionType, ProTableBuiltInColumnActionNames } from './types'
 import { I18nText } from '../config'
-import Actions, { getActionNodes } from './Actions'
+import Actions from './Actions'
 import Action from '../actions/Action'
 import handleAsyncActionResponse from '../actions/handleAsyncActionResponse'
 
@@ -73,11 +74,11 @@ export default function useColumnActions(): {
   const renderColumnsActions = useMemoizedFn((record, idx: number, dataSource: any[], actionConfigs?: any[]) => (
     <Actions
       className="f-pro-table-columns-actions"
-      configs={() => actionConfigs ?? latestColumnActionConfigs?.current}
+      configs={() => (actionConfigs ?? latestColumnActionConfigs?.current) as any}
       getBuiltInActions={() => latestColumnActions.current}
       actionParams={[record, idx, dataSource]}
       onClick={(e: any) => run(e, 'stopPropagation')}
-      renderActionConfig={({ onClick, actionType = 'button', ...actionProps }: any = {}) => (
+      renderAction={({ onClick, actionType = 'button', ...actionProps }: any = {}) => (
         <Action
           key={actionProps?.key}
           size={actionType === 'button' ? 'small' : undefined}
@@ -114,7 +115,7 @@ export default function useColumnActions(): {
     const nodes = getActionNodes(configs, {
       builtInActions: latestColumnActions.current,
       getActionParams: [record, idx, dataSource],
-      renderActionConfig: () => <></>,
+      renderAction: () => <></>,
     })
 
     return (nodes?.length ?? 0) > 0
@@ -131,7 +132,7 @@ export default function useColumnActions(): {
         (columnActionConfigs ?? [])
           .filter(Boolean)
           .filter(
-            (action) => (action as any)?.hidden !== false,
+            (action) => (action as any)?.hidden !== true,
           ) as ProTableTableActionType<ProTableBuiltInColumnActionNames>[],
       [columnActionConfigs],
     ),

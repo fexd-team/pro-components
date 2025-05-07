@@ -268,11 +268,8 @@ export type ServerResponse<T = any> = {
   response?: AxiosResponse<T>
 }
 
-export type BuiltInServerResponse<T, R> = T extends ServerResponse<any>
-  ? T
-  : R extends ServerResponse<any>
-    ? ServerResponse<T>
-    : T
+export type BuiltInServerResponse<T, R> =
+  T extends ServerResponse<any> ? T : R extends ServerResponse<any> ? ServerResponse<T> : T
 
 export type ServerRequest<R extends Record<string, any> = ServerResponse> = {
   clone<NR extends Record<string, any> = R>(config?: Parameters<typeof cloneAxiosInstance>['1']): ServerRequest<NR>

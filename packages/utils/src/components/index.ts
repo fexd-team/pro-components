@@ -22,6 +22,9 @@ export * from './Switch'
 export { default as Action } from './Action'
 export * from './Action'
 
+export { default as Actions } from './Actions'
+export * from './Actions'
+
 export { default as Tooltip } from './Tooltip'
 export * from './Tooltip'
 

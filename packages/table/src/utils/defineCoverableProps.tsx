@@ -72,13 +72,14 @@ type _CoverableConfig<V extends Record<string, [any, any]>, T extends Record<str
   [K in keyof V]?: CoverableObjectConfig<T[K], V[K][0]> | V[K][1]
 }
 
-export type CoverableObjectConfig<V, T> = V extends Record<string, any>
-  ?
-      | Record<keyof V, T>
-      | {
-          [key: string | number | symbol]: T
-        }
-  : V
+export type CoverableObjectConfig<V, T> =
+  V extends Record<string, any>
+    ?
+        | Record<keyof V, T>
+        | {
+            [key: string | number | symbol]: T
+          }
+    : V
 
 type _CoverableProTablePropsMap = {
   actions: [ProTableTableActionType<ProTableBuiltInActionNames>, ProTableProps['actions']]

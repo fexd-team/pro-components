@@ -594,7 +594,7 @@ const CoreProForm = memo(
               const renderResult = run(
                 isArray(customizedRenderFields)
                   ? () => renderFields(customizedRenderFields as any[])
-                  : customizedRenderFields ?? defaultRenderFields,
+                  : (customizedRenderFields ?? defaultRenderFields),
                 undefined,
                 getProFormInternalParams(),
               )

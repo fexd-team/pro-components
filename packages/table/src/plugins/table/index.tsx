@@ -2,7 +2,7 @@
 import React, { memo, forwardRef, useImperativeHandle, useRef, useMemo } from 'react'
 import { Table as AntdTable, TableProps, Empty } from 'antd'
 import { run, classnames, isObject, isArray } from '@fexd/tools'
-import { useMemoizedFn } from 'ahooks'
+import { useMemoizedFn, useLatest } from 'ahooks'
 
 import { useProps, createPlugin } from '../../utils'
 import useQueryFieldPlugin from '../queryField'
@@ -69,13 +69,6 @@ const PluginTable = memo(
     const tableToolbarDomRef = useRef<HTMLDivElement>(null)
     const antdTableRef = useRef<any>(null)
 
-    useImperativeHandle(ref, () => ({
-      tableWrapperDomRef,
-      tableToolbarDomRef,
-      tableContentDomRef,
-      antdTableRef,
-    }))
-
     const { renderStation } = useModalPlugin(() => [])
     const { hasToolbar, renderToolbar } = useToolbar({
       ref: tableToolbarDomRef,
@@ -89,6 +82,17 @@ const PluginTable = memo(
     const resizableColumns = useResizableColumns(columns)
 
     useStickyScrollBar(antdTableRef, antdTablePaginationConfig)
+
+    const tableColumns = resizableHeader ? resizableColumns : columns
+    const tableColumnsRef = useLatest(tableColumns)
+
+    useImperativeHandle(ref, () => ({
+      tableWrapperDomRef,
+      tableToolbarDomRef,
+      tableContentDomRef,
+      antdTableRef,
+      tableColumnsRef,
+    }))
 
     return (
       <div
@@ -179,7 +183,7 @@ const PluginTable = memo(
             rowKey={rowKey}
             // dataSource={dataSource}
             dataSource={isArray(dataSource) ? dataSource : isObject(dataSource) ? Object.values(dataSource) : []}
-            columns={resizableHeader ? resizableColumns : columns}
+            columns={tableColumns}
           />
         </div>
       </div>
@@ -188,7 +192,13 @@ const PluginTable = memo(
 )
 
 export const useTablePlugin = createPlugin(() => {
-  const tableRef = useRef<any>(null)
+  const tableRef = useRef<{
+    tableWrapperDomRef: HTMLDivElement
+    tableToolbarDomRef: HTMLDivElement
+    tableContentDomRef: HTMLDivElement
+    antdTableRef: any
+    tableColumnsRef: any[]
+  }>(null)
 
   return {
     tableRef,

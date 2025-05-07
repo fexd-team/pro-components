@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useEffect, useMemo } from 'react'
-import { message } from 'antd'
 import { classnames, run, isNumber, delay, isArray, isObject, intersection, isExist, isFunction } from '@fexd/tools'
 
 import { useGetState, useMemoizedFn, useLatest, useSafeState } from 'ahooks'
 import { Result } from 'ahooks/es/useRequest/src/types'
 import 'ahooks/es/useRequest/src/types'
 
-import { catchPromise, useProState, Hook, useRequest } from '@fexd/pro-utils'
+import { catchPromise, useProState, Hook, useRequest, isAhooksUseRequestResult } from '@fexd/pro-utils'
 import { ProFieldValueTypes, ProForm } from '@fexd/pro-form'
 
 import useValueTypePlugin from '../valueType'
@@ -158,20 +157,7 @@ export const useQueryFieldPlugin = createPlugin((props: ProTableProps) => {
     },
   )
 
-  const onQueryIsService = useMemo(() => {
-    if (!isObject(onQuery)) {
-      return false
-    }
-    const serviceKeys = Object.keys(innerService)
-    if (serviceKeys?.length === 0) {
-      return false
-    }
-    // 取 keys 交集
-    const matchKeys = intersection(serviceKeys, Object.keys(onQuery as any))
-
-    // 判断 keys 重合度大于 50%，认为传入的是 service
-    return matchKeys?.length / serviceKeys?.length >= 0.5
-  }, [])
+  const onQueryIsService = useMemo(() => isAhooksUseRequestResult(onQuery), [onQuery])
 
   const queryService: Result<any, any> = onQueryIsService ? onQuery : (innerService as any)
   const [isSearched, setIsSearched] = useSafeState(false)

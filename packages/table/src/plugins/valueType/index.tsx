@@ -18,7 +18,7 @@ export const renderField = (
 
   return (
     <ProField
-      key={isString(key) ? `${key}:${fieldTypeName}` : key ?? fieldTypeName}
+      key={isString(key) ? `${key}:${fieldTypeName}` : (key ?? fieldTypeName)}
       ref={(field as any)?.ref ?? config?.ref}
       {...(field as any)}
     />

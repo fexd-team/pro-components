@@ -53,13 +53,14 @@ type _CoverableConfig<V extends Record<string, [any, any]>, T extends Record<str
   [K in keyof V]?: CoverableObjectConfig<T[K], V[K][0]> | V[K][1]
 }
 
-type CoverableObjectConfig<V, T> = V extends Record<string, any>
-  ?
-      | Record<keyof V, T>
-      | {
-          [key: string | number | symbol]: T
-        }
-  : V
+type CoverableObjectConfig<V, T> =
+  V extends Record<string, any>
+    ?
+        | Record<keyof V, T>
+        | {
+            [key: string | number | symbol]: T
+          }
+    : V
 
 type _CoverableProFormPropsMap = {
   fields: [ProFieldValueFieldType, ProFormProps['fields']]
