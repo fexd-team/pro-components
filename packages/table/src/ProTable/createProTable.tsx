@@ -22,7 +22,7 @@ const TableContent = memo(
     const table = useTablePlugin()
     const ctxSize = useContextSize()
     const {
-      mini = ctxSize === 'small' ?? false,
+      mini = ctxSize ? ctxSize === 'small' : false,
       pure = false,
       tableExtraRender,
       hideQueryFields,

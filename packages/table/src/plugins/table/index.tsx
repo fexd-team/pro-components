@@ -119,6 +119,7 @@ const PluginTable = memo(
         >
           <AntdTable
             ref={antdTableRef}
+            tableLayout={!restProps?.scroll || restProps?.scroll?.x === 'max-content' ? 'auto' : undefined} // 修复 chrome 136 中的宽度 bug
             scroll={useMemo(() => ({ x: 'max-content' }), [])}
             size={size as any}
             onChange={useMemoizedFn(async (pagination, filters, sorters, extra) => {
