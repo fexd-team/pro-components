@@ -115,7 +115,12 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
     | ModalSelectProps
     | UploadProps
     | PreviewImageGroupProps
-    | TreeProps
+    | (TreeProps & {
+        /** 是否只由子节点控制父节点 */
+        parentControlledByChildren?: boolean
+        /** 是否在 onCheck 时包含半选状态 */
+        includeHalfCheckedWhileOnCheck?: boolean
+      })
   form?: ProFormInstance<any> | false
   fromNowTooltip?: boolean
   format?: string

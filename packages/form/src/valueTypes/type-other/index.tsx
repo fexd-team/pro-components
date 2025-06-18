@@ -36,6 +36,26 @@ function useFileList(value) {
   return fileList
 }
 
+const filterTreeLeafPermission = (permissionList, allPermissonTreeList) => {
+  const treeMap: any = {}
+
+  const dig = (node) => {
+    // console.log(node)
+    treeMap[node.value] = node
+    ;(node.children ?? [])?.forEach(dig)
+  }
+
+  allPermissonTreeList?.forEach?.(dig)
+
+  return (
+    permissionList?.filter?.((permission) => {
+      const node = treeMap?.[permission]
+
+      return (node?.children?.length ?? 0) === 0
+    }) ?? []
+  )
+}
+
 const types = defineTypes({
   // 星级组件
   rate: {
@@ -289,9 +309,10 @@ const types = defineTypes({
   },
   tree: {
     // @ts-ignore
-    renderField: ({ fieldProps: { children, ...props } = {} } = {}) => (
-      <Hook {...props}>
-        {(props) => {
+    renderField: ({ fieldProps: { children, ...rawProps } = {} } = {}) => (
+      <Hook {...rawProps}>
+        {(rawProps) => {
+          const { parentControlledByChildren, includeHalfCheckedWhileOnCheck, ...props } = rawProps
           const { t } = useLocales(({ t }) => [t])
           const {
             loading,
@@ -303,6 +324,10 @@ const types = defineTypes({
               value: 'key',
             },
           })
+
+          const checkedKeys = parentControlledByChildren
+            ? filterTreeLeafPermission(props?.value ?? [], remoteOptions)
+            : (props?.value ?? [])
 
           return (
             <Spin spinning={loading}>
@@ -316,19 +341,26 @@ const types = defineTypes({
                 // style={{
                 //   border: 'solid 1px #e6e6e6',
                 // }}
-                defaultExpandedKeys={props?.value ?? []}
+                defaultExpandedKeys={checkedKeys}
                 {...props}
-                checkedKeys={props?.value ?? []}
-                onCheck={props?.onChange}
+                checkedKeys={checkedKeys}
+                onCheck={(checkedKeys, info) => {
+                  if (includeHalfCheckedWhileOnCheck && isArray(checkedKeys)) {
+                    return props?.onChange?.([...checkedKeys, ...(info?.halfCheckedKeys ?? [])])
+                  }
+
+                  return props?.onChange?.(checkedKeys)
+                }}
               />
             </Spin>
           )
         }}
       </Hook>
     ),
-    renderView: (value, config: any = {}) => (
+    renderView: (value, rawConfig: any = {}) => (
       <Hook>
         {() => {
+          const { parentControlledByChildren, ...config } = rawConfig
           const { t } = useLocales(({ t }) => [t])
           const {
             loading,
@@ -341,6 +373,10 @@ const types = defineTypes({
             },
           })
 
+          const checkedKeys = parentControlledByChildren
+            ? filterTreeLeafPermission(value ?? [], remoteOptions)
+            : (value ?? [])
+
           return (
             <Spin spinning={loading}>
               <Tree
@@ -349,9 +385,9 @@ const types = defineTypes({
                 checkable
                 selectable={false}
                 treeData={remoteOptions}
-                defaultExpandedKeys={value ?? []}
+                defaultExpandedKeys={checkedKeys}
                 {...config?.props}
-                checkedKeys={value ?? []}
+                checkedKeys={checkedKeys}
               />
             </Spin>
           )
