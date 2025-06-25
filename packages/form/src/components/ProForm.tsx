@@ -78,6 +78,7 @@ const CoreProForm = memo(
       render: propRender, // customizedRenderFields,
       sharedFieldProps = {},
       formRef,
+      localeKey,
       ...restProps
     }: ProFormProps,
     ref: any,
@@ -612,7 +613,7 @@ const CoreProForm = memo(
 
     return (
       <ErrorBoundary>
-        <ConfigProvider parentContextFirst numberLocale={{ toFixed: 2 }}>
+        <ConfigProvider parentContextFirst localeKey={localeKey} numberLocale={{ toFixed: 2 }}>
           <useLocales.Provider>
             <formSharedContext.Provider
               value={{

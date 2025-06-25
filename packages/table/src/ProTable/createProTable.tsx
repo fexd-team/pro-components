@@ -64,7 +64,7 @@ const TableContent = memo(
     return (
       <ConfigProvider
         parentContextFirst
-        localeKey={(props as any)?.localeKey ?? 'en_US'}
+        localeKey={(props as any)?.localeKey}
         numberLocale={{ toFixed: 2 }}
         size={mini ? 'small' : undefined}
       >

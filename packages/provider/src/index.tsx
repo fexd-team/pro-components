@@ -2,7 +2,8 @@ import React, { createContext, useContext } from 'react'
 import { ConfigProvider as AntdConfigProvider } from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
 import { ConfigProviderProps as AntdConfigProviderProps } from 'antd/es/config-provider'
-import { pickBy, isExist, __ } from '@fexd/tools'
+import { pickBy, isExist, __, run } from '@fexd/tools'
+import { deepMerge } from '@fexd/pro-utils'
 
 import zh_CN from './locales/zh_CN'
 import en_US from './locales/en_US'
@@ -38,33 +39,37 @@ export function useContextSize() {
 
 const omitEmptyValue = __(pickBy)(__, isExist)
 
-export function ConfigProvider({
-  localeKey: propLocaleKey = 'en_US',
-  locale: propLocale = {},
-  size: propSize,
-  numberLocale,
-  currencyLocale,
-  children,
-  parentContextFirst = false,
-}: ConfigProviderProps) {
+export function ConfigProvider(props: ConfigProviderProps) {
+  const {
+    localeKey: propLocaleKey,
+    locale: propLocale,
+    size: propSize,
+    numberLocale,
+    currencyLocale,
+    children,
+    parentContextFirst = false,
+  } = props
   const contextSize = useContext(AntdConfigProvider.SizeContext)
   const parentProContext = useProContext() ?? {}
-  const localeKey = (parentContextFirst ? parentProContext?.localeKey : undefined) ?? propLocaleKey
-  const locale = (parentContextFirst ? parentProContext?.locale : undefined) ?? propLocale
+  const localeKey = propLocaleKey ?? (parentContextFirst ? parentProContext?.localeKey : undefined) ?? 'en_US'
+  const locale = run(() => {
+    if (!!propLocaleKey && !propLocale) {
+      return {}
+    }
+
+    return propLocale ?? (parentContextFirst ? parentProContext?.locale : undefined) ?? {}
+  })
   const size = (parentContextFirst ? parentProContext?.size : undefined) ?? propSize ?? contextSize
 
-  const mergedLocale = {
-    ...(builtInLocaleMap?.[localeKey as 'en_US'] ?? {}),
-    ...locale,
-  }
+  const mergedLocale = deepMerge(builtInLocaleMap?.[localeKey as 'en_US'] ?? {}, locale)
 
   const ctxValue = omitEmptyValue({
-    size,
-    locale: mergedLocale,
-    localeKey,
     numberLocale,
     currencyLocale,
     ...omitEmptyValue(parentContextFirst ? parentProContext : {}),
+    size,
+    locale: mergedLocale,
+    localeKey,
   })
 
   return (

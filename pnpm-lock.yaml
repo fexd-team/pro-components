@@ -135,10 +135,10 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.57
-      '@fexd/pro-provider': ^0.1.20
-      '@fexd/pro-table': ^0.5.71
-      '@fexd/pro-utils': ^0.2.29
+      '@fexd/pro-form': ^0.2.59
+      '@fexd/pro-provider': ^0.1.21
+      '@fexd/pro-table': ^0.5.73
+      '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -172,8 +172,8 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-provider': ^0.1.20
-      '@fexd/pro-utils': ^0.2.29
+      '@fexd/pro-provider': ^0.1.21
+      '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/bignumber.js': ^5.0.0
       '@types/hoist-non-react-statics': ^3.3.1
@@ -213,6 +213,7 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
+      '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178
@@ -226,6 +227,7 @@ importers:
     dependencies:
       '@ant-design/icons': 4.7.0_react-dom@16.14.0+react@16.14.0
       '@babel/runtime': 7.18.9
+      '@fexd/pro-utils': link:../utils
       '@fexd/tools': 0.1.6
       '@types/hoist-non-react-statics': 3.3.1
       ahooks: 3.8.4_react@16.14.0
@@ -242,9 +244,9 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.57
-      '@fexd/pro-provider': ^0.1.20
-      '@fexd/pro-utils': ^0.2.29
+      '@fexd/pro-form': ^0.2.59
+      '@fexd/pro-provider': ^0.1.21
+      '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
       '@types/lodash': ^4.14.178

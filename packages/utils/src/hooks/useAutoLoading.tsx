@@ -16,11 +16,19 @@ export default function useAutoLoading({ loading: propLoading, action }: UseAuto
 
   const onAction = useMemoizedFn(async (...args: any[]) => {
     setLoading(true)
-    const [err] = await catchPromise(run(action, undefined, ...args))
-    if (err) {
+    let result: any
+    try {
+      const [err, value] = await catchPromise(run(action, undefined, ...args))
+      if (err) {
+        console.error(err)
+      }
+      result = value
+    } catch (err) {
       console.error(err)
     }
+
     setLoading(false)
+    return result
   })
 
   return {

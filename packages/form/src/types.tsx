@@ -47,7 +47,7 @@ import {
   GridProps,
   PreviewImageGroupProps,
 } from '@fexd/pro-utils'
-import { ConfigProviderProps } from '@fexd/pro-provider'
+import { ConfigProviderProps, ProContextType } from '@fexd/pro-provider'
 import { Options as UseInViewportOptions } from 'ahooks/es/useInViewport'
 import { DebounceOptions } from 'ahooks/es/useDebounce/debounceOptions'
 import { Optional } from 'utility-types'
@@ -217,6 +217,7 @@ export interface ProFormInternalParams<T = ProFieldValueFieldType> {
 export interface ProFormRenderParams<T = ProFieldValueFieldType> extends ProFormInternalParams<T> {}
 
 export interface ProFormProps<Values = any> extends Omit<FormProps, 'fields' | 'form'> {
+  localeKey?: ProContextType['localeKey']
   form?: ProFormInstance<Values>
   formRef?: React.Ref<ProFormInternalParams>
   mode?: 'view' | 'edit'

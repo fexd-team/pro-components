@@ -1,9 +1,9 @@
-export default function createValueProxy(target, valueHandler) {
+export default function createValueProxy(target: any, valueHandler: (value: any, prop: any) => any) {
   try {
     return new Proxy(target, {
       get: (obj, prop) => {
         if (prop in obj) {
-          return valueHandler?.(obj?.[prop]) ?? obj?.[prop]
+          return valueHandler?.(obj?.[prop], prop) ?? obj?.[prop]
         }
         return undefined
       },

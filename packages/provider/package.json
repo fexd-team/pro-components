@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-provider",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -21,6 +21,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
+    "@fexd/pro-utils": "^0.2.30",
     "@fexd/tools": "^0.1.6",
     "@types/hoist-non-react-statics": "^3.3.1",
     "ahooks": "^3.8.1",
