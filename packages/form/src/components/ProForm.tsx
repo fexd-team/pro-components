@@ -43,6 +43,7 @@ import ProField from './ProField'
 import FormItem from './FormItem'
 import createForm from '../createForm'
 import useForm from '../useForm'
+import useValues from '../useValues'
 import { formSharedContext } from './formSharedContext'
 
 import {
@@ -656,6 +657,7 @@ interface ProFormType extends CoreProFormType {
   defineCoverableProps: typeof defineCoverableProps
   useCoverableProps: typeof useCoverableProps
   coloringOptions: typeof coloringOptions
+  useValues: typeof useValues
 }
 
 interface ProFormType extends Omit<FormType, 'useForm'> {
@@ -670,6 +672,7 @@ Object.assign(ProForm, {
   createRef: createProFormRef,
   createForm,
   useForm,
+  useValues,
   defineCoverableProps,
   useCoverableProps,
   coloringOptions,
