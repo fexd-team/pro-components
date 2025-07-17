@@ -135,9 +135,9 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.60
-      '@fexd/pro-provider': ^0.1.21
-      '@fexd/pro-table': ^0.5.74
+      '@fexd/pro-form': ^0.2.62
+      '@fexd/pro-provider': ^0.1.22
+      '@fexd/pro-table': ^0.5.76
       '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1
@@ -172,7 +172,7 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-provider': ^0.1.21
+      '@fexd/pro-provider': ^0.1.22
       '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/bignumber.js': ^5.0.0
@@ -244,8 +244,8 @@ importers:
     specifiers:
       '@ant-design/icons': ^4.2.2
       '@babel/runtime': ^7.13.10
-      '@fexd/pro-form': ^0.2.60
-      '@fexd/pro-provider': ^0.1.21
+      '@fexd/pro-form': ^0.2.62
+      '@fexd/pro-provider': ^0.1.22
       '@fexd/pro-utils': ^0.2.30
       '@fexd/tools': ^0.1.6
       '@types/hoist-non-react-statics': ^3.3.1

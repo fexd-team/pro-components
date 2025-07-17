@@ -1,6 +1,7 @@
 import React from 'react'
 import { run, isExist } from '@fexd/tools'
 import { Tooltip, Hook, dayjsTZ } from '@fexd/pro-utils'
+import { useProContext } from '@fexd/pro-provider'
 
 import useLocales from '../../locales'
 import { defineTypes } from '../types-define'
@@ -16,8 +17,10 @@ const types = defineTypes({
       <Hook {...props}>
         {(props) => {
           const { t } = useLocales(({ t }) => [t])
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = props?.format ?? ctxDayFormat ?? 'YYYY-MM-DD'
 
-          return <TZ_DatePicker placeholder={t('form.selectDate')} {...props} />
+          return <TZ_DatePicker placeholder={t('form.selectDate')} {...props} format={format} />
         }}
       </Hook>
     ),
@@ -27,7 +30,14 @@ const types = defineTypes({
       !isExist(value) ? (
         '--'
       ) : (
-        <FromNowTooltip value={value} format={config?.format ?? 'YYYY-MM-DD'} enable={config?.fromNowTooltip} />
+        <Hook>
+          {() => {
+            const { dayFormat: ctxDayFormat } = useProContext()
+            const format = config?.format ?? ctxDayFormat ?? 'YYYY-MM-DD'
+
+            return <FromNowTooltip value={value} format={format} enable={config?.fromNowTooltip} />
+          }}
+        </Hook>
       ),
   },
   // 日期时间
@@ -36,8 +46,10 @@ const types = defineTypes({
       <Hook {...props}>
         {(props) => {
           const { t } = useLocales(({ t }) => [t])
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = props?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
 
-          return <TZ_DatePicker placeholder={t('form.selectDate')} showTime {...props} />
+          return <TZ_DatePicker placeholder={t('form.selectDate')} showTime {...props} format={format} />
         }}
       </Hook>
     ),
@@ -47,11 +59,13 @@ const types = defineTypes({
       !isExist(value) ? (
         '--'
       ) : (
-        <FromNowTooltip
-          value={value}
-          format={config?.format ?? 'YYYY-MM-DD HH:mm:ss'}
-          enable={config?.fromNowTooltip}
-        />
+        <Hook>
+          {() => {
+            const { dayFormat: ctxDayFormat } = useProContext()
+            const format = config?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
+            return <FromNowTooltip value={value} format={format} enable={config?.fromNowTooltip} />
+          }}
+        </Hook>
       ),
   },
   // 周
@@ -161,8 +175,10 @@ const types = defineTypes({
       <Hook {...props}>
         {(props) => {
           const { t } = useLocales(({ t }) => [t])
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = props?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
 
-          return <TZ_DatePicker placeholder={t('form.selectTime')} showTime {...props} />
+          return <TZ_DatePicker placeholder={t('form.selectTime')} showTime {...props} format={format} />
         }}
       </Hook>
     ),
@@ -178,7 +194,15 @@ const types = defineTypes({
 
             return (
               <Tooltip
-                title={<Hook>{() => formatDateValue(value, config?.format ?? 'YYYY-MM-DD HH:mm:ss', localeKey)}</Hook>}
+                title={
+                  <Hook>
+                    {() => {
+                      const { dayFormat: ctxDayFormat } = useProContext()
+                      const format = config?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
+                      return formatDateValue(value, format, localeKey)
+                    }}
+                  </Hook>
+                }
               >
                 {run(dayjsTZ(value).locale(localeKey), 'fromNow')}
               </Tooltip>

@@ -1,5 +1,7 @@
 import React, { Fragment } from 'react'
 import { run, isString, isArray } from '@fexd/tools'
+import { Hook } from '@fexd/pro-utils'
+import { useProContext } from '@fexd/pro-provider'
 
 import { ProFormValueTypeMapConfig } from '../types-define'
 import { toValidMomentValue, normalizeMomentValue } from '../type-date-time/time-utils'
@@ -29,8 +31,6 @@ export const normalizeTimeRangeValue = (value: any) => {
 export const renderTimeRangeValue =
   (defaultFormat: string = 'YYYY-MM-DD'): ProFormValueTypeMapConfig['renderView'] =>
   (value, config = {}) => {
-    const format = config?.format ?? defaultFormat
-
     const [start, end] = run(() => {
       if (isArray(value)) {
         return value
@@ -51,7 +51,18 @@ export const renderTimeRangeValue =
         {[start, end].filter(Boolean).map((value, idx) => (
           <Fragment key={idx}>
             {idx > 0 && ' ~ '}
-            {value ? <FromNowTooltip value={value} format={format} enable={config?.fromNowTooltip} /> : '--'}
+            {value ? (
+              <Hook>
+                {() => {
+                  const { dayFormat: ctxDayFormat = 'YYYY-MM-DD' } = useProContext()
+                  const format = config?.format ?? defaultFormat?.replace('YYYY-MM-DD', ctxDayFormat ?? 'YYYY-MM-DD')
+
+                  return <FromNowTooltip value={value} format={format} enable={config?.fromNowTooltip} />
+                }}
+              </Hook>
+            ) : (
+              '--'
+            )}
           </Fragment>
         ))}
       </>

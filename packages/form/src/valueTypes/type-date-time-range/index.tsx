@@ -2,6 +2,7 @@ import React, { Fragment } from 'react'
 
 import { isArray, run, isString } from '@fexd/tools'
 import { Hook, dayjsTZ, Tooltip } from '@fexd/pro-utils'
+import { useProContext } from '@fexd/pro-provider'
 
 import useLocales from '../../locales'
 
@@ -23,12 +24,18 @@ const types = defineTypes({
             ...props,
             ...field,
           })
+          const mergeProps = {
+            ...props,
+            ...builtInProps,
+          }
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = mergeProps?.format ?? ctxDayFormat ?? 'YYYY-MM-DD'
 
           return (
             <TZ_DatePicker_RangePicker
               placeholder={[t('form.startDate'), t('form.endDate')]}
-              {...props}
-              {...builtInProps}
+              {...mergeProps}
+              format={format}
             />
           )
         }}
@@ -56,12 +63,19 @@ const types = defineTypes({
             ...field,
           })
 
+          const mergeProps = {
+            ...props,
+            ...builtInProps,
+          }
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = mergeProps?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
+
           return (
             <TZ_DatePicker_RangePicker
               placeholder={[t('form.startTime'), t('form.endTime')]}
               showTime
-              {...props}
-              {...builtInProps}
+              {...mergeProps}
+              format={format}
             />
           )
         }}
@@ -201,12 +215,19 @@ const types = defineTypes({
             ...field,
           })
 
+          const mergeProps = {
+            ...props,
+            ...builtInProps,
+          }
+          const { dayFormat: ctxDayFormat } = useProContext()
+          const format = mergeProps?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
+
           return (
             <TZ_DatePicker_RangePicker
               placeholder={[t('form.startTime'), t('form.endTime')]}
               showTime
-              {...props}
-              {...builtInProps}
+              {...mergeProps}
+              format={format}
             />
           )
         }}
@@ -230,8 +251,6 @@ const types = defineTypes({
         return '--'
       }
 
-      const format = config?.format ?? 'YYYY-MM-DD HH:mm:ss'
-
       return (
         <>
           {[start, end].filter(Boolean).map((value, idx) => (
@@ -241,6 +260,8 @@ const types = defineTypes({
                 <Hook key={value}>
                   {() => {
                     const localeKey = useDayjsLocale()
+                    const { dayFormat: ctxDayFormat } = useProContext()
+                    const format = config?.format ?? `${ctxDayFormat ?? 'YYYY-MM-DD'} HH:mm:ss`
 
                     return (
                       <Tooltip title={<Hook>{() => formatDateValue(value, format, localeKey)}</Hook>}>

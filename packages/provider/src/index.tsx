@@ -47,6 +47,7 @@ export function ConfigProvider(props: ConfigProviderProps) {
     numberLocale,
     currencyLocale,
     children,
+    dayFormat,
     parentContextFirst = false,
   } = props
   const contextSize = useContext(AntdConfigProvider.SizeContext)
@@ -66,6 +67,7 @@ export function ConfigProvider(props: ConfigProviderProps) {
   const ctxValue = omitEmptyValue({
     numberLocale,
     currencyLocale,
+    dayFormat,
     ...omitEmptyValue(parentContextFirst ? parentProContext : {}),
     size,
     locale: mergedLocale,
@@ -77,6 +79,10 @@ export function ConfigProvider(props: ConfigProviderProps) {
       <ProConfigContext.Provider value={ctxValue}>{children}</ProConfigContext.Provider>
     </AntdConfigProvider>
   )
+}
+
+ConfigProvider.defaultProps = {
+  // dayFormat: 'YYYY-MM-DD',
 }
 
 export default ConfigProvider
@@ -163,6 +169,8 @@ export interface ProContextType {
   numberLocale?: NumberLocaleValue | NumberLocaleConfig
   /** 参考文档：https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat */
   currencyLocale?: NumberLocaleValue | NumberLocaleConfig
+  /** 默认的日期格式（仅用于日期部分，不影响时间） */
+  dayFormat?: string
 }
 
 export interface ConfigProviderProps extends ProContextType {
