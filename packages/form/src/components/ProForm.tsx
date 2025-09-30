@@ -619,7 +619,7 @@ const CoreProForm = memo(
             <formSharedContext.Provider
               value={{
                 sharedFieldProps: {
-                  preserve,
+                  formPreserve: preserve,
                   ...sharedFieldProps,
                 },
                 groupRegisterMap,

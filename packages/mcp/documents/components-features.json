@@ -1,0 +1,145 @@
+{
+  "ProTable": {
+    "name": "ProTable",
+    "description": "功能强大的表格组件，提供完整的数据展示和操作解决方案",
+    "features": {
+      "basic": {
+        "name": "基础表格功能",
+        "description": "数据展示、列配置、分页、排序等基础表格功能",
+        "docs": "basic/docs.md",
+        "examples": "basic/examples.md",
+        "keywords": ["表格", "数据展示", "分页", "列配置", "排序"]
+      },
+      "query": {
+        "name": "查询功能",
+        "description": "查询表单、筛选条件、参数持久化等查询相关功能",
+        "docs": "query/docs.md",
+        "examples": "query/examples.md",
+        "keywords": ["查询", "搜索", "筛选", "表单", "条件"]
+      },
+      "crud": {
+        "name": "增删改功能",
+        "description": "新增、编辑、删除数据的完整CRUD功能",
+        "docs": "crud/docs.md",
+        "examples": "crud/examples.md",
+        "keywords": ["新增", "编辑", "删除", "CRUD", "数据操作"]
+      },
+      "actions": {
+        "name": "动作管理功能",
+        "description": "表格动作、图标动作、列动作等操作按钮管理",
+        "docs": "actions/docs.md",
+        "examples": "actions/examples.md",
+        "keywords": ["动作", "按钮", "操作", "批量操作"]
+      },
+      "responsive": {
+        "name": "响应式功能",
+        "description": "移动端适配、屏幕尺寸自适应等响应式功能",
+        "docs": "responsive/docs.md",
+        "examples": "responsive/examples.md",
+        "keywords": ["响应式", "移动端", "适配", "屏幕尺寸"]
+      },
+      "i18n": {
+        "name": "国际化功能",
+        "description": "多语言支持、本地化配置等国际化功能",
+        "docs": "i18n/docs.md",
+        "examples": "i18n/examples.md",
+        "keywords": ["国际化", "多语言", "本地化", "i18n"]
+      }
+    }
+  },
+  "ProForm": {
+    "name": "ProForm",
+    "description": "高级表单组件，提供丰富的表单控件和验证功能",
+    "features": {
+      "basic": {
+        "name": "基础表单功能",
+        "description": "表单布局、字段配置、基础控件等基础功能",
+        "docs": "basic/docs.md",
+        "examples": "basic/examples.md",
+        "keywords": ["表单", "布局", "字段", "控件"]
+      },
+      "validation": {
+        "name": "验证功能",
+        "description": "表单验证、自定义校验规则、异步验证等功能",
+        "docs": "validation/docs.md",
+        "examples": "validation/examples.md",
+        "keywords": ["验证", "校验", "规则", "异步验证"]
+      },
+      "advanced": {
+        "name": "高级功能",
+        "description": "动态表单、条件显示、复杂交互等高级功能",
+        "docs": "advanced/docs.md",
+        "examples": "advanced/examples.md",
+        "keywords": ["动态表单", "条件显示", "复杂交互"]
+      }
+    }
+  },
+  "ProField": {
+    "name": "ProField",
+    "description": "通用字段组件，支持多种数据类型的展示和编辑",
+    "features": {
+      "basic": {
+        "name": "基础字段功能",
+        "description": "文本、数字、日期等基础字段类型的展示和编辑",
+        "docs": "basic/docs.md",
+        "examples": "basic/examples.md",
+        "keywords": ["字段", "文本", "数字", "日期"]
+      },
+      "advanced": {
+        "name": "高级字段功能",
+        "description": "选择器、上传、自定义渲染等高级字段功能",
+        "docs": "advanced/docs.md",
+        "examples": "advanced/examples.md",
+        "keywords": ["选择器", "上传", "自定义渲染"]
+      }
+    }
+  },
+  "Utils": {
+    "name": "Utils",
+    "description": "工具模块，提供业务组件化、图片预览、弹窗、防抖等实用工具函数和 Hooks",
+    "features": {
+      "useCoverable": {
+        "name": "业务组件化 Hook",
+        "description": "用于创建可配置的业务组件，支持默认配置与运行时配置的智能合并",
+        "docs": "useCoverable/docs.md",
+        "examples": "useCoverable/examples.md",
+        "keywords": ["业务组件化", "配置化", "可覆盖", "标准化", "Hook"]
+      },
+      "showImages": {
+        "name": "图片预览工具",
+        "description": "命令式图片预览工具，支持单图和多图轮播，提供丰富交互功能",
+        "docs": "showImages/docs.md",
+        "examples": "showImages/examples.md",
+        "keywords": ["图片预览", "轮播", "命令式", "多图", "交互"]
+      },
+      "showModal": {
+        "name": "命令式弹窗工具",
+        "description": "命令式模态框工具，支持灵活内容渲染、可拖拽、Promise 异步操作",
+        "docs": "showModal/docs.md",
+        "examples": "showModal/examples.md",
+        "keywords": ["弹窗", "模态框", "命令式", "可拖拽", "Promise"]
+      },
+      "Action": {
+        "name": "操作按钮组件",
+        "description": "增强的按钮组件，集成加载状态管理、确认操作、异步处理等功能",
+        "docs": "Action/docs.md",
+        "examples": "Action/examples.md",
+        "keywords": ["按钮", "操作", "加载状态", "确认", "异步"]
+      },
+      "useDebounce": {
+        "name": "防抖 Hook",
+        "description": "防抖 Hook，用于延迟更新值，常用于搜索输入、API 调用优化等场景",
+        "docs": "useDebounce/docs.md",
+        "examples": "useDebounce/examples.md",
+        "keywords": ["防抖", "延迟", "搜索", "优化", "Hook"]
+      },
+      "useAutoLoading": {
+        "name": "自动加载状态管理 Hook",
+        "description": "自动管理异步函数加载状态的 Hook，简化异步操作的状态管理",
+        "docs": "useAutoLoading/docs.md",
+        "examples": "useAutoLoading/examples.md",
+        "keywords": ["加载状态", "异步", "状态管理", "自动", "Hook"]
+      }
+    }
+  }
+}

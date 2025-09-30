@@ -45,6 +45,17 @@ export default class ProFormStore extends FormStore {
         return rawResult
       }
     }
+
+    // if (isFunction(this.updateStore)) {
+    //   const raw_updateStore = this.updateStore.bind(this)
+    //   this.updateStore = (...args) => {
+    //     const prevStore = this.store
+    //     console.log('updateStore', ...args)
+    //     const rawResult = raw_updateStore(...args)
+
+    //     return rawResult
+    //   }
+    // }
   }
 
   private getInternalHooks = (key: string): InternalHooks | null => {

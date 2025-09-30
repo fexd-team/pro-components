@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { memo, isValidElement, forwardRef, useImperativeHandle, useRef, useMemo } from 'react'
+import React, { memo, isValidElement, forwardRef, useImperativeHandle, useRef, useMemo, useEffect } from 'react'
 import { Form } from 'antd'
 import { random, run, isString, isObject, isFunction, isExist, isNumber, isArray } from '@fexd/tools'
 import { ConfigProvider } from '@fexd/pro-provider'
 import { ErrorBoundary } from '@fexd/pro-utils'
-import { useMount } from 'ahooks'
+import { useLatest, useMount, useUnmountedRef } from 'ahooks'
 
 import useLocales from '../../locales'
 import FormItem from '../FormItem'
@@ -37,11 +37,13 @@ export const ProField: React.FC<ProFieldProps> = memo(
       dependencies,
       shouldUpdate,
       group: groupRegisterInfo,
+      formPreserve,
       ...field
     } = {
       ...sharedFieldProps,
       ...props,
     } as ProFieldValueFieldType
+    const formPreserveRef = useLatest(formPreserve)
     const fieldRef = useRef(field)
 
     if (isExist(groupRegisterInfo)) {
@@ -98,15 +100,21 @@ export const ProField: React.FC<ProFieldProps> = memo(
               const key = dynamicField?.key ?? field?.key
 
               const mountedRef = useRef(false)
-              useMount(() => {
+              useEffect(() => {
                 mountedRef.current = true
-              })
 
+                return () => {
+                  mountedRef.current = false
+                }
+              }, [])
+
+              // 便于在 hook 内通过改 key 来重置 field 值
               useMemo(() => {
                 if (!mountedRef.current) {
                   return
                 }
-                if (field?.preserve === false && isExist(field?.name)) {
+
+                if (formPreserveRef.current === false && field?.preserve !== true && isExist(field?.name)) {
                   form?.resetFields?.([field?.name as any])
                 }
               }, [key])

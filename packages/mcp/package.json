@@ -1,0 +1,47 @@
+{
+  "name": "@fexd/pro-components-mcp",
+  "version": "0.0.0-beta.5",
+  "type": "module",
+  "description": "An MCP service for FEXD Pro components query | 一个减少 Pro 组件代码生成幻觉的 MCP 服务，包含系统提示词、组件文档、API 文档、代码示例",
+  "bin": "dist/cli.js",
+  "scripts": {
+    "_start": "node dist/cli.js",
+    "build": "tsup",
+    "_dev": "tsup --watch",
+    "_pretest": "tsup",
+    "_test": "tsx test-server.ts",
+    "_inspector": "pnpm build & npx @modelcontextprotocol/inspector node dist/cli.js",
+    "_prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "mcp",
+    "antd",
+    "ant design",
+    "model context protocol",
+    "ui components"
+  ],
+  "files": [
+    "dist",
+    "documents",
+    "README.md"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "to-vfile": "^8.0.0",
+    "vfile-matter": "^5.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "maintainers": [
+    "chenjy"
+  ]
+}

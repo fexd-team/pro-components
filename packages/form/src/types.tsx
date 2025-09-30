@@ -80,7 +80,9 @@ export interface BuiltInHookParams {
   form: ProFormInstance<any>
 }
 
-export interface ProFieldValueFieldType extends Pick<ConfigProviderProps, 'numberLocale' | 'currencyLocale'> {}
+export interface ProFieldValueFieldType extends Pick<ConfigProviderProps, 'numberLocale' | 'currencyLocale'> {
+  formPreserve?: boolean
+}
 
 export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'required'> {
   labelFontBold?: boolean
@@ -160,6 +162,8 @@ export interface ProFieldValueFieldType extends Omit<ProFieldItemProps, 'require
   colSpan?: ColProps['span']
   lazyRender?: boolean | UseInViewportOptions | DebounceOptions
 }
+
+export type ProFieldConfig = ProFieldValueFieldType
 
 export type ProFieldOptionValueType = string | number | boolean
 

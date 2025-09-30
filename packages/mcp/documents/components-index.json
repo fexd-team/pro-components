@@ -1,0 +1,38 @@
+[
+  {
+    "name": "ProField",
+    "dirName": "ProField",
+    "description": "字段组件，可独立使用，支持多种字段类型和编辑/查看双模式",
+    "whenToUse": "需要独立的字段渲染、不依赖表单上下文的字段展示、自定义字段组件开发"
+  },
+  {
+    "name": "ProForm",
+    "dirName": "ProForm",
+    "description": "配置化表单组件，提供灵活的 Grid 布局和丰富的字段类型支持",
+    "whenToUse": "需要快速生成表单、复杂表单布局、支持编辑/只读模式切换的场景"
+  },
+  {
+    "name": "ProTable",
+    "dirName": "ProTable",
+    "description": "功能强大的表格组件，集成数据展示、查询、编辑、操作等功能的一体化解决方案",
+    "whenToUse": "数据管理页面、需要查询筛选的列表页、支持 CRUD 操作的数据表格"
+  },
+  {
+    "name": "ConfigProvider",
+    "dirName": "ConfigProvider",
+    "description": "全局配置组件，提供国际化、主题、尺寸等全局配置功能",
+    "whenToUse": "需要全局国际化配置、自定义组件尺寸、修改内置文案的应用场景"
+  },
+  {
+    "name": "Utils",
+    "dirName": "Utils",
+    "description": "工具模块，提供业务组件化、图片预览、弹窗、防抖等实用工具函数和 Hooks",
+    "whenToUse": "需要业务组件化开发、命令式操作、性能优化、状态管理的场景"
+  },
+  {
+    "name": "Guide",
+    "dirName": "Guide",
+    "description": "开发指南和体验规范，包含设计原则、表单规范、表格规范、错误处理等最佳实践",
+    "whenToUse": "需要了解开发规范、最佳实践、体验规范，或进行代码审查和团队培训的场景"
+  }
+]
