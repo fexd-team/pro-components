@@ -2,7 +2,7 @@ import { get, isExist, memoize, run, isObject } from '@fexd/tools'
 import { useRef, useMemo } from 'react'
 
 import { cloneDeep, deepItemFilter, deepMap, isIterable, shallowMerge, useLatest, useMemoizedFn } from './helpers'
-import { Coverable } from './types'
+import { Coverable, CoverableInternal } from './types'
 
 export default function useCoverable<T extends Record<string, any>, O = T>(
   config: T | ((options: { getConfig: () => Record<string, any> }) => T),
@@ -77,9 +77,9 @@ export default function useCoverable<T extends Record<string, any>, O = T>(
     return mergedConfig
   })
 
-  const configReadedRef = useRef(false)
+  const configReadRef = useRef(false)
   const getConfig = useMemoizedFn(() => {
-    configReadedRef.current = true
+    configReadRef.current = true
     return getFinalConfigRef.current() as T
   })
 
@@ -87,8 +87,8 @@ export default function useCoverable<T extends Record<string, any>, O = T>(
     getConfig,
     __getRawConfig: () => getDefaultConfigRef.current(),
     __isCoverableProps: () => true,
-    __isConfigReaded: () => configReadedRef.current,
+    __isConfigRead: () => configReadRef.current,
     __cover: override,
     __getUpdateKeyPathMapRef: () => updateKeyPathMapRef,
-  } as any as Coverable<T, O>
+  } as unknown as Coverable<T, O> & CoverableInternal<T>
 }

@@ -72,8 +72,8 @@ export default function createComponent<Props extends Record<string, any> & { co
 
         readUpdateKeyPath(coverableConfig, [])
 
-        const isConfigReaded = Object.values(updateKeyPathMapRef.current).some(([item]: any) => {
-          if (run(item?.__isConfigReaded)) {
+        const isConfigRead = Object.values(updateKeyPathMapRef.current).some(([item]: any) => {
+          if (run(item?.__isConfigRead)) {
             return true
           }
           return false
@@ -81,7 +81,7 @@ export default function createComponent<Props extends Record<string, any> & { co
 
         getDefaultCoverableConfigRef.current = getDefaultCoverableConfig
         updateConfig()
-        if (!isFunction(content) || isConfigReaded) {
+        if (!isFunction(content) || isConfigRead) {
           triggerRender()
         }
       }, [])

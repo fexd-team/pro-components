@@ -3,11 +3,15 @@ import { run, set } from '@fexd/tools'
 import { deepItemFilter, deepMap } from './helpers'
 
 export default function createPropsRender<T>(coverableConfig: T) {
+  let cachedDefaultConfig: any = null
+
   return {
     render: (content) => ({
       coverableConfig,
       content,
       getDefaultCoverableConfig: () => {
+        if (cachedDefaultConfig) return cachedDefaultConfig
+
         let defaultProps = {} as any
 
         if ((coverableConfig as any)?.__isCoverableProps) {
@@ -23,12 +27,9 @@ export default function createPropsRender<T>(coverableConfig: T) {
           return [canContinue, item]
         })
 
-        // return defaultProps
-
         const handledMark = new Map()
 
-        return deepMap(defaultProps as any, (item, key, keyPath) => {
-          // 过滤已处理的项
+        cachedDefaultConfig = deepMap(defaultProps as any, (item, key, keyPath) => {
           if (handledMark.has(item)) {
             return [false, item]
           }
@@ -41,6 +42,8 @@ export default function createPropsRender<T>(coverableConfig: T) {
           const canContinue = deepItemFilter(item)
           return [canContinue, item]
         })
+
+        return cachedDefaultConfig
       },
     }),
   }

@@ -3,16 +3,45 @@ import React, { isValidElement, useCallback, useMemo, useRef, useState } from 'r
 import lodashCloneDeepWith from 'lodash/cloneDeepWith'
 // import lodashCloneDeep from 'lodash/cloneDeep'
 
+const rawSet = new WeakSet()
+
+/** 标记一个对象为"不可处理"，coverable 系统会跳过对它的 clone / traverse / merge */
+export function markRaw<T>(value: T): T {
+  if (typeof value === 'object' && value !== null) {
+    rawSet.add(value)
+  }
+  return value
+}
+
+export function isRaw(value: any): boolean {
+  return typeof value === 'object' && value !== null && rawSet.has(value)
+}
+
+/**
+ * 启发式检测 React ref（useRef / createRef 产物）
+ * 仅当对象恰好只有 `current` 一个自有键时判定为 ref
+ */
+export function isReactRef(value: any): boolean {
+  if (!isObject(value) || isArray(value) || isValidElement(value)) return false
+  const keys = Object.keys(value)
+  return keys.length === 1 && keys[0] === 'current'
+}
+
+/** 判断一个值是否应被 coverable 跳过（不深入遍历 / 不克隆） */
+export function isOpaqueValue(value: any): boolean {
+  return isRaw(value) || isReactRef(value)
+}
+
 export function deepItemFilter(item) {
   if (isArray(item)) {
     return true
   }
 
-  if (item?.$$typeof) {
+  if (item?.__isCoverableValue) {
     return false
   }
 
-  if (item?.__isCoverableValue) {
+  if (isOpaqueValue(item)) {
     return false
   }
 
@@ -25,9 +54,16 @@ export function deepMap<T>(
     item,
   ) => [true, item],
   keyPath: (string | number)[] = [],
+  _visited?: WeakSet<object>,
 ): T {
   if (!deepItemFilter(input)) {
     return input
+  }
+
+  const visited = _visited ?? new WeakSet()
+  if (typeof input === 'object' && input !== null) {
+    if (visited.has(input)) return input
+    visited.add(input)
   }
 
   if (Array.isArray(input)) {
@@ -36,7 +72,7 @@ export function deepMap<T>(
       const item = input[i]
       const [continueDeep, newItem] = handleItem(item, i, keyPath.concat([i]), input as T) ?? [true, item]
       if (continueDeep && (Array.isArray(newItem) || typeof newItem === 'object')) {
-        newArray.push(deepMap(newItem, handleItem, keyPath.concat([i])))
+        newArray.push(deepMap(newItem, handleItem, keyPath.concat([i]), visited))
       } else {
         newArray.push(newItem)
       }
@@ -49,7 +85,7 @@ export function deepMap<T>(
         const item = input[key]
         const [continueDeep, newItem] = handleItem(item, key, keyPath.concat([key]), input as T) ?? [true, item]
         if (continueDeep && (Array.isArray(newItem) || typeof newItem === 'object')) {
-          newObject[key] = deepMap(newItem, handleItem, keyPath.concat([key]))
+          newObject[key] = deepMap(newItem, handleItem, keyPath.concat([key]), visited)
         } else {
           newObject[key] = newItem
         }
@@ -57,7 +93,6 @@ export function deepMap<T>(
     }
     return newObject as T
   } else {
-    // If input is neither an array nor an object, return it directly
     return input
   }
 }
@@ -72,7 +107,9 @@ export function deepMerge(target: any, source: any, filter: (value: any, key: st
   Object.keys(source).forEach((key) => {
     const sourceValue = source[key]
 
-    if ((isObject(sourceValue) || isArray(sourceValue)) && run(filter, undefined, sourceValue, key) !== false) {
+    if (isOpaqueValue(sourceValue)) {
+      target[key] = sourceValue
+    } else if ((isObject(sourceValue) || isArray(sourceValue)) && run(filter, undefined, sourceValue, key) !== false) {
       target[key] = deepMerge(target[key], sourceValue)
     } else {
       target[key] = sourceValue
@@ -92,6 +129,9 @@ export function cloneDeep<T>(value: T): T {
   return lodashCloneDeepWith(value, (value) => {
     if (React.isValidElement(value)) {
       return React.cloneElement(value) as T
+    }
+    if (isOpaqueValue(value)) {
+      return value
     }
   }) as T
 }

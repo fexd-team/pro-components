@@ -38,7 +38,10 @@
     "new:component": "node ./scripts/new-component/index.js",
     "patch": "patch-package code-kitchen --use-yarn --patch-dir ./scripts/patches",
     "postinstall": "patch-package --patch-dir ./scripts/patches",
-    "version:auto-update": "node ./scripts/autoUpdateVersions.js"
+    "version:auto-update": "node ./scripts/autoUpdateVersions.js",
+    "version:auto-update:internal": "node ./scripts/autoUpdateVersions.js --registry=http://registry.npm.al.com",
+    "version:check-remote": "node ./scripts/checkRemoteVersions.js",
+    "version:check-remote:internal": "node ./scripts/checkRemoteVersions.js --registry=http://registry.npm.al.com"
   },
   "devDependencies": {
     "@cjy0208/import-cost": "^2.2.1",

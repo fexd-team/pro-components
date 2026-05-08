@@ -2,111 +2,70 @@ const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
 const glob = require('glob')
+const {
+  getRegistry,
+  getRemoteVersion,
+  compareVersions,
+  calculateNewVersion,
+  printTableRow,
+  printDivider,
+} = require('./versionHelpers')
 
-// 检查包的src目录是否有改动
 function hasSourceChanged(packagePath) {
   const srcPath = path.join(path.dirname(packagePath), 'src')
   try {
-    // 检查暂存区和工作区的改动
     const statusResult = execSync(`git status --porcelain "${srcPath}"`, {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     }).trim()
 
-    // 解析 git status 的输出，处理文件状态
     const changedFiles = statusResult
       .split('\n')
       .filter(Boolean)
-      .map((line) => {
-        const status = line.slice(0, 2)
-        const filePath = line.slice(3)
-        return {
-          status,
-          path: filePath,
-        }
-      })
+      .map((line) => ({ status: line.slice(0, 2), path: line.slice(3) }))
 
-    const hasChanges = changedFiles.length > 0
-    if (hasChanges) {
+    if (changedFiles.length > 0) {
       console.log(`\n检测到 ${path.dirname(packagePath)} 有源码改动:`)
-      changedFiles.forEach((file) => {
-        const status = file.status.trim()
-        let statusText = ''
-        if (status === 'M') statusText = '修改'
-        else if (status === 'A') statusText = '新增'
-        else if (status === 'D') statusText = '删除'
-        else if (status === '??') statusText = '未跟踪'
-        else statusText = status
-
-        console.log(`  ${statusText}: ${file.path}`)
+      const statusText = { M: '修改', A: '新增', D: '删除', '??': '未跟踪' }
+      changedFiles.forEach((f) => {
+        console.log(`  ${statusText[f.status.trim()] || f.status.trim()}: ${f.path}`)
       })
     }
 
-    return {
-      hasChanges,
-      changedFiles: changedFiles.map((f) => f.path),
-    }
+    return { hasChanges: changedFiles.length > 0, changedFiles: changedFiles.map((f) => f.path) }
   } catch (error) {
     console.error(`检查 ${srcPath} 改动时发生错误:`, error.message)
-    return {
-      hasChanges: false,
-      changedFiles: [],
-    }
+    return { hasChanges: false, changedFiles: [] }
   }
 }
 
-// 检查包的依赖是否有变更
 function hasDependenciesChanged(packagePath) {
   try {
-    // 检查暂存区和工作区的改动
     const statusResult = execSync(`git status --porcelain "${packagePath}"`, {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     }).trim()
 
-    // 解析 git status 的输出，处理文件状态
     const changedFiles = statusResult
       .split('\n')
       .filter(Boolean)
-      .map((line) => {
-        const status = line.slice(0, 2)
-        const filePath = line.slice(3)
-        return {
-          status,
-          path: filePath,
-        }
-      })
+      .map((line) => ({ status: line.slice(0, 2), path: line.slice(3) }))
 
-    const hasChanges = changedFiles.length > 0
-    if (hasChanges) {
+    if (changedFiles.length > 0) {
       console.log(`\n检测到 ${packagePath} 有 package.json 改动:`)
-      changedFiles.forEach((file) => {
-        const status = file.status.trim()
-        let statusText = ''
-        if (status === 'M') statusText = '修改'
-        else if (status === 'A') statusText = '新增'
-        else if (status === 'D') statusText = '删除'
-        else if (status === '??') statusText = '未跟踪'
-        else statusText = status
-
-        console.log(`  ${statusText}: ${file.path}`)
+      const statusText = { M: '修改', A: '新增', D: '删除', '??': '未跟踪' }
+      changedFiles.forEach((f) => {
+        console.log(`  ${statusText[f.status.trim()] || f.status.trim()}: ${f.path}`)
       })
     }
 
-    return {
-      hasChanges,
-      changedFiles: changedFiles.map((f) => f.path),
-    }
+    return { hasChanges: changedFiles.length > 0, changedFiles: changedFiles.map((f) => f.path) }
   } catch (error) {
     console.error(`检查 ${packagePath} 改动时发生错误:`, error.message)
-    return {
-      hasChanges: false,
-      changedFiles: [],
-    }
+    return { hasChanges: false, changedFiles: [] }
   }
 }
 
-// 获取所有包的信息
 function getAllPackagesInfo() {
   const packagesPath = path.join(__dirname, '../packages/*/package.json')
   const packageFiles = glob.sync(packagesPath)
@@ -115,7 +74,6 @@ function getAllPackagesInfo() {
   packageFiles.forEach((packagePath) => {
     const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'))
 
-    // 检查 package.json 是否有未提交的改动
     let hasPackageJsonChanged = false
     try {
       const result = execSync(`git status --porcelain "${packagePath}"`, {
@@ -127,9 +85,8 @@ function getAllPackagesInfo() {
       console.error(`检查 ${packagePath} 状态时发生错误:`, error.message)
     }
 
-    // 如果 package.json 有未提交的改动，提示用户
     if (hasPackageJsonChanged) {
-      console.warn(`警告: ${pkg.name} 的 package.json 有未提交的改动，这可能会影响版本更新`)
+      console.warn(`⚠️  ${pkg.name} 的 package.json 有未提交的改动`)
     }
 
     packagesInfo[pkg.name] = {
@@ -147,31 +104,22 @@ function getAllPackagesInfo() {
   return packagesInfo
 }
 
-// 构建依赖关系图
 function buildDependencyGraph(packagesInfo) {
   const graph = {}
   const packageNames = new Set(Object.keys(packagesInfo))
 
   Object.entries(packagesInfo).forEach(([pkgName, info]) => {
-    graph[pkgName] = {
-      dependencies: [],
-      dependents: [],
-      level: 0,
-    }
+    graph[pkgName] = { dependencies: [], dependents: [], level: 0 }
 
-    // 只从 dependencies 中收集依赖关系
-    Object.entries(info.dependencies).forEach(([depName, depVersion]) => {
+    Object.entries(info.dependencies).forEach(([depName]) => {
       if (packageNames.has(depName)) {
         graph[pkgName].dependencies.push(depName)
-        if (!graph[depName]) {
-          graph[depName] = { dependencies: [], dependents: [], level: 0 }
-        }
+        if (!graph[depName]) graph[depName] = { dependencies: [], dependents: [], level: 0 }
         graph[depName].dependents.push(pkgName)
       }
     })
   })
 
-  // 计算每个包的依赖层级
   function calculateLevel(pkgName, visited = new Set()) {
     if (visited.has(pkgName)) return graph[pkgName].level
     visited.add(pkgName)
@@ -180,83 +128,52 @@ function buildDependencyGraph(packagesInfo) {
     if (deps.length === 0) {
       graph[pkgName].level = 0
     } else {
-      const maxDepLevel = Math.max(...deps.map((dep) => calculateLevel(dep, visited)))
-      graph[pkgName].level = maxDepLevel + 1
+      graph[pkgName].level = Math.max(...deps.map((dep) => calculateLevel(dep, visited))) + 1
     }
-
     return graph[pkgName].level
   }
 
   Object.keys(graph).forEach((pkgName) => calculateLevel(pkgName))
-
   return graph
 }
 
-// 可视化依赖关系图
 function visualizeDependencyGraph(graph, packagesInfo) {
-  console.log('\n依赖关系图谱：')
-  console.log('─'.repeat(50))
+  console.log('\n📊 依赖关系图谱：')
+  printDivider(50)
 
-  // 按层级排序
-  const sortedPackages = Object.entries(graph)
+  const sorted = Object.entries(graph)
     .sort(([, a], [, b]) => a.level - b.level)
-    .map(([name, info]) => ({
-      name,
-      ...info,
-      version: packagesInfo[name].version,
-    }))
+    .map(([name, info]) => ({ name, ...info, version: packagesInfo[name].version }))
 
-  // 输出每个包的信息
-  sortedPackages.forEach((pkg) => {
+  sorted.forEach((pkg) => {
     const indent = '  '.repeat(pkg.level)
     console.log(`${indent}${pkg.name}@${pkg.version} (层级: ${pkg.level})`)
-
     if (pkg.dependencies.length > 0) {
-      console.log(`${indent}  依赖:`)
-      pkg.dependencies.forEach((dep) => {
-        console.log(`${indent}    - ${dep}@${packagesInfo[dep].version}`)
-      })
+      pkg.dependencies.forEach((dep) => console.log(`${indent}  └─ ${dep}@${packagesInfo[dep].version}`))
     }
-
-    if (pkg.dependents.length > 0) {
-      console.log(`${indent}  被依赖:`)
-      pkg.dependents.forEach((dep) => {
-        console.log(`${indent}    - ${dep}`)
-      })
-    }
-    console.log()
   })
 
-  console.log('─'.repeat(50))
-  return sortedPackages.map((pkg) => pkg.name)
+  printDivider(50)
+  return sorted.map((pkg) => pkg.name)
 }
 
-// 计算新版本号
-function calculateNewVersion(version) {
-  const [major, minor, patch] = version.split('.').map(Number)
-  return `${major}.${minor}.${patch + 1}`
-}
-
-// 主处理函数
 function processVersionUpdates() {
+  const registry = getRegistry()
+  console.log(`\n📦 registry: ${registry}`)
+
   const packagesInfo = getAllPackagesInfo()
 
-  // 检查是否有未提交的 package.json 改动
-  const hasUncommittedChanges = Object.values(packagesInfo).some((info) => info.hasPackageJsonChanged)
+  const hasUncommittedChanges = Object.values(packagesInfo).some((i) => i.hasPackageJsonChanged)
   if (hasUncommittedChanges) {
-    console.log('\n警告: 检测到未提交的 package.json 改动')
-    console.log('建议先提交或回滚这些改动，以确保版本更新的准确性')
-    console.log('是否继续？(按 Ctrl+C 取消)\n')
+    console.log('\n⚠️  检测到未提交的 package.json 改动，建议先提交或回滚')
   }
 
   const graph = buildDependencyGraph(packagesInfo)
   const updateOrder = visualizeDependencyGraph(graph, packagesInfo)
 
-  console.log('\n开始检查和更新版本...')
-  console.log('─'.repeat(50))
+  console.log('\n🔍 检查源码和依赖变更...')
 
-  // 第一轮：检查源码改动和依赖变更
-  Object.entries(packagesInfo).forEach(([pkgName, info]) => {
+  Object.entries(packagesInfo).forEach(([, info]) => {
     const sourceChanges = hasSourceChanged(info.path)
     const dependencyChanges = hasDependenciesChanged(info.path)
 
@@ -266,120 +183,110 @@ function processVersionUpdates() {
     }
   })
 
-  // 计算所有包的最终版本和依赖更新
-  const versionUpdates = new Map() // 存储所有需要更新的包信息
+  const versionUpdates = new Map()
+  const skippedPackages = []
   const processedPackages = new Set()
 
-  // 计算单个包的更新信息
   function calculatePackageUpdates(pkgName) {
     const info = packagesInfo[pkgName]
-
-    // 如果已经处理过，直接返回计算好的版本
     if (processedPackages.has(pkgName)) {
       return versionUpdates.get(pkgName)?.newVersion || info.version
     }
-
-    // 标记为已处理
     processedPackages.add(pkgName)
 
-    // 先处理所有依赖
     const depVersions = {}
     let hasUpdatedDeps = false
 
-    // 处理所有依赖，并检查是否有依赖更新了版本
     for (const dep of graph[pkgName].dependencies) {
       const depVersion = calculatePackageUpdates(dep)
-      const originalVersion = packagesInfo[dep].version
-
-      // 只有当依赖的版本真的发生变化时，才记录更新
-      if (depVersion !== originalVersion) {
+      if (depVersion !== packagesInfo[dep].version) {
         depVersions[dep] = depVersion
         hasUpdatedDeps = true
       }
     }
 
-    // 当源码改动或依赖版本更新时都需要更新版本
     const needsUpdate = info.hasChanged || hasUpdatedDeps
+    if (!needsUpdate) return info.version
 
-    if (needsUpdate) {
-      const newVersion = calculateNewVersion(info.version)
-      versionUpdates.set(pkgName, {
+    const remoteVersion = getRemoteVersion(pkgName, registry)
+    const newVersion = calculateNewVersion(info.version, remoteVersion)
+    const reason = info.hasChanged ? '源码改动' : `依赖更新 (${Object.keys(depVersions).join(', ')})`
+
+    if (!newVersion) {
+      skippedPackages.push({
         pkgName,
-        path: info.path,
-        currentVersion: info.version,
-        newVersion,
-        reason: info.hasChanged
-          ? `源码改动 (变更文件: ${info.changedFiles.join(', ')})`
-          : `依赖更新 (${Object.entries(depVersions)
-              .map(([dep, ver]) => `${dep}@${ver}`)
-              .join(', ')})`,
-        depVersions,
+        localVersion: info.version,
+        remoteVersion: remoteVersion || '-',
+        reason,
       })
-      return newVersion
+      return info.version
     }
 
-    return info.version
+    versionUpdates.set(pkgName, {
+      pkgName,
+      path: info.path,
+      currentVersion: info.version,
+      newVersion,
+      remoteVersion: remoteVersion || '-',
+      reason,
+      depVersions,
+    })
+    return newVersion
   }
 
-  // 按顺序计算每个包的更新
-  updateOrder.forEach((pkgName) => {
-    calculatePackageUpdates(pkgName)
-  })
+  updateOrder.forEach((pkgName) => calculatePackageUpdates(pkgName))
 
-  // 如果没有需要更新的包，直接返回
+  // 汇总表格
+  const W = [28, 10, 10, 10, 18, 10]
+  const totalWidth = W.reduce((a, b) => a + b, 0)
+
+  console.log()
+  printDivider(totalWidth)
+  printTableRow(['包名', '线上', '本地', '更新后', '原因', '状态'], W)
+  printDivider(totalWidth)
+
+  for (const u of versionUpdates.values()) {
+    printTableRow([u.pkgName, u.remoteVersion, u.currentVersion, u.newVersion, u.reason, '📤 更新'], W)
+  }
+  for (const s of skippedPackages) {
+    printTableRow([s.pkgName, s.remoteVersion, s.localVersion, '-', s.reason, '⏭️  跳过'], W)
+  }
+
+  if (versionUpdates.size === 0 && skippedPackages.length === 0) {
+    printTableRow(['（无需要处理的包）', '', '', '', '', ''], W)
+  }
+
+  printDivider(totalWidth)
+
   if (versionUpdates.size === 0) {
-    console.log('\n没有检测到需要更新版本的包')
+    console.log('\n✅ 所有包已是最新，无需更新')
     return
   }
 
-  // 统一更新所有需要更新的包
-  console.log('\n开始更新文件...')
+  // 写入文件
   for (const update of versionUpdates.values()) {
     const pkg = JSON.parse(fs.readFileSync(update.path, 'utf-8'))
     pkg.version = update.newVersion
 
-    // 更新依赖版本
     if (Object.keys(update.depVersions).length > 0) {
-      if (pkg.dependencies) {
+      const updateDep = (deps) => {
+        if (!deps) return
         Object.entries(update.depVersions).forEach(([depName, version]) => {
-          if (pkg.dependencies[depName]) {
-            pkg.dependencies[depName] = `^${version}`
-          }
+          if (deps[depName]) deps[depName] = `^${version}`
         })
       }
-      if (pkg.devDependencies) {
-        Object.entries(update.depVersions).forEach(([depName, version]) => {
-          if (pkg.devDependencies[depName]) {
-            pkg.devDependencies[depName] = `^${version}`
-          }
-        })
-      }
+      updateDep(pkg.dependencies)
+      updateDep(pkg.devDependencies)
     }
 
-    // 写入文件
     fs.writeFileSync(update.path, JSON.stringify(pkg, null, 2) + '\n')
-
-    // 输出更新信息
-    console.log(`\n更新 ${update.pkgName}:`)
-    console.log(`  当前版本: ${update.currentVersion}`)
-    console.log(`  新版本: ${update.newVersion}`)
-    console.log(`  更新原因: ${update.reason}`)
-
-    if (Object.keys(update.depVersions).length > 0) {
-      console.log('  更新的依赖:')
-      Object.entries(update.depVersions).forEach(([depName, version]) => {
-        console.log(`    ${depName}: ^${version}`)
-      })
-    }
   }
 
-  console.log('\n─'.repeat(50))
-  console.log('版本更新完成！')
-  console.log('更新的包：')
-  for (const { pkgName, newVersion } of versionUpdates.values()) {
-    console.log(`  ${pkgName}@${newVersion}`)
+  console.log(`\n✅ 已更新 ${versionUpdates.size} 个包：`)
+  for (const { pkgName, currentVersion, newVersion } of versionUpdates.values()) {
+    console.log(`   ${pkgName}: ${currentVersion} → ${newVersion}`)
   }
+  console.log()
 }
 
-// 执行版本更新
 processVersionUpdates()

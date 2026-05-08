@@ -99,5 +99,14 @@ export type DefaultCoverableConfig<T> = {
           : T[K]
 }
 
+/** useCoverable 返回对象的内部协议，供 component / props 等模块间通信 */
+export interface CoverableInternal<T = any> {
+  __getRawConfig: () => T
+  __isCoverableProps: () => true
+  __isConfigRead: () => boolean
+  __cover: (config: any) => void
+  __getUpdateKeyPathMapRef: () => { current: Record<string, [any, (string | number)[]]> }
+}
+
 // export type CurrentCoverableProps<T> = CoverableProps<T extends CoverableMark<any> ? T & T['__T__'] : T>
 // export type DefaultConfig<T> = DefaultCoverableConfig<T extends CoverableMark<any> ? T & T['__T__'] : T>

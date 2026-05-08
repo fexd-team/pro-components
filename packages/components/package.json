@@ -38,12 +38,18 @@
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },
+  "bin": {
+    "pro-components": "./cli/index.js"
+  },
   "files": [
     "documents",
     "es",
     "lib",
     "src",
-    "types.d.ts"
+    "types.d.ts",
+    "skills",
+    "cli",
+    "AGENTS.md"
   ],
   "sideEffects": [
     "*.less"
