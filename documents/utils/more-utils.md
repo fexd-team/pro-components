@@ -74,6 +74,8 @@ import { Actions } from '@fexd/pro-components'
 
 ## DropdownButton — 下拉按钮
 
+<code src="./demos/dropdownButton-demo.tsx"></code>
+
 增强的 `Dropdown.Button`，继承 Action 的自动 loading：
 
 ```tsx | pure
@@ -96,6 +98,8 @@ import { DropdownButton } from '@fexd/pro-components'
 ---
 
 ## createValueProxy — 值代理
+
+<code src="./demos/createValueProxy-demo.tsx"></code>
 
 为对象属性读取创建 Proxy，拦截并转换值。典型用途：选项数组的 i18n 翻译代理。
 
@@ -142,6 +146,8 @@ coloringOptions({ 1: '选项A', 2: '选项B' })
 
 ## showTipsWithResponse — 响应自动提示
 
+<code src="./demos/showTips-demo.tsx"></code>
+
 根据 `ServerResponse` 格式自动显示 `message` 或 `notification`：
 
 ```tsx | pure
@@ -155,52 +161,15 @@ showTipsWithResponse(res)
 
 ---
 
-## deepMerge — 深度合并
+## 内部工具函数
 
-<code src="./demos/deepMerge-demo.tsx"></code>
-
-深度合并两个对象，支持循环引用检测（使用 WeakSet）。
-
-```tsx | pure
-import { deepMerge } from '@fexd/pro-components'
-
-const merged = deepMerge({ a: 1, nested: { x: 10 } }, { b: 2, nested: { y: 20 } })
-// { a: 1, b: 2, nested: { x: 10, y: 20 } }
-```
-
----
-
-## deepMapItem — 深度遍历转换
-
-递归遍历对象/数组的每个节点，可对值做变换或过滤：
-
-```tsx | pure
-import { deepMapItem } from '@fexd/pro-components'
-
-const cleaned = deepMapItem(rawData, {
-  handleItem: (value, key, keyPath) => (value === null ? '' : value),
-})
-```
-
----
-
-## diffArray — 数组差异计算
-
-比较两个数组，算出新增、移除、全部差异：
-
-```tsx | pure
-import { diffArray } from '@fexd/pro-components'
-
-const { add, remove, diff } = diffArray([1, 2, 3], [2, 3, 4, 5])
-// add: [4, 5], remove: [1], diff: [4, 5, 1]
-```
-
----
-
-## 其他常用工具
+以下为内部工具函数速查表，主要供组件内部使用：
 
 | 函数                        | 说明                                         |
 | --------------------------- | -------------------------------------------- |
+| deepMerge(a, b)             | 深度合并对象（支持循环引用检测）             |
+| deepMapItem(obj, options)   | 递归遍历转换对象/数组节点                    |
+| diffArray(init, current)    | 数组差异计算（add/remove/diff）              |
 | catchPromise(promise)       | 安全 Promise 捕获，返回 \[error, data\] 元组 |
 | filterObjectEmptyValue(obj) | 过滤对象中的空值                             |
 | file2base64(file)           | 文件转 base64                                |
@@ -208,6 +177,6 @@ const { add, remove, diff } = diffArray([1, 2, 3], [2, 3, 4, 5])
 | formdata2obj(formdata)      | FormData 转对象                              |
 | createSharedHook(hook)      | 创建跨组件共享的 Hook                        |
 | useGetLatest(value)         | 始终获取最新值的 ref                         |
-| useThrottle(value, delay)   | 节流 Hook                                    |
+| useThrottle(value, options) | 节流 Hook                                    |
 | useForceUpdate()            | 强制重渲染                                   |
 | usePreferredDark()          | 检测系统暗色模式                             |

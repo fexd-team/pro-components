@@ -23,10 +23,11 @@ order: 1
 
 ### 🪝 Hooks
 
-| Hook                                         | 说明                |
-| -------------------------------------------- | ------------------- |
-| [useCoverable](/utils/use-coverable)         | 业务组件化核心 Hook |
-| [useDebounce / useAutoLoading](/utils/hooks) | 防抖与自动 loading  |
+| Hook                                         | 说明                               |
+| -------------------------------------------- | ---------------------------------- |
+| [useCoverable](/utils/use-coverable)         | 业务组件化核心 Hook                |
+| [useProState](/utils/use-pro-state)          | 跨组件同步 + 持久化 + 对象自动合并 |
+| [useDebounce / useAutoLoading](/utils/hooks) | 防抖与自动 loading                 |
 
 ### 🔧 工具函数
 

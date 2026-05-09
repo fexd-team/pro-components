@@ -20,13 +20,23 @@ order: 9
 ### API
 
 ```tsx | pure
-const debouncedValue = useDebounce<T>(value: T, delay: number): T
+const debouncedValue = useDebounce<T>(value: T, options?: DebounceOptions): T
 ```
 
-| 参数  | 说明             | 类型   | 默认值 |
-| ----- | ---------------- | ------ | ------ |
-| value | 需要防抖的值     | T      | -      |
-| delay | 延迟时间（毫秒） | number | -      |
+| 参数    | 说明         | 类型            | 默认值 |
+| ------- | ------------ | --------------- | ------ |
+| value   | 需要防抖的值 | T               | -      |
+| options | 防抖配置     | DebounceOptions | -      |
+
+**DebounceOptions**（来自 ahooks）：
+
+| 属性     | 说明             | 类型    | 默认值 |
+| -------- | ---------------- | ------- | ------ |
+| wait     | 延迟时间（毫秒） | number  | 0      |
+| leading  | 是否在延迟前调用 | boolean | false  |
+| trailing | 是否在延迟后调用 | boolean | true   |
+
+> `wait` 为 0 或不传时，直接返回原始值（同步模式，不触发额外渲染）。
 
 ### 搜索输入
 
@@ -36,7 +46,7 @@ import { useDebounce } from '@fexd/pro-components'
 
 const SearchComponent = () => {
   const [searchText, setSearchText] = useState('')
-  const debouncedSearch = useDebounce(searchText, 300)
+  const debouncedSearch = useDebounce(searchText, { wait: 300 })
 
   useEffect(() => {
     if (debouncedSearch) {
@@ -52,7 +62,7 @@ const SearchComponent = () => {
 
 ```tsx | pure
 const [email, setEmail] = useState('')
-const debouncedEmail = useDebounce(email, 500)
+const debouncedEmail = useDebounce(email, { wait: 500 })
 
 useEffect(() => {
   if (debouncedEmail) {
@@ -72,20 +82,24 @@ useEffect(() => {
 ### API
 
 ```tsx | pure
-const { loading, run, runAsync } = useAutoLoading(asyncFn)
+const { loading, onAction } = useAutoLoading({ action: asyncFn, loading?: externalLoading })
 ```
 
-| 参数    | 说明     | 类型                        |
-| ------- | -------- | --------------------------- |
-| asyncFn | 异步函数 | (...args) => Promise\<any\> |
+| 参数    | 说明              | 类型                        |
+| ------- | ----------------- | --------------------------- |
+| action  | 异步函数          | (...args) => Promise\<any\> |
+| loading | 外部 loading 控制 | boolean（可选）             |
 
 ### 返回值
 
-| 属性     | 说明                   | 类型    |
-| -------- | ---------------------- | ------- |
-| loading  | 是否加载中             | boolean |
-| run      | 执行（不返回 Promise） | T       |
-| runAsync | 执行（返回 Promise）   | T       |
+| 属性            | 说明                     | 类型     |
+| --------------- | ------------------------ | -------- |
+| loading         | 防抖后的加载状态         | boolean  |
+| realTimeLoading | 实时加载状态（无防抖）   | boolean  |
+| onAction        | 执行函数（返回 Promise） | Function |
+| setLoading      | 手动设置 loading         | Function |
+
+> `Action` 组件内部使用此 Hook，通常不需要直接调用。
 
 ### 基础用法
 

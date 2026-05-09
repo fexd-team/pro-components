@@ -50,11 +50,13 @@ const controller = showModal(content, options?)
 
 ### 返回值 controller
 
-| 属性    | 说明                          | 类型                        |
-| ------- | ----------------------------- | --------------------------- |
-| promise | 确认时 resolve，取消时 reject | Promise\<any\>              |
-| close   | 手动关闭                      | (result?) => void           |
-| update  | 更新内容和配置                | (content, options?) => void |
+| 属性    | 说明               | 类型                                   |
+| ------- | ------------------ | -------------------------------------- |
+| promise | 弹窗关闭时 resolve | Promise\<void\>                        |
+| open    | 重新打开弹窗       | () => void                             |
+| close   | 关闭弹窗           | () => void                             |
+| destroy | 销毁弹窗           | () => void                             |
+| update  | 更新配置           | (props: Record\<string, any\>) => void |
 
 ## 在线演示
 

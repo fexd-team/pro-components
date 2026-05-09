@@ -6,7 +6,7 @@ const { Text } = Typography
 
 export default () => {
   const [inputValue, setInputValue] = useState('')
-  const debouncedValue = useDebounce(inputValue, 500)
+  const debouncedValue = useDebounce(inputValue, { wait: 500 })
   const [searchCount, setSearchCount] = useState(0)
 
   useEffect(() => {

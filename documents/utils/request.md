@@ -93,7 +93,6 @@ const data = await request('/api/resource')
 - 自动检测超出安全范围的数字
 - 将大数字转换为字符串保留精度
 - 不影响正常范围的数字
-- 底层从 `json-bigint` 迁移到 `json-custom-numbers`，更轻量
 
 ## 常见模式
 
