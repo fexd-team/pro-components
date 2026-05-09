@@ -7,10 +7,6 @@ order: 3
 
 一套用于构建**可覆盖配置**的业务组件化 Hook 体系。组件作者定义默认配置，使用者通过 `coverable` prop 按路径精确覆盖任意层级的配置项，无需整体替换。
 
-<code src="./demos/useCoverable.tsx"></code>
-
----
-
 ## 设计理念：为什么需要 useCoverable？
 
 传统的 React 组件复用方式是通过 Props 暴露定制接口。当组件足够复杂（如一整个 CRUD 管理页面）时，需要定制的点会非常多——API 地址、权限开关、表格列、分页大小、操作按钮……传统方式会导致 Props 接口爆炸式增长。

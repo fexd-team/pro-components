@@ -95,6 +95,7 @@ const Docs: FC = memo(() => {
           gridArea: `main / main / main / main`,
           margin: mobile ? 0 : 24,
           marginBottom: mobile ? 0 : 48,
+          minWidth: 0,
         }}
       >
         <Center width={'100%'}>

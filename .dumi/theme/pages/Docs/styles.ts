@@ -51,7 +51,7 @@ export const useStyles = createStyles(({ css, responsive, token }: any) => ({
     max-width: ${token.contentMaxWidth}${typeof token.contentMaxWidth === 'number' ? 'px' : ''};
     width: 100%;
     margin: 0 24px;
-
+    overflow-x: auto;
 
     ${responsive.mobile} {
       margin: 0;
