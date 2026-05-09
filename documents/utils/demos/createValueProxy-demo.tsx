@@ -10,21 +10,25 @@ const translations: Record<string, Record<string, string>> = {
   id: { 启用: 'Aktif', 禁用: 'Nonaktif', 待审核: 'Menunggu' },
 }
 
+let currentLang = 'zh-cn'
+
 const rawOptions = [
   { label: '启用', value: 1 },
   { label: '禁用', value: 0 },
   { label: '待审核', value: 2 },
 ]
 
+const proxiedOptions = rawOptions.map((item) =>
+  createValueProxy(item, (value: any, key: any) => {
+    if (key === 'label') return translations[currentLang]?.[value] ?? value
+    return value
+  }),
+)
+
 export default () => {
   const [lang, setLang] = useState('zh-cn')
 
-  const proxiedOptions = rawOptions.map((item) =>
-    createValueProxy(item, (value: any, key: any) => {
-      if (key === 'label') return translations[lang]?.[value] ?? value
-      return value
-    }),
-  )
+  currentLang = lang
 
   return (
     <Card size="small" title="createValueProxy 值代理（i18n 翻译示例）">
@@ -50,7 +54,7 @@ export default () => {
           ))}
         </div>
         <Text type="secondary" style={{ fontSize: 12 }}>
-          原始 label 不变，Proxy 读取时自动翻译
+          proxiedOptions 定义在组件外部，读取 label 时动态返回当前语言
         </Text>
       </Space>
     </Card>

@@ -5,127 +5,117 @@ order: 7
 
 # request 请求工具
 
-基于 fetch 的请求工具，提供 API 定义、大数字安全解析、`useCoverable` 集成等增强特性。
+基于 axios 的请求封装，提供简洁的 HTTP 方法调用、大数字安全解析、可覆盖 API 定义等特性。
 
-## 核心 API
-
-### request
-
-发起 HTTP 请求，支持中间件扩展。
+## 基础用法
 
 ```tsx | pure
 import { request } from '@fexd/pro-components'
 
-const data = await request('/api/users', {
-  method: 'GET',
-  params: { page: 1, size: 10 },
-})
+// GET
+const result = await request.get('/api/users', { params: { page: 1, size: 10 } })
+
+// POST
+const result = await request.post('/api/users', { name: '张三', email: 'test@example.com' })
+
+// PUT
+const result = await request.put('/api/users/1', { name: '李四' })
+
+// DELETE
+const result = await request.delete('/api/users/1')
 ```
 
-| 参数    | 说明     | 类型           | 默认值 |
-| ------- | -------- | -------------- | ------ |
-| url     | 请求 URL | string         | -      |
-| options | 请求配置 | RequestOptions | -      |
-
-### RequestOptions
-
-| 属性         | 说明             | 类型   | 默认值 |
-| ------------ | ---------------- | ------ | ------ |
-| method       | 请求方法         | string | 'GET'  |
-| params       | URL 参数         | object | -      |
-| data / body  | 请求体           | any    | -      |
-| headers      | 请求头           | object | -      |
-| timeout      | 超时时间（毫秒） | number | -      |
-| responseType | 响应类型         | string | 'json' |
-| prefix       | URL 前缀         | string | -      |
-
-## defineApi - API 定义
-
-使用 `defineApi` 创建类型安全的 API 函数，结合 `useCoverable` 支持可覆盖配置。
+### 响应结构
 
 ```tsx | pure
-import { defineApi } from '@fexd/pro-components'
+interface ServerResponse<T = any> {
+  success: boolean
+  data: T
+  message?: string
+  notification?: string
+}
 
-const fetchUsers = defineApi({
-  url: '/api/users',
-  method: 'GET',
-})
-
-const createUser = defineApi({
-  url: '/api/users',
-  method: 'POST',
-})
-
-// 使用
-const users = await fetchUsers({ params: { page: 1 } })
-await createUser({ data: { name: '张三' } })
+const result = await request.get('/api/users')
+if (result.success) {
+  console.log(result.data)
+}
 ```
 
-### 与 useCoverable 集成
+## 组合 useRequest
 
-```tsx | pure
-import { defineApi, useCoverable } from '@fexd/pro-components'
-
-const api = useCoverable.raw({
-  fetchUsers: defineApi({ url: '/api/users' }),
-  createUser: defineApi({ url: '/api/users', method: 'POST' }),
-})
-
-// 组件中
-const users = await api.fetchUsers({ params: { page: 1 } })
-```
-
-## 大数字安全解析
-
-使用 `json-custom-numbers` 进行 JSON 解析，安全处理超过 `Number.MAX_SAFE_INTEGER` 的大数字。
-
-```tsx | pure
-// 后端返回 {"id": 9007199254740993}
-// 默认 JSON.parse 精度丢失: 9007199254740992
-
-// request 自动安全解析:
-const data = await request('/api/resource')
-// data.id === "9007199254740993" (字符串保留精度)
-```
-
-### 原理
-
-- 自动检测超出安全范围的数字
-- 将大数字转换为字符串保留精度
-- 不影响正常范围的数字
-
-## 常见模式
-
-### 组合 useRequest
+推荐使用 ahooks 的 `useRequest` 搭配 `request`：
 
 ```tsx | pure
 import { useRequest } from 'ahooks'
 import { request } from '@fexd/pro-components'
 
 const UserList = () => {
-  const data = useRequest(() => request('/api/users'))
+  const data = useRequest(() => request.get('/api/users'))
 
   return <Table dataSource={data.data?.list} loading={data.loading} />
 }
 ```
 
-### RESTful CRUD
+## 全局配置
 
 ```tsx | pure
-const userApi = {
-  list: defineApi({ url: '/api/users' }),
-  detail: defineApi({ url: '/api/users/:id' }),
-  create: defineApi({ url: '/api/users', method: 'POST' }),
-  update: defineApi({ url: '/api/users/:id', method: 'PUT' }),
-  remove: defineApi({ url: '/api/users/:id', method: 'DELETE' }),
-}
+// 设置全局请求配置（基于 axios）
+request.setConfig({
+  baseURL: '/api',
+  timeout: 10000,
+  headers: { Authorization: `Bearer ${token}` },
+})
 ```
 
-### 错误处理
+## 克隆实例
+
+```tsx | pure
+// 创建独立的 request 实例（不影响全局配置）
+const customRequest = request.clone({
+  baseURL: 'https://other-api.example.com',
+  timeout: 30000,
+})
+```
+
+## request.coverable — 可覆盖 API
+
+结合 `useCoverable` 体系，定义可被上层 BC 覆盖配置的 API。
+
+```tsx | pure
+import { request } from '@fexd/pro-components'
+
+// 定义可覆盖的 API
+const fetchUsers = request.coverable({
+  url: '/api/users',
+  method: 'get',
+})
+
+const createUser = request.coverable({
+  url: '/api/users',
+  method: 'post',
+})
+
+// 在 useCoverable 组件中，上层可通过 coverable 属性覆盖 API 配置
+```
+
+## 大数字安全解析
+
+自动检测超过 `Number.MAX_SAFE_INTEGER` 的大数字，转为字符串保留精度。
+
+```tsx | pure
+// 后端返回 {"id": 9007199254740993}
+// 默认 JSON.parse 精度丢失: 9007199254740992
+
+// request 自动安全解析:
+const data = await request.get('/api/resource')
+// data.id === "9007199254740993" (字符串保留精度)
+```
+
+## 错误处理
 
 ```tsx | pure
 try {
-  const data = await request('/api/users')
+  const data = await request.get('/api/users')
 } catch (error) {
   if (error.response?.status === 401) {
     redirectToLogin()

@@ -38,13 +38,13 @@ const controller = showDrawer(config)
 
 ### 返回值 controller
 
-| 属性    | 说明               | 类型            |
-| ------- | ------------------ | --------------- |
-| promise | 抽屉关闭时 resolve | Promise\<void\> |
-| open    | 打开抽屉           | () => void      |
-| close   | 关闭抽屉           | () => void      |
-| destroy | 销毁抽屉           | () => void      |
-| update  | 更新配置           | (props) => void |
+| 属性    | 说明                         | 类型                                   |
+| ------- | ---------------------------- | -------------------------------------- |
+| promise | 抽屉关闭时 resolve           | Promise\<void\>                        |
+| close   | 关闭抽屉                     | () => void                             |
+| destroy | 销毁抽屉                     | () => void                             |
+| update  | 更新配置                     | (props: Record\<string, any\>) => void |
+| open    | 重新打开已关闭抽屉（极少用） | () => void                             |
 
 ## 在线演示
 
