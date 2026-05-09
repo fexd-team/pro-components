@@ -89,6 +89,182 @@ import { ProTable } from '@fexd/pro-components'
 | mock       | 列 mock 规则              | -                                    | -        |
 | render     | 自定义单元格渲染          | `(text, record, index) => ReactNode` | -        |
 
+## 行展开详情（expandView）
+
+在列配置中设置 `expandView: true` 的列，会被收集为展开区域的字段。表格自动支持**点击行展开**，展开区渲染为 ProForm 只读视图（Descriptions 样式）。
+
+```tsx
+<ProTable
+  columns={{
+    姓名: { label: '姓名', name: 'name' },
+    邮箱: { label: '邮箱', name: 'email', expandView: true },
+    地址: { label: '地址', name: 'address', expandView: true },
+    备注: { label: '备注', name: 'remark', expandView: true },
+  }}
+  // 展开区域布局配置（可选）
+  expandableDescriptionConfig={{ gridColumns: 2 }}
+  // 或完全自定义展开区的 ProForm render
+  expandableProFormRender={({ renderField }) => (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      {renderField('email')}
+      {renderField('address')}
+      {renderField('remark')}
+    </div>
+  )}
+  // 也可传 antd expandable 的原生配置
+  expandable={{ expandRowByClick: true }}
+/>
+```
+
+**相关 Props：**
+
+| 属性                          | 说明                       | 类型                             |
+| ----------------------------- | -------------------------- | -------------------------------- |
+| `column.expandView`           | 是否作为展开字段           | `boolean`                        |
+| `column.expandViewField`      | 展开字段配置（覆盖列配置） | `FieldConfig`                    |
+| `expandableDescriptionConfig` | 展开区 Descriptions 配置   | `ProFormRenderDescriptionParams` |
+| `expandableProFormRender`     | 完全自定义展开区布局       | `ProFormProps['render']`         |
+| `expandable`                  | antd Table expandable 配置 | `ExpandableConfig`               |
+
+## 行号列（showDataSourceIndex）
+
+内置行号列，无需手动定义：
+
+```tsx
+<ProTable
+  showDataSourceIndex // 显示行号
+  dataSourceIndexCalcWithPage // 行号跨页累加（如第2页从11开始）
+  dataSourceIndexColumnConfig={{
+    // 自定义行号列配置
+    width: 60,
+    fixed: 'left',
+    label: '序号',
+  }}
+/>
+```
+
+## 单元格渲染内置捷径（builtIn render）
+
+`column.render` 除了返回 ReactNode，还可以返回一个 `{ builtIn, props? }` 对象，使用内置的渲染模式：
+
+```tsx
+columns={{
+  状态: {
+    label: '状态', name: 'status',
+    render: (value) => ({ builtIn: 'tag', props: { color: value === 1 ? 'green' : 'red' } }),
+  },
+  链接: {
+    label: '链接', name: 'url',
+    render: (value) => value ? { builtIn: 'link', props: { href: value, target: '_blank' } } : '--',
+  },
+  头像: {
+    label: '头像', name: 'avatar',
+    render: (value) => ({ builtIn: 'avatar', props: { src: value } }),
+  },
+  进度: {
+    label: '完成度', name: 'progress',
+    render: (value) => ({ builtIn: 'progress', props: { percent: value * 100 } }),
+  },
+}}
+```
+
+**支持的 builtIn 类型：**`text` | `link` | `tag` | `button` | `badge` | `image` | `progress` | `avatar` | `rate` | `field`
+
+## 性能优化
+
+### lazyRenderCell — 单元格懒渲染
+
+ProTable 默认启用了智能懒渲染策略：
+
+| 区域                | 行为                                  |
+| ------------------- | ------------------------------------- |
+| 前 15 行 × 前 10 列 | 直接渲染（不懒加载）                  |
+| 前 15 行的操作列    | 直接渲染                              |
+| 其余单元格          | IntersectionObserver + 128ms debounce |
+
+可自定义策略：
+
+```tsx
+<ProTable
+  lazyRenderCell={({ dataSource, column, item, xIndex, yIndex, isActionColumn }) => {
+    if (yIndex <= 30) return false // 前30行都不懒加载
+    return { threshold: 0, wait: 64 }
+  }}
+/>
+```
+
+传 `false` 可完全关闭：`lazyRenderCell={false}`
+
+### lightweightRenderCell — 轻量渲染
+
+启用后，非编辑态的单元格使用 `ReadonlyProFieldCore` 渲染（更快，但动态 field hook 失效）：
+
+```tsx
+<ProTable lightweightRenderCell />
+```
+
+## 样式与布局 Props
+
+ProTable 分层结构：`wrapper > query + main > toolbar + body(table)`，可独立控制每层样式：
+
+| 属性                | 说明                            | 类型            | 默认值                      |
+| ------------------- | ------------------------------- | --------------- | --------------------------- |
+| `wrapperStyle`      | 最外层容器样式                  | `CSSProperties` | -                           |
+| `wrapperClassName`  | 最外层容器 className            | `string`        | -                           |
+| `mainStyle`         | 主体区域（toolbar + table）样式 | `CSSProperties` | -                           |
+| `mainClassName`     | 主体区域 className              | `string`        | -                           |
+| `bodyStyle`         | table 区域样式                  | `CSSProperties` | -                           |
+| `bodyClassName`     | table 区域 className            | `string`        | -                           |
+| `toolbarStyle`      | 工具栏样式                      | `CSSProperties` | -                           |
+| `queryWrapperStyle` | 查询区域包裹样式                | `CSSProperties` | `pure` 时自动 `{padding:0}` |
+| `noBackgroundColor` | 去除默认白底（嵌入场景常用）    | `boolean`       | `false`                     |
+
+```tsx
+<ProTable
+  noBackgroundColor
+  wrapperStyle={{ border: '1px solid #f0f0f0' }}
+  toolbarStyle={{ padding: '8px 16px' }}
+  bodyStyle={{ minHeight: 300 }}
+/>
+```
+
+## 表格尺寸与表头拖拽
+
+| 属性               | 说明                                            | 类型                             | 默认值  |
+| ------------------ | ----------------------------------------------- | -------------------------------- | ------- |
+| `defaultSize`      | 默认表格尺寸（`mini` 为 true 时自动 `'small'`） | `'small' \| 'middle' \| 'large'` | -       |
+| `defaultTableSize` | 同 `defaultSize`（别名）                        | 同上                             | -       |
+| `resizableHeader`  | 表头列宽可拖拽调整（⚠️ 功能不稳定）             | `boolean`                        | `false` |
+
+```tsx
+<ProTable defaultSize="small" resizableHeader />
+```
+
+## 初始分页参数
+
+除 `defaultPageSize` 外，还可通过对象形式精确控制初始页码与每页数：
+
+```tsx
+<ProTable
+  initialPaginationParams={{ page: 1, pageSize: 50 }}
+  // 或
+  defaultPaginationParams={{ page: 1, pageSize: 20 }}
+/>
+```
+
+两者语义相同（内部合并），优先级：`defaultPaginationParams > initialPaginationParams > defaultPageSize`。
+
+## 其他实用 Props
+
+| 属性                    | 说明                                       | 类型              | 默认值     |
+| ----------------------- | ------------------------------------------ | ----------------- | ---------- |
+| `hideColumnsWhenNoData` | 数据为空时隐藏所有列（减少空表格视觉噪音） | `boolean`         | `false`    |
+| `stickyScrollBar`       | 吸底横向滚动条（随 `sticky` 联动）         | `boolean`         | `!!sticky` |
+| `normalizeFieldValue`   | 是否序列化字段值（如 Moment→时间戳）       | `boolean`         | `true`     |
+| `noTableHeaderEllipsis` | 表头不折叠省略                             | `boolean`         | -          |
+| `noBatchToolbar`        | 隐藏批量操作工具栏                         | `boolean`         | -          |
+| `tableExtraRender`      | 表格区域额外渲染                           | `() => ReactNode` | -          |
+
 ## 响应数据格式
 
 ```typescript
@@ -96,7 +272,8 @@ interface ServerResponse<T = any> {
   success: boolean
   data?: T
   total?: number
-  message?: any
+  message?: string | MessageArgsProps
+  notification?: string | NotificationArgsProps // 也支持 notification 提示
 }
 ```
 

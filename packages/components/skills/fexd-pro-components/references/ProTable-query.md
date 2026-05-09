@@ -319,6 +319,100 @@ queryFields={[
 
 > 如果设置了 `id` prop，内部会自动使用 `id` 作为 `queryFieldPersistKey` 的默认值。
 
+### 持久化粒度控制
+
+可以分别控制表单参数和分页参数的持久化，并排除特定字段：
+
+```tsx
+<ProTable
+  queryFieldPersistKey="order-list"
+  queryFieldPersistForm={true} // 是否持久化表单部分（默认 true）
+  queryFieldPersistPaginationParams={true} // 是否持久化分页部分（默认 true）
+  queryFieldPersistFormKeyExcludes={['password', 'token']} // 表单中排除的字段
+  queryFieldPersistPaginationParamsKeyExcludes={['page']} // 分页中排除的字段（如只保留 pageSize）
+/>
+```
+
+| 属性                                           | 说明               | 类型       | 默认值           |
+| ---------------------------------------------- | ------------------ | ---------- | ---------------- |
+| `queryFieldPersistForm`                        | 是否持久化表单部分 | `boolean`  | 有 key 时 `true` |
+| `queryFieldPersistPaginationParams`            | 是否持久化分页部分 | `boolean`  | 有 key 时 `true` |
+| `queryFieldPersistFormKeyExcludes`             | 表单持久化排除项   | `string[]` | -                |
+| `queryFieldPersistPaginationParamsKeyExcludes` | 分页持久化排除项   | `string[]` | -                |
+
+## 翻页与查询联动
+
+### queryAfterPaginationChange
+
+分页器翻页时是否自动触发查询（默认 `true`）：
+
+```tsx
+// 关闭翻页自动查询，需手动调用 refresh
+<ProTable queryAfterPaginationChange={false} />
+```
+
+### unknownDataLength — 无 total 分页
+
+当后端接口不返回 `total`（如游标分页、流式接口），开启此模式进入「无总数分页」：
+
+```tsx
+<ProTable
+  unknownDataLength
+  onQuery={async (params) => {
+    const res = await api.fetchCursorList({ cursor: params.page, size: params.pageSize })
+    return { success: true, data: res.list } // 不传 total
+  }}
+/>
+```
+
+分页器会隐藏总数显示，只提供「上一页/下一页」。
+
+## 查询按钮自定义
+
+### queryFieldActionSortList — 按钮排序
+
+控制查询区域按钮的显示顺序：
+
+```tsx
+<ProTable
+  queryFieldActionSortList={['query', 'reset', 'fold']} // 默认顺序
+  // 可选值：'query' | 'reset' | 'fold' | 'text-fold'
+  // 'text-fold' 为纯文本形式的展开/收起
+/>
+```
+
+### 按钮 Props 自定义
+
+每个按钮都可自定义样式和行为：
+
+```tsx
+<ProTable
+  queryFieldQueryActionProps={{ type: 'primary', size: 'large' }}
+  queryFieldResetActionProps={{ danger: true }}
+  queryFieldFoldActionProps={{ type: 'link' }}
+  queryFieldTextFoldActionProps={{ style: { fontSize: 12 } }}
+/>
+```
+
+## 列设置持久化
+
+通过 `id` 和 `columnSettingPersistType` 实现列隐藏/排序的跨刷新保留：
+
+```tsx
+<ProTable
+  id="user-table" // 必须设置 id 作为持久化 key
+  iconActions={['settings']} // 开启列设置按钮
+  columnSettingPersistType="localStorage" // 默认跟随 queryFieldPersistType
+/>
+```
+
+列级别可通过以下属性控制设置行为：
+
+| 列属性             | 说明                              | 默认值 |
+| ------------------ | --------------------------------- | ------ |
+| `hideable`         | 是否允许在列设置中隐藏            | `true` |
+| `columnSettingKey` | 列设置中的唯一标识（默认用 name） | -      |
+
 ## 自定义表单类型
 
 使用 `renderField` 配置项自定义表单类型（作为 Form.Item 的子节点）：

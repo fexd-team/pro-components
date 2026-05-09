@@ -44,7 +44,7 @@
 
 | 导出 | 说明 | 何时使用 | 参考文档 |
 | --- | --- | --- | --- |
-| useCoverable | 业务组件化 Hook，可覆盖配置体系 | 创建可配置的业务组件 | [useCoverable.md](references/useCoverable.md) |
+| useCoverable | 业务组件化 Hook，可覆盖配置体系 | 创建可跨项目复用的业务组件（BC包） | [useCoverable.md](references/useCoverable.md)（→ [设计指南](references/useCoverable-design.md) · [BC编写](references/useCoverable-bc.md) · [消费指南](references/useCoverable-consume.md) · [request.coverable](references/useCoverable-request.md) · [迁移](references/useCoverable-migration.md)） |
 | useDebounce | 防抖 Hook | 搜索输入、API 调用优化 | [useDebounce.md](references/useDebounce.md) |
 | useAutoLoading | 自动管理异步加载状态 | 异步操作的 loading 管理 | [useAutoLoading.md](references/useAutoLoading.md) |
 | useRequest | 请求 Hook（来自 ahooks） | 数据请求与缓存 | - |

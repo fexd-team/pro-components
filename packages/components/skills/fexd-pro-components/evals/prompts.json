@@ -83,14 +83,191 @@
     "expected": ["使用 Action 组件", "onClick 是 async 函数", "不手动管理 loading（自动）", "onError 处理错误提示"]
   },
   {
-    "id": "request-api",
+    "id": "request-interceptor",
     "category": "request",
-    "prompt": "用 defineApi 定义一组用户管理的 API（列表、创建、更新、删除），并在 ProTable 中使用",
+    "prompt": "修改 request 的内置拦截器：1) 将 success 判断改为 code===0 表示成功 2) 添加请求拦截器注入 token 3) 401 时跳转登录页",
     "expected": [
-      "使用 defineApi 定义 4 个 API",
-      "handleParams 处理参数",
-      "在 ProTable 的 onQuery/onAdd/onEdit/onDelete 中调用",
-      "响应格式正确"
+      "使用 builtInRequestConfig.responseInterceptors.onFulfilled 修改成功判断",
+      "使用 request.interceptors.request.use 添加 token",
+      "在 onRejected 或额外拦截器中处理 401",
+      "返回统一的 { success, data, code, message } 格式"
+    ]
+  },
+  {
+    "id": "expand-view",
+    "category": "ProTable",
+    "prompt": "创建一个订单表格，主列显示订单号、金额、状态，点击行可以展开查看收货地址、备注、物流信息等详细信息",
+    "expected": [
+      "使用 expandView: true 标记展开列",
+      "或使用 expandViewField 配置",
+      "expandableDescriptionConfig 或 expandableProFormRender 控制布局",
+      "展开区自动渲染为只读视图"
+    ]
+  },
+  {
+    "id": "builtin-render",
+    "category": "ProTable",
+    "prompt": "表格有状态列（用彩色标签）、链接列（可点击跳转）、头像列、进度列，不要自定义 render 函数，用最简洁的方式",
+    "expected": [
+      "render 返回 { builtIn: 'tag' } 带 color",
+      "render 返回 { builtIn: 'link' } 带 href",
+      "render 返回 { builtIn: 'avatar' }",
+      "render 返回 { builtIn: 'progress' }",
+      "不使用自定义 JSX 渲染"
+    ]
+  },
+  {
+    "id": "props-passthrough",
+    "category": "ProField",
+    "prompt": "配置一个手机号字段：最大11位、前缀+86、Form.Item 有额外提示语'仅限大陆号'、校验手机号格式。说明哪些 props 传给 Form.Item 哪些传给 Input",
+    "expected": [
+      "maxLength/addonBefore/allowClear 放在 props: {} 中（给 Input）",
+      "rules/extra/tooltip 放在顶层或 fieldItemProps 中（给 Form.Item）",
+      "理解并正确区分两层透传目标",
+      "placeholder/disabled 理解其双向透传特性"
+    ]
+  },
+  {
+    "id": "options-tag-badge",
+    "category": "ProField",
+    "prompt": "创建一个状态选择字段，选项分别是'已上线'(绿色标签)、'待发布'(橙色标签)、'已下线'(灰色标签)，在只读模式下自动显示彩色标签，不需要自定义 renderView",
+    "expected": [
+      "options 数组中使用 tag 或 badge 属性",
+      "如 { label: '已上线', value: 1, tag: 'success' }",
+      "不需要 renderView 或 render 自定义",
+      "或使用 coloringOptions 工具函数"
+    ]
+  },
+  {
+    "id": "useprostate",
+    "category": "Hooks",
+    "prompt": "实现一个跨组件共享的用户偏好设置状态，要求：1) 多个组件使用相同状态 2) 刷新页面后状态保留 3) 支持部分更新",
+    "expected": [
+      "使用 useProState",
+      "key 参数相同实现跨组件同步",
+      "persist: true 或 'localStorage' 持久化",
+      "autoMergeObject: true 支持部分更新",
+      "setState 只传部分字段即可合并"
+    ]
+  },
+  {
+    "id": "dayjs-timezone",
+    "category": "Utils",
+    "prompt": "后端服务器在东七区(GMT+7)，前端用户在东八区，如何确保日期控件选择的时间能正确传给后端？",
+    "expected": [
+      "使用 dayjsTZ 替代 dayjs",
+      "dayjsTZ.setDefault('Etc/GMT-7') 设置后端时区",
+      "ProField 时间类字段自动适配",
+      "所有时间控件的输入/展示自动转换"
+    ]
+  },
+  {
+    "id": "bc-component",
+    "category": "useCoverable",
+    "prompt": "用 useCoverable 创建一个完整的 BC 业务组件：用户列表管理，包含 apis（列表/新增/删除）、permission（查询/新增/删除权限控制）、ProTable 配置，消费方可覆盖 API 地址和权限",
+    "expected": [
+      "useCoverable.component 创建 BC 组件",
+      "apis 使用 request.coverable 定义",
+      "permission 使用 useCoverable 定义",
+      "ProTable.useCoverableProps 处理表格配置",
+      "useCoverable.props({}).render() 暴露管线",
+      "消费方通过 coverable={{ apis: {...}, permission: {...} }} 覆盖"
+    ]
+  },
+  {
+    "id": "define-fields-layout",
+    "category": "ProTable",
+    "prompt": "创建一个订单管理页，表格列和编辑弹窗字段分组定义。编辑弹窗需要自定义布局：第一行显示订单号（只读）、客户名、金额，第二行显示地址（占满一行），第三行显示备注。要求字段 name 变化时布局不受影响",
+    "expected": [
+      "使用 ProTable.defineFields 定义字段组",
+      "renderModalEditFields 自定义弹窗布局",
+      "renderFields 使用二维数组（freeLayout）控制行列",
+      "通过 fields.key.name 引用字段名（而非硬编码字符串）",
+      "key 为语义标识符（中文或英文），name 为接口字段名"
+    ]
+  },
+  {
+    "id": "extend-column-field",
+    "category": "ProTable",
+    "prompt": "有一个消息推送管理表格，定义了表格列（推送ID、标题、状态、时间），现在需要从这些列配置中派生出：1) 查询字段（复用 label/type/options，但某些 name 不同）2) 详情字段 3) 新增字段（在继承的基础上加 required），如何复用而不重复定义？",
+    "expected": [
+      "使用 extendColumn 从列配置提取公共属性（label/name/type/options）",
+      "使用 extendField 从已有字段继承",
+      "用 spread 语法覆盖差异属性（如 name、type、required）",
+      "defineFields 分别定义 queryFields/viewFields/addFields",
+      "一处改动自动传播到所有继承位置"
+    ]
+  },
+  {
+    "id": "define-fields-from",
+    "category": "ProTable",
+    "prompt": "已有一个 defineColumns 定义的表格列配置（含状态、金额、时间三列），现在要快速派生出查询字段：状态保持 select 类型加 placeholder '全部'，时间改为 dateTimeRange 类型。用最简洁的方式",
+    "expected": [
+      "使用 defineFields.from(columns, overrides)",
+      "自动继承列的 label/name/type/options",
+      "只需指定差异属性（placeholder/type 覆盖）",
+      "返回值具备 getConfigs() 等标准方法",
+      "支持 fields.key.name 引用"
+    ]
+  },
+  {
+    "id": "coloring-options",
+    "category": "Utils",
+    "prompt": "后端返回一个审批状态列表（待审批/审批中/已通过/已拒绝/已取消共5种状态），需要在表格中以彩色标签展示，但不想逐个手动配色，如何自动分配颜色？",
+    "expected": [
+      "使用 coloringOptions 函数包装选项数组",
+      "自动为每个选项分配 tag 颜色",
+      "已有 tag 属性的不覆盖",
+      "配合 ProTable 列的 type: 'select' + options 自动显示彩色标签",
+      "无需自定义 render 或 renderView"
+    ]
+  },
+  {
+    "id": "actions-group",
+    "category": "Components",
+    "prompt": "表格每行有一组操作按钮：编辑、审批（需确认）、删除（红色+确认）。要求：一个按钮 loading 时其余 disabled，用配置式写法",
+    "expected": [
+      "使用 Actions 组件而非手写多个 Button",
+      "configs 数组配置每个按钮",
+      "shareAutoLoading 实现互斥 loading",
+      "danger: true + confirm 实现红色确认删除",
+      "Action 自动管理 loading，不手动 useState"
+    ]
+  },
+  {
+    "id": "render-fields-freelayout",
+    "category": "ProForm",
+    "prompt": "创建一个表单，第一行 3 列（姓名、性别、年龄），第二行 2 列（手机号、邮箱），第三行 1 列（地址占满一行），不用 colSpan 实现",
+    "expected": [
+      "renderFields 使用二维数组定义布局",
+      "如 renderFields([['name','gender','age'], ['phone','email'], ['address']])",
+      "或配合 freeLayout 模式",
+      "自动根据每行数组长度平均分配宽度",
+      "不需要手动设置 colSpan"
+    ]
+  },
+  {
+    "id": "create-value-proxy",
+    "category": "Utils",
+    "prompt": "有一组静态定义的选项数组（如状态选项），需要支持 i18n：切换语言时 label 自动翻译，但不想每次 render 都重新创建数组。如何实现？",
+    "expected": [
+      "使用 createValueProxy",
+      "对选项数组的每个 item 创建代理",
+      "在 get handler 中对 label 属性调用 t() 翻译函数",
+      "选项数组只定义一次（模块级常量）",
+      "读取 label 时动态翻译，无需 useMemo/重建"
+    ]
+  },
+  {
+    "id": "show-tips-response",
+    "category": "Utils",
+    "prompt": "调用接口后需要根据返回结果自动提示：成功时显示后端返回的 message 字段，失败时显示错误信息。不想每次都手动判断 success 再写 message.success/error",
+    "expected": [
+      "使用 showTipsWithResponse(response)",
+      "传入 { success, message, ... } 格式的响应对象",
+      "success=true 自动 message.success",
+      "success=false 自动 message.error",
+      "支持 notification 字段自动弹 notification"
     ]
   }
 ]

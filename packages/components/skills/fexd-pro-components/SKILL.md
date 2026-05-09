@@ -30,12 +30,44 @@ React 管理系统组件库，基于 Ant Design 4.x + React 16/17，覆盖表格
 | 开发表单页面 | `references/ProForm.md`（→ [Ref](references/ProForm-ref.md) · [Fields](references/ProForm-fields.md) · [Layout](references/ProForm-layout.md) · [Advanced](references/ProForm-advanced.md)） + [ProField](references/ProField.md) |
 | 命令式弹窗 / 图片预览 | `references/showModal.md` / `references/showImages.md` / `references/showDrawer.md` |
 | 确认操作 | `references/confirmPromise.md`（轻量确认）/ `references/Action.md`（按钮+确认） |
-| 业务组件化 | `references/useCoverable.md` |
+| 业务组件化 | `references/useCoverable.md`（→ [设计指南](references/useCoverable-design.md) · [BC编写](references/useCoverable-bc.md) · [消费指南](references/useCoverable-consume.md) · [request.coverable](references/useCoverable-request.md) · [迁移](references/useCoverable-migration.md)） |
 | 理解架构 | [architecture.md](architecture.md) |
 | 体验规范 / 最佳实践 | [guide.md](guide.md) |
 | 使用 Hooks / 工具函数 | [utilities.md](utilities.md) |
 | 源码探索 | [source-navigation.md](source-navigation.md) |
 | 终端快速查文档 | `npx pro-components list/docs/search` |
+
+## BC 组件（Business Components）
+
+BC 组件是一种**可覆盖配置的复用业务组件**设计模式，核心理念：将完整的业务页面（含 API 调用、权限控制、表格/表单配置）封装为一个组件，通过 `coverable` prop 暴露所有可定制点，让消费方按需覆盖而无需修改源码。
+
+**核心机制：**
+
+- 组件内部使用 `useCoverable` Hook 定义默认配置（API 地址、权限、列定义、枚举等）
+- 消费方通过 `<Component coverable={{ ... }}>` 传入覆盖配置
+- `useCoverable` 将默认值与覆盖值**深度合并**（对象递归合并、数组按索引合并）
+- 组件通过 `getConfig()` 读取最终合并后的配置
+
+**典型场景：**
+
+- 同一套业务逻辑（如用户列表、权限管理）在多个项目中复用，仅 API 地址、权限、部分 UI 有差异
+- BC 组件发布为 npm 包（如 `@my-bc/user-manager`），各业务项目引入后通过 `coverable` 定制
+
+**快速示例：**
+
+```tsx
+// BC 组件（封装方）
+const UserList = useCoverable.component(({ coverable }) => {
+  const apis = useCoverable({ getList: request.coverable({ url: '/api/users' }) }, coverable?.apis)
+  const permission = useCoverable({ add: true, delete: true }, coverable?.permission)
+  return <ProTable onQuery={() => apis.getConfig().getList()} ... />
+})
+
+// 消费方 — 只改 API 地址，禁用删除
+<UserList coverable={{ apis: { getList: { url: '/v2/users' } }, permission: { delete: false } }} />
+```
+
+详细指南：[useCoverable.md](references/useCoverable.md) → [设计](references/useCoverable-design.md) · [BC编写](references/useCoverable-bc.md) · [消费](references/useCoverable-consume.md)
 
 ## 推荐实践
 

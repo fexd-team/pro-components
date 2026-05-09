@@ -28,26 +28,21 @@ describe('type="dateTime" 编辑模式', () => {
 
   // 能够正确选择日期
   it('can select date correctly', async () => {
-    const testDate = dayjs('2025-01-16 11:43:00') // 使用固定的测试日期
+    const testDate = dayjs().date(15)
     const { container } = render(<ProField className="test-picker" type="dateTime" props={{ open: true }} />)
 
-    // 等待日期选择器打开
     await delay(100)
 
-    // 点击日期
     const dateCell = document.querySelector(`.ant-picker-cell[title="${testDate.format('YYYY-MM-DD')}"]`)
     expect(dateCell).toBeInTheDocument()
     fireEvent.click(dateCell!)
     await delay(100)
 
-    // 点击确定按钮
     const okButton = document.querySelector('.ant-picker-ok button')
     expect(okButton).toBeInTheDocument()
     fireEvent.click(okButton!)
     await delay(100)
 
-    // 验证结果
-    // 由于时间部分可能会使用当前时间，我们只验证日期部分
     const input = container.querySelector('.test-picker .ant-picker-input > input')
     expect(input).toBeInTheDocument()
     const inputValue = input!.getAttribute('value')

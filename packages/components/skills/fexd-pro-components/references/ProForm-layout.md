@@ -188,6 +188,50 @@ description: ProForm 布局系统完整指南——Grid 布局、render 自由�
 
 > `children` 函数返回数组时也会走 `renderFields` 处理。
 
+### renderFields 的 useBuiltInGrid 选项
+
+`renderFields` 默认使用内置 Grid 包裹字段。如果你想在自定义布局中调用 `renderFields` 但不要 Grid 容器（只返回纯字段列表），可以传配置对象：
+
+```tsx
+render={({ renderFields }) => (
+  <div className="my-custom-grid">
+    {renderFields(['name', 'email', 'phone'], { useBuiltInGrid: false })}
+  </div>
+)}
+```
+
+| useBuiltInGrid | 行为                                           |
+| -------------- | ---------------------------------------------- |
+| `true`（默认） | renderFields 输出被 Grid/Row/Col 包裹          |
+| `false`        | renderFields 输出为纯 Fragment（字段直接排列） |
+
+### renderFields 的 freeLayout（二维数组自由布局）
+
+当 `configs` 参数传入**二维数组**时，`freeLayout` 自动启用，每行的字段自动平分一行宽度：
+
+```tsx
+render={({ renderFields }) => (
+  renderFields(
+    [
+      ['name', 'email'],           // 第一行：2个字段各占 12 栅格
+      ['phone', 'dept', 'role'],   // 第二行：3个字段各占 8 栅格
+      ['remark'],                  // 第三行：1个字段占满
+    ]
+  )
+)}
+```
+
+也可显式启用：
+
+```tsx
+renderFields(fieldKeys, { freeLayout: true })
+```
+
+`freeLayout` 与 `useBuiltInGrid` 可组合：
+
+- `freeLayout: true` + `useBuiltInGrid: true`（默认）：自动分配每行栅格
+- `freeLayout: true` + `useBuiltInGrid: false`：二维结构 flatten，不加 Grid
+
 ## 布局对比表
 
 | 特征         | Grid            | render               | 二维 fields     |

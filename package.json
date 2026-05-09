@@ -27,9 +27,9 @@
     "version:check": "node ./scripts/checkVersionAndMarkPrivate.js check",
     "version:mark-private": "node ./scripts/checkVersionAndMarkPrivate.js mark-private",
     "version:restore": "node ./scripts/checkVersionAndMarkPrivate.js restore",
-    "release:public": "npm run prerelease && pnpm -r publish --no-git-checks --force --access=public && npm run version:restore",
-    "release": "npm run prerelease && pnpm -r publish --no-git-checks --force && npm run version:restore",
-    "release:force": "pnpm -r publish --no-git-checks --force",
+    "release:public": "node ./scripts/release.js --public",
+    "release": "node ./scripts/release.js",
+    "release:force": "node ./scripts/release.js --force",
     "prerelease": "npm run version:check && node ./scripts/bringDocuments.js",
     "postrelease": "npm run version:restore && node ./scripts/bringDocuments.js --delete",
     "unpublish": "node ./scripts/unpublish",
@@ -39,12 +39,12 @@
     "patch": "patch-package code-kitchen --use-yarn --patch-dir ./scripts/patches",
     "postinstall": "patch-package --patch-dir ./scripts/patches",
     "version:auto-update": "node ./scripts/autoUpdateVersions.js",
-    "version:auto-update:internal": "node ./scripts/autoUpdateVersions.js --registry=http://registry.npm.al.com",
-    "version:check-remote": "node ./scripts/checkRemoteVersions.js",
-    "version:check-remote:internal": "node ./scripts/checkRemoteVersions.js --registry=http://registry.npm.al.com"
+    "version:check-remote": "node ./scripts/checkRemoteVersions.js"
   },
   "devDependencies": {
     "@cjy0208/import-cost": "^2.2.1",
+    "@swc/core": "1.3.39",
+    "@swc/jest": "^0.2.39",
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",
     "@fexd/tools": "^0.1.6",
@@ -92,7 +92,8 @@
   },
   "resolutions": {
     "react": "^16.8.0",
-    "react-dom": "^16.8.0"
+    "react-dom": "^16.8.0",
+    "@swc/core": "1.3.39"
   },
   "commitlint": {
     "extends": [
@@ -110,15 +111,12 @@
       "prettier --write"
     ],
     "*.{css,less}": [
-      "stylelint",
       "prettier --write"
     ],
     "*.js?(x)": [
-      "eslint --cache",
       "prettier --write"
     ],
     "*.ts?(x)": [
-      "eslint --cache",
       "prettier --parser=typescript --write"
     ]
   },

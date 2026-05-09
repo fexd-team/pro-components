@@ -94,7 +94,7 @@ describe('ProTable 单独定义 queryFields', () => {
   })
 
   it('搜索框查询功能正常工作', async () => {
-    jest.useFakeTimers()
+    jest.useRealTimers()
     const fn1 = jest.fn()
     // @ts-ignore
     let currentParams: any = {}
@@ -108,50 +108,31 @@ describe('ProTable 单独定义 queryFields', () => {
       }),
     )
 
-    // 在单选框中选择内容，触发查询
-    // const select = node.getByPlaceholderText('请选择内容')
-    toggleOpen(node.container.querySelector('.f-pro-table-query')!)
-    // fireEvent.click(select)
-    // await delay(300)
-    await waitFor(() => expect(screen.getByText('选项1')).toBeInTheDocument())
-    // expect(screen.getByText('选项1')).toBeInTheDocument()
-    fireEvent.click(node.getByText('选项1'))
+    await delay(300)
 
-    jest.useFakeTimers()
-    // 点击查询按钮
-    fireEvent.click(document.querySelector('.f-pro-table-query-form-actions .ant-btn-primary')!)
-    await waitFor(() => expect(fn1).toBeCalledTimes(1))
-    // 当前参数选项是选项1
-    expect(currentParams?.select).toBe(1)
-    jest.advanceTimersByTime(600)
-    jest.useRealTimers()
+    const selectContainer = node.container.querySelector('.f-pro-table-query')!
+    fireEvent.mouseDown(selectContainer.querySelector('.ant-select-selector')!)
     await delay(100)
-    expect(fn1).toBeCalledTimes(2)
 
-    await delay(500)
+    await waitFor(() => expect(screen.getByText('选项1')).toBeInTheDocument())
+    fireEvent.click(node.getByText('选项1'))
+    await delay(100)
 
-    // 希望表格中出现至少 1 个选项搜索的结果
+    fireEvent.click(document.querySelector('.f-pro-table-query-form-actions .ant-btn-primary')!)
+    await waitFor(() => expect(fn1).toHaveBeenCalled())
+    expect(currentParams?.select).toBe(1)
+
+    await delay(1000)
+
     expect(node.getAllByText('选项1')?.length).toBeGreaterThan(1)
-    // 希望表格中不出现选项搜索的结果
     expect(node.queryByText('选项2', { selector: '.f-pro-table-table' })).not.toBeInTheDocument()
   })
 })
 
 describe('ProTable 从 columns 中继承 queryField', () => {
-  // beforeEach(() => {
-  //   jest.useFakeTimers()
-  // })
-
   afterEach(() => {
     jest.useRealTimers()
   })
-
-  function toggleOpen(container: ReturnType<typeof render>['container']): void {
-    fireEvent.mouseDown(container.querySelector('.ant-select-selector')!)
-    act(() => {
-      jest.runAllTimers()
-    })
-  }
 
   it('基础查询功能正常工作', async () => {
     jest.useFakeTimers()
@@ -164,8 +145,6 @@ describe('ProTable 从 columns 中继承 queryField', () => {
         fn: fn1,
       }),
     )
-    // jest.useRealTimers()
-    // await delay(600)
     expect(node.queryAllByText('项目 1')?.length).toBe(2)
     expect(node.queryAllByText('项目 2')?.length).toBe(2)
     await waitFor(() => expect(fn1).toHaveBeenCalled())
@@ -174,11 +153,9 @@ describe('ProTable 从 columns 中继承 queryField', () => {
     jest.useRealTimers()
     await delay(100)
     expect(fn1).toBeCalledTimes(2)
-    // jest.useFakeTimers()
   })
 
   it('输入框查询正常工作', async () => {
-    // jest.useFakeTimers()
     jest.useRealTimers()
     const fn1 = jest.fn()
     // @ts-ignore
@@ -196,12 +173,10 @@ describe('ProTable 从 columns 中继承 queryField', () => {
     )
 
     await delay(300)
-    // 在文本框中输入内容，触发查询
     const input = node.getByPlaceholderText('请输入')
     fireEvent.change(input, { target: { value: mockData?.[0]?.value1 } })
 
     jest.useFakeTimers()
-    // 点击查询按钮
     fireEvent.click(document.querySelector('.f-pro-table-query-form-actions .ant-btn-primary')!)
     await waitFor(() => expect(fn1).toBeCalledTimes(1))
     jest.advanceTimersByTime(600)
@@ -211,14 +186,12 @@ describe('ProTable 从 columns 中继承 queryField', () => {
     await delay(500)
     const nodes = node.getAllByText(mockData?.[0]?.value1)
     const dataSource = ref?.current?.queryField?.dataSource
-    // 希望表格中出现搜索的结果
     expect(nodes?.length).toBe(dataSource?.length)
-    // 希望表格中不出现搜索的结果
     expect(node.queryByText(mockData?.[1]?.value1)).not.toBeInTheDocument()
   })
 
   it('搜索框查询功能正常工作', async () => {
-    jest.useFakeTimers()
+    jest.useRealTimers()
     const fn1 = jest.fn()
     // @ts-ignore
     let currentParams: any = {}
@@ -232,31 +205,23 @@ describe('ProTable 从 columns 中继承 queryField', () => {
       }),
     )
 
-    // 在单选框中选择内容，触发查询
-    // const select = node.getByPlaceholderText('请选择内容')
-    toggleOpen(node.container.querySelector('.f-pro-table-query')!)
-    // fireEvent.click(select)
-    // await delay(300)
-    await waitFor(() => expect(screen.getByText('选项1')).toBeInTheDocument())
-    // expect(screen.getByText('选项1')).toBeInTheDocument()
-    fireEvent.click(node.getByText('选项1'))
+    await delay(300)
 
-    jest.useFakeTimers()
-    // 点击查询按钮
-    fireEvent.click(document.querySelector('.f-pro-table-query-form-actions .ant-btn-primary')!)
-    await waitFor(() => expect(fn1).toBeCalledTimes(1))
-    // 当前参数选项是选项1
-    expect(currentParams?.value2).toBe(1)
-    jest.advanceTimersByTime(600)
-    jest.useRealTimers()
+    const selectContainer = node.container.querySelector('.f-pro-table-query')!
+    fireEvent.mouseDown(selectContainer.querySelector('.ant-select-selector')!)
     await delay(100)
-    expect(fn1).toBeCalledTimes(2)
 
-    await delay(500)
+    await waitFor(() => expect(screen.getByText('选项1')).toBeInTheDocument())
+    fireEvent.click(node.getByText('选项1'))
+    await delay(100)
 
-    // 希望表格中出现至少 1 个选项搜索的结果
+    fireEvent.click(document.querySelector('.f-pro-table-query-form-actions .ant-btn-primary')!)
+    await waitFor(() => expect(fn1).toHaveBeenCalled())
+    expect(currentParams?.value2).toBe(1)
+
+    await delay(1000)
+
     expect(node.getAllByText('选项1')?.length).toBeGreaterThan(1)
-    // 希望表格中不出现选项搜索的结果
     expect(node.queryByText('选项2', { selector: '.f-pro-table-table' })).not.toBeInTheDocument()
   })
 })

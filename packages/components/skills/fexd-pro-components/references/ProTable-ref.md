@@ -217,9 +217,9 @@ controller.ref                         // 原始 ref
 | `ProTable.useController()`              | 创建控制器 Hook（扁平化 API）                               |
 | `ProTable.setDefaultProps(props)`       | 全局修改默认 props                                          |
 | `ProTable.useProps`                     | 获取合并后的 props（内部用）                                |
-| `ProTable.defineColumns(config)`        | 对象格式定义列                                              |
+| `ProTable.defineColumns(config)`        | 对象格式定义列（返回增强对象，见下文）                      |
 | `ProTable.defineColumn(config)`         | 定义单列                                                    |
-| `ProTable.defineFields(config)`         | 对象格式定义字段                                            |
+| `ProTable.defineFields(config)`         | 对象格式定义字段（返回增强对象，见下文）                    |
 | `ProTable.defineField(config)`          | 定义单字段                                                  |
 | `ProTable.extendColumn(base, override)` | 继承并扩展列配置                                            |
 | `ProTable.extendField(base, override)`  | 继承并扩展字段配置                                          |
@@ -228,6 +228,231 @@ controller.ref                         // 原始 ref
 | `ProTable.useItem`                      | 获取当前行 item                                             |
 | `ProTable.useFieldParams`               | 获取字段参数                                                |
 | `ProTable.useColumnConfig`              | 获取列配置                                                  |
+
+### defineColumns / defineFields — 对象格式定义与按 key 引用
+
+#### 三大核心价值
+
+1. **按 key 直接引用字段** — 在 `renderModalEditFields` 自定义布局中，通过 `config.fields.xxx.name` 引用字段名
+2. **对象格式 + coverable** — 使 deepMerge 可按 key 精确覆盖
+3. **`defineColumn()` 支持 Hooks** — 单列定义中可以使用 `useRequest` 等
+
+#### 用法一：defineFields + renderModalEditFields 自定义布局（最常见）
+
+将表单字段分组定义，在自定义弹窗布局中按 key 引用字段名，配合 `renderFields` 二维数组实现精确布局：
+
+```tsx
+const config = useConfigurable(() => ({
+  // 定义多个字段组
+  basicInfoFields: ProTable.defineFields({
+    编号: { label: t('编号'), name: 'letter_no', mode: 'view' },
+    分类: { label: t('分类'), name: 'classification', type: 'select', options: classOptions },
+    重要性: { label: t('重要性'), name: 'importance', type: 'select', options: importanceOptions },
+    创建日期: { label: t('创建日期'), name: 'create_date', type: 'dateTime', mode: 'view' },
+    主题: { label: t('主题'), name: 'subject', type: 'textarea', mode: 'view' },
+    备注: { label: t('备注'), name: 'note', type: 'textarea', mode: 'view' },
+  }),
+  actionPlanFields: ProTable.defineFields({
+    计划ID: { label: t('计划ID'), name: 'plan_id', mode: 'view' },
+    预计完工: { label: t('预计完工'), name: 'due_date', type: 'date' },
+    状态: { label: t('状态'), name: 'status', type: 'select', options: statusOptions },
+    描述: { label: t('描述'), name: 'description', type: 'textarea' },
+  }),
+  columns: ProTable.defineColumns({ /* ... */ }),
+}))
+
+// ProTable 中使用
+<ProTable
+  columns={config.columns.getConfigs()}
+  editFields={config.basicInfoFields.getConfigs()}  // 整组作为数组
+  viewFields={config.basicInfoFields.getConfigs()}
+  renderModalEditFields={({ renderFields, mode, item }) => (
+    <div className="flex flex-col gap-4">
+      <Card title={t('基本信息')}>
+        {/* ✅ 关键用法：通过 key 引用字段名，配合 freeLayout 二维数组布局 */}
+        {renderFields([
+          [config.basicInfoFields.编号.name, config.basicInfoFields.分类.name, config.basicInfoFields.重要性.name],
+          [config.basicInfoFields.创建日期.name],
+          [config.basicInfoFields.主题.name],
+          [config.basicInfoFields.备注.name],
+        ])}
+      </Card>
+      <Card title={t('行动计划')}>
+        {renderFields([
+          [config.actionPlanFields.计划ID.name, config.actionPlanFields.预计完工.name, config.actionPlanFields.状态.name],
+          [config.actionPlanFields.描述.name],
+        ])}
+      </Card>
+    </div>
+  )}
+/>
+```
+
+**为什么不直接写字符串 `'letter_no'`？**
+
+因为在 coverable/configurable 场景下，消费方可能覆盖字段的 `name`：
+
+```tsx
+// 消费方覆盖字段 name（对接不同后端接口）
+<MyComponent
+  configurable={{
+    basicInfoFields: {
+      编号: { name: 'inquiry_no' }, // 改了 name
+    },
+  }}
+/>
+```
+
+通过 `config.basicInfoFields.编号.name` 引用，可以动态获取到覆盖后的值。
+
+#### 用法二：defineColumns + coverable 覆盖列
+
+```tsx
+const config = useConfigurable(() => ({
+  columns: ProTable.defineColumns({
+    订单类型: ProTable.defineColumn(() => {
+      const options = useRequest(async () => await apis.fetchOrderTypes())
+      return {
+        label: t('订单类型'),
+        name: 'order_type',
+        type: 'select',
+        options,
+        queryField: { props: { allowClear: false } },
+      }
+    }),
+    审核状态: {
+      label: t('审核状态'),
+      name: 'check_status',
+      type: 'select',
+      options: statusService,
+      queryField: { placeholder: '全部' },
+    },
+  }),
+}))
+
+<ProTable columns={config.columns.getConfigs()} />
+
+// 消费方按 key 覆盖
+<OrderQuery configurable={{ columns: { 订单类型: { options: customOpts } } }} />
+```
+
+#### defineColumn — 单列 Hook 容器
+
+```tsx
+// ✅ defineColumn 内可使用 Hooks
+columns: {
+  状态: ProTable.defineColumn(() => {
+    const options = useRequest(fetchStatus)
+    return { label: '状态', name: 'status', options }
+  }),
+}
+```
+
+#### getter 方法
+
+| 方法                                   | 返回值   | 使用频率                                     |
+| -------------------------------------- | -------- | -------------------------------------------- |
+| `getConfigs()`                         | 数组     | ⭐⭐⭐ — 传给 ProTable / editFields          |
+| `config.xxx.name`                      | 字段名   | ⭐⭐⭐ — renderModalEditFields 中按 key 引用 |
+| `getRawConfig()`                       | 原始对象 | 偶尔                                         |
+| `getQueryFields()` / `getEditFields()` | Record   | 极少（ProTable 内部自动处理）                |
+
+#### extendColumn / extendField — 跨组继承字段配置
+
+从已有的列或字段配置中提取公共属性（label、name、type、options 等），用于在另一个字段集中继承复用：
+
+```tsx
+const { defineColumns, defineFields, extendColumn, extendField } = ProTable
+
+// 1. 定义表格列
+const columns = defineColumns({
+  推送ID: { label: t('推送ID'), name: 'pushId', width: 190, copyable: true, expandView: true },
+  推送标题: { label: t('推送标题'), name: 'title', width: 200 },
+  推送状态: { label: t('推送状态'), name: 'status', type: 'select', options: statusOpts },
+  推送时间: { label: t('推送时间'), name: 'pushTime', type: 'dateTime', width: 160 },
+  创建人: { label: t('创建人'), name: 'oprName', type: 'select', width: 100 },
+})
+
+// 2. 定义查询字段 — 可覆盖 name/type
+const queryFields = defineFields({
+  推送ID: { ...extendColumn(columns.推送ID), name: 'id' },
+  推送标题: { ...extendColumn(columns.推送标题), name: 'pushTitle' },
+  推送状态: { ...extendColumn(columns.推送状态), name: ['extend', 'statusSwitch'], placeholder: '全部' },
+  推送时间: { ...extendColumn(columns.推送时间), type: 'dateTimeRange' },
+  创建人: { ...extendColumn(columns.创建人), name: ['extend', 'oprName'] },
+})
+
+// 3. 定义详情字段 — 继承列配置，可加 renderView
+const viewFields = defineFields({
+  推送ID: extendColumn(columns.推送ID),
+  推送标题: extendColumn(columns.推送标题),
+  推送状态: { ...extendColumn(columns.推送状态), label: t('推送状态') },
+  推送时间: extendColumn(columns.推送时间),
+  创建人: extendColumn(columns.创建人),
+})
+
+// 4. 定义新增字段 — 继承 + 扩展（required、rules、placeholder）
+const addFields = defineFields({
+  推送标题: {
+    ...extendField(queryFields.推送标题),
+    required: true,
+    placeholder: t('不超过60个字符'),
+    rules: [{ max: 60, message: t('不超过60个字符') }],
+  },
+  推送时间: {
+    ...extendColumn(columns.推送时间),
+    type: 'radio',
+    required: true,
+    name: 'pushType.type',
+  },
+  短信内容: {
+    ...extendField(viewFields.短信内容),
+    type: 'textarea',
+    required: true,
+  },
+})
+```
+
+**`extendColumn` 提取的属性**：`label`、`name`、`type`、`options`、`tooltip`、`format`、`unit`、`copyable`、`lazyRender` 等（过滤掉 undefined 的）
+
+**`extendField` 行为**：直接 pickBy 过滤 undefined，返回干净的字段配置副本
+
+**使用场景**：
+
+- **列 → 查询字段**：表格列的 label/type/options 与查询表单基本一致，只需改 name
+- **列 → 详情字段**：展开详情或 view 模式复用列配置
+- **查询/详情 → 新增字段**：在已有字段配置上追加 required、rules
+- **一处改动全局生效**：修改 `columns.推送ID` 的 label 后，所有继承的地方自动同步
+
+#### 设计意图：key 为契约，name 为实现
+
+`defineColumns`/`defineFields` 的对象格式中，**key 是稳定的语义标识符**，而字段的 `.name` 属性是可变的实现细节：
+
+```tsx
+const fields = defineFields({
+  状态: { label: '状态', name: 'status', ... },
+  // key「状态」永远不变；name 'status' 可能被覆盖为 'order_status'
+})
+
+// ✅ 通过 key 引用 name — 即使 name 被覆盖/重命名，布局代码不受影响
+renderFields([[fields.状态.name, fields.金额.name, fields.时间.name]])
+
+// ❌ 硬编码 name — 如果 configurable 覆盖了 name，这里就断了
+renderFields([['status', 'amount', 'createTime']])
+```
+
+这与 coverable 的理念一致：**key 是不变的接口契约，配置内容（含 name）是可被覆盖的实现细节**。
+
+#### 最佳实践总结
+
+| 场景                  | 推荐做法                                                        |
+| --------------------- | --------------------------------------------------------------- |
+| 多字段组 + 自定义布局 | `defineFields` 分组，`renderFields` 中用 `fields.key.name` 引用 |
+| 跨组继承字段配置      | `extendColumn`/`extendField` 提取公共属性 + spread 覆盖         |
+| 列定义 + coverable    | `defineColumns` 对象格式，消费方按 key 覆盖                     |
+| 单列需要 Hooks        | `defineColumn(() => { useRequest... })`                         |
+| 传给 ProTable/ProForm | `.getConfigs()` 转数组                                          |
+| 避免 name 耦合        | 布局引用一律用 `fields.key.name`，不硬编码字符串                |
 
 ### 内置插件 Hook（高级用法）
 

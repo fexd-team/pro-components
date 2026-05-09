@@ -11,39 +11,72 @@ description: ProTable 增删改查完整指南——新增、编辑、详情、�
 
 ### 编辑相关
 
-| 属性                  | 说明                     | 类型                                  | 默认值            |
-| --------------------- | ------------------------ | ------------------------------------- | ----------------- |
-| editFields            | 编辑表单字段配置         | `FieldConfig[]`                       | -                 |
-| onEdit                | 编辑回调                 | `(params, item) => Promise<Response>` | -                 |
-| refreshAfterEdit      | 编辑后自动刷新           | `boolean`                             | `true` (**源码**) |
-| whenToTriggerOnEdit   | 触发 onEdit 的时机       | `string`                              | -                 |
-| editFieldColumns      | 编辑表单列数             | `number`                              | -                 |
-| editFieldGutter       | 编辑表单间距             | `number`                              | -                 |
-| editFieldLayout       | 编辑表单布局             | `string`                              | -                 |
-| editFieldFormProps    | 编辑表单的 ProForm props | `object`                              | -                 |
-| editFieldModalProps   | 编辑弹窗配置             | `ModalProps & { drawer?: boolean }`   | -                 |
-| renderModalEditFields | 自定义编辑区布局         | `(params) => ReactNode`               | -                 |
+| 属性 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| editFields | 编辑表单字段配置 | `FieldConfig[] \| ((item, mode) => FieldConfig[])` | - |
+| onEdit | 编辑回调 | `(params, item) => Promise<Response>` | - |
+| refreshAfterEdit | 编辑后自动刷新 | `boolean` | `true` (**源码**) |
+| whenToTriggerOnEdit | 触发 onEdit 的时机 | `'changed' \| 'always'` | `'changed'` |
+| editFieldColumns | 编辑表单列数 | `number` | - |
+| editFieldGutter | 编辑表单间距 | `number \| ((item, mode) => number)` | - |
+| editFieldLayout | 编辑表单布局 | `string` | - |
+| editFieldFormProps | 编辑表单的 ProForm props | `ProFormProps \| ((item, mode) => ProFormProps)` | - |
+| editFieldModalProps | 编辑弹窗配置 | `ModalProps & { drawer?: boolean }` | - |
+| editFieldFilterEmptyParam | 编辑提交是否过滤空值 | `boolean` | - |
+| renderModalEditFields | 自定义编辑区布局 | `(params) => ReactNode` | - |
+
+**whenToTriggerOnEdit 说明**：
+
+- `'changed'`（默认）：只在表单值有变更时才触发 `onEdit`，无改动关闭弹窗不调用
+- `'always'`：无论是否修改，确认即触发 `onEdit`
 
 ### 新增相关
 
-| 属性               | 说明                     | 类型                                | 默认值 |
-| ------------------ | ------------------------ | ----------------------------------- | ------ |
-| addFields          | 新增表单字段配置         | `FieldConfig[]`                     | -      |
-| onAdd              | 新增回调                 | `(params) => Promise<Response>`     | -      |
-| refreshAfterAdd    | 新增后自动刷新           | `boolean`                           | `true` |
-| addFieldColumns    | 新增表单列数             | `number`                            | -      |
-| addFieldGutter     | 新增表单间距             | `number`                            | -      |
-| addFieldFormProps  | 新增表单的 ProForm props | `object`                            | -      |
-| addFieldModalProps | 新增弹窗配置             | `ModalProps & { drawer?: boolean }` | -      |
+| 属性                     | 说明                     | 类型                                               | 默认值 |
+| ------------------------ | ------------------------ | -------------------------------------------------- | ------ |
+| addFields                | 新增表单字段配置         | `FieldConfig[] \| ((item, mode) => FieldConfig[])` | -      |
+| onAdd                    | 新增回调                 | `(params) => Promise<Response>`                    | -      |
+| refreshAfterAdd          | 新增后自动刷新           | `boolean`                                          | `true` |
+| addFieldColumns          | 新增表单列数             | `number`                                           | -      |
+| addFieldGutter           | 新增表单间距             | `number \| ((item, mode) => number)`               | -      |
+| addFieldFormProps        | 新增表单的 ProForm props | `ProFormProps \| ((item, mode) => ProFormProps)`   | -      |
+| addFieldModalProps       | 新增弹窗配置             | `ModalProps & { drawer?: boolean }`                | -      |
+| addFieldFilterEmptyParam | 新增提交是否过滤空值     | `boolean`                                          | -      |
 
 ### 详情相关
 
-| 属性                | 说明                           | 类型                                | 默认值 |
-| ------------------- | ------------------------------ | ----------------------------------- | ------ |
-| viewFields          | 详情展示字段配置               | `FieldConfig[]`                     | -      |
-| onView              | 详情回调（可异步获取详情数据） | `(item) => Promise<Response>`       | -      |
-| viewFieldColumns    | 详情列数                       | `number`                            | -      |
-| viewFieldModalProps | 详情弹窗配置                   | `ModalProps & { drawer?: boolean }` | -      |
+| 属性                  | 说明                           | 类型                                               | 默认值 |
+| --------------------- | ------------------------------ | -------------------------------------------------- | ------ |
+| viewFields            | 详情展示字段配置               | `FieldConfig[] \| ((item, mode) => FieldConfig[])` | -      |
+| onView                | 详情回调（可异步获取详情数据） | `(item, mode) => Promise<Response>`                | -      |
+| viewFieldColumns      | 详情列数                       | `number`                                           | -      |
+| viewFieldFormProps    | 详情表单 ProForm props         | `ProFormProps \| ((item, mode) => ProFormProps)`   | -      |
+| viewFieldModalProps   | 详情弹窗配置                   | `ModalProps & { drawer?: boolean }`                | -      |
+| renderModalViewFields | 自定义详情区布局               | `(params) => ReactNode`                            | -      |
+
+### 字段配置的函数形式
+
+`editFields`、`addFields`、`viewFields` 支持函数形式，根据当前行数据和模式动态生成字段：
+
+```tsx
+<ProTable
+  editFields={(item, mode) => {
+    const baseFields = [
+      { label: '名称', name: 'name', required: true },
+      { label: '类型', name: 'type', type: 'select', options: typeOptions },
+    ]
+    if (mode === 'edit' && item?.type === 'advanced') {
+      baseFields.push({ label: '高级配置', name: 'config', type: 'textarea' })
+    }
+    return baseFields
+  }}
+  viewFields={(item, mode) => [
+    { label: '名称', name: 'name' },
+    { label: '类型', name: 'type', type: 'select', options: typeOptions },
+    ...(item?.log ? [{ label: '操作日志', name: 'log', type: 'textarea' }] : []),
+  ]}
+/>
+```
 
 ### 删除相关
 

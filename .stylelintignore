@@ -26,3 +26,4 @@
 *.ts
 *.jsx
 *.js
+/docs

@@ -10,4 +10,34 @@ order: 1
 
 ## 内置工具
 
-一些内置的常用工具
+`@fexd/pro-components` 提供了丰富的工具函数、Hooks 和命令式组件，全部通过统一入口导出。
+
+### 🧩 命令式组件
+
+| 工具                             | 说明                                     |
+| -------------------------------- | ---------------------------------------- |
+| [showModal](/utils/show-modal)   | 命令式弹窗，支持拖拽、Promise、动态更新  |
+| [showDrawer](/utils/show-drawer) | 命令式抽屉，侧边面板展示                 |
+| [showImages](/utils/show-images) | 命令式图片预览                           |
+| [Action](/utils/action)          | 自动 loading 的操作按钮 + confirmPromise |
+
+### 🪝 Hooks
+
+| Hook                                         | 说明                |
+| -------------------------------------------- | ------------------- |
+| [useCoverable](/utils/use-coverable)         | 业务组件化核心 Hook |
+| [useDebounce / useAutoLoading](/utils/hooks) | 防抖与自动 loading  |
+
+### 🔧 工具函数
+
+| 工具                                  | 说明                                       |
+| ------------------------------------- | ------------------------------------------ |
+| [request / defineApi](/utils/request) | 请求工具与 API 定义                        |
+| [dayjsTZ](/utils/dayjs-tz)            | 时区安全的 dayjs 包装                      |
+| [更多工具](/utils/more-utils)         | deepMerge / diffArray / coloringOptions 等 |
+
+### 🤖 AI Skills
+
+| 文档                          | 说明                                     |
+| ----------------------------- | ---------------------------------------- |
+| [AI Skills](/utils/ai-skills) | 让 AI 编辑器理解组件库的 Skills 配置指南 |

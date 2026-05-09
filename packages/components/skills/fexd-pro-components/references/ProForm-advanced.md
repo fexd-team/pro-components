@@ -157,6 +157,40 @@ fields={[
 }
 ```
 
+### hook 返回 ReactNode 替换字段
+
+hook 不仅能返回配置对象或 `false`，还可以直接返回 React 节点，完全替换该字段的渲染：
+
+```tsx
+{
+  label: '预览', name: 'preview',
+  hook: ({ form }) => {
+    const type = form.getFieldValue('contentType')
+
+    if (type === 'image') {
+      return <img src={form.getFieldValue('url')} style={{ maxWidth: 200 }} />
+    }
+
+    if (type === 'video') {
+      return <video src={form.getFieldValue('url')} controls width={300} />
+    }
+
+    return { type: 'text', disabled: true }  // 正常配置对象
+  },
+  dependencies: ['contentType', 'url'],
+}
+```
+
+**hook 返回值的完整行为：**
+
+| 返回值                         | 行为                              |
+| ------------------------------ | --------------------------------- |
+| 配置对象 `{ ... }`             | 与当前字段配置合并，渲染 ProField |
+| `false` / `null` / `undefined` | 隐藏字段                          |
+| `true`                         | 使用原始配置（不修改）            |
+| ReactNode（JSX）               | 直接渲染该节点，替换整个字段      |
+| `string` / `number`            | 直接作为文本渲染                  |
+
 ### hook 参数
 
 | 参数 | 说明                        |
@@ -272,12 +306,15 @@ fields={[
 
 ### 定义分组
 
+`group` 属性可以是字符串或**字符串数组**（一个字段属于多个分组）：
+
 ```tsx
 fields={[
   { label: '姓名', name: 'name', group: 'basic' },
-  { label: '邮箱', name: 'email', group: 'basic' },
+  { label: '邮箱', name: 'email', group: ['basic', 'contact'] },  // 同时属于两个组
   { label: '技能', name: 'skills', group: 'professional' },
   { label: '简介', name: 'bio', group: 'professional' },
+  { label: '电话', name: 'phone', group: 'contact' },
 ]}
 ```
 
@@ -300,7 +337,55 @@ const [form] = ProForm.useForm()
 
 // 仅校验 basic 组
 await form.validateGroups(['basic'])
+
+// 校验多个组（字段如果属于 contact 组，在此也会被校验）
+await form.validateGroups(['basic', 'contact'])
 ```
+
+> 注意：`validateGroups` 依赖内部的 `groupRegisterMap`（字段挂载时自动注册），如果字段被 `hook` 返回 `false` 隐藏了，它不会注册到分组中。
+
+### renderDescriptions 完整参数
+
+`renderDescriptions` 支持丰富的配置参数，控制描述列表的展示：
+
+```tsx
+formRef.current?.renderDescriptions({
+  // 基础过滤
+  group: 'basic', // 只展示指定分组
+  filter: (field) => !field.hidden, // 自定义过滤函数
+  sort: (a, b) => a.label.localeCompare(b.label), // 排序
+
+  // 指定要渲染的字段（数组格式，可混合字段名和配置对象）
+  configs: ['name', 'phone', { label: '备注', name: 'remark', colSpan: 2 }],
+  // 或对象格式覆盖特定字段
+  // configs: { name: { label: '用户姓名' } },
+
+  // antd Descriptions 配置
+  descriptionsProps: {
+    bordered: true,
+    column: 2,
+    size: 'small',
+  },
+
+  // 单项配置（可为函数）
+  descriptionsItemProps: (field) => ({
+    span: field.name === 'bio' ? 2 : 1,
+  }),
+
+  // 使用动态网格渲染
+  gridDynamicRender: true,
+})
+```
+
+| 参数 | 类型 | 说明 |
+| --- | --- | --- |
+| `group` | `string` | 按分组筛选字段 |
+| `filter` | `(field) => boolean` | 自定义过滤条件 |
+| `sort` | `(a, b) => number` | 自定义排序 |
+| `configs` | `(FieldConfig \| NamePath)[]` 或 `Record<string, FieldConfig>` | 指定要渲染的字段列表或配置覆盖（数组时为字段名/配置的列表；对象时为覆盖 map） |
+| `descriptionsProps` | `DescriptionsProps` | antd Descriptions 组件 props |
+| `descriptionsItemProps` | `object \| (field) => object` | 每项的 props（支持函数按字段定制） |
+| `gridDynamicRender` | `boolean` | 使用 Grid 动态渲染 |
 
 ## sharedFieldProps
 

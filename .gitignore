@@ -39,3 +39,5 @@ package-lock.json
 # pnpm-lock.yaml
 
 coverage
+nul
+debug*.log

@@ -142,22 +142,41 @@ export const defineColumns = <T extends Record<string, ProTableColumnType | ((..
   return Object.assign(extendMethod, run(value)) as any as typeof extendMethod & T
 }
 
-export const defineFields = <
-  T extends Record<string, ProTableEditFieldType | ((...args: any[]) => ProTableEditFieldType)>,
->(
-  value: T | (() => T),
-): DefinedProTableFields<T> => {
-  const getRawConfig = () => run(value)
-  const getConfigs = () => Object.values(run(value)).map((item) => run(item))
+export const defineFields = Object.assign(
+  <T extends Record<string, ProTableEditFieldType | ((...args: any[]) => ProTableEditFieldType)>>(
+    value: T | (() => T),
+  ): DefinedProTableFields<T> => {
+    const getRawConfig = () => run(value)
+    const getConfigs = () => Object.values(run(value)).map((item) => run(item))
 
-  const extendMethod = {
-    getConfigs,
-    getRawConfig,
-    __isProTableFields: true as true,
-  }
+    const extendMethod = {
+      getConfigs,
+      getRawConfig,
+      __isProTableFields: true as true,
+    }
 
-  return Object.assign(extendMethod, run(value)) as any as typeof extendMethod & T
-}
+    return Object.assign(extendMethod, run(value)) as any as typeof extendMethod & T
+  },
+  {
+    from<K extends string>(
+      source: Record<string, any>,
+      overrides: Record<K, Partial<ProTableEditFieldType> | ((...args: any[]) => Partial<ProTableEditFieldType>)>,
+    ): DefinedProTableFields<Record<K, ProTableEditFieldType>> {
+      const derived: any = {}
+      for (const key of Object.keys(overrides)) {
+        const sourceField = source?.[key]
+        const base = sourceField
+          ? (sourceField as any)?.__isProTableColumns || (sourceField as any)?.dataIndex || (sourceField as any)?.title
+            ? extendColumn(sourceField)
+            : extendField(sourceField)
+          : {}
+        const override = run((overrides as any)[key])
+        derived[key] = { ...base, ...override }
+      }
+      return defineFields(derived) as any
+    },
+  },
+)
 
 export const defineColumn = <T extends ProTableColumnType>(value: T | (() => T)) => run(value) as T
 export const defineField = <T extends ProTableEditFieldType>(value: T | (() => T)) => run(value) as T
