@@ -2,6 +2,22 @@ const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
 const glob = require('glob')
+const { getRegistry } = require('./versionHelpers')
+
+const registry = getRegistry()
+
+function isVersionPublished(packageName, version) {
+  try {
+    const result = execSync(`npm view ${packageName}@${version} version --registry=${registry}`, {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 15000,
+    }).trim()
+    return result === version
+  } catch {
+    return false
+  }
+}
 
 // 检查单个包的version字段是否有变更
 function hasPackageVersionChanged(packagePath) {
@@ -64,8 +80,14 @@ function processPackages(shouldCheck = true) {
     if (shouldCheck) {
       const hasChanged = hasPackageVersionChanged(packagePath)
       if (!hasChanged) {
-        setPackagePrivate(packagePath, true)
-        hasUnchangedPackages = true
+        const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf-8'))
+        const published = isVersionPublished(pkg.name, pkg.version)
+        if (published) {
+          setPackagePrivate(packagePath, true)
+          hasUnchangedPackages = true
+        } else {
+          console.log(`  ${pkg.name}@${pkg.version} 版本未变更但远端未发布，仍需发布`)
+        }
       }
     } else {
       setPackagePrivate(packagePath, false)

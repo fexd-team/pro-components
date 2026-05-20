@@ -25,17 +25,52 @@ function getRemoteVersion(packageName, registry) {
   }
 }
 
+function parseSemver(version) {
+  const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/)
+  if (!match) return null
+  return {
+    major: parseInt(match[1], 10),
+    minor: parseInt(match[2], 10),
+    patch: parseInt(match[3], 10),
+    prerelease: match[4] || null,
+  }
+}
+
 function compareVersions(a, b) {
-  const [aMaj, aMin, aPat] = a.split('.').map(Number)
-  const [bMaj, bMin, bPat] = b.split('.').map(Number)
-  if (aMaj !== bMaj) return aMaj - bMaj
-  if (aMin !== bMin) return aMin - bMin
-  return aPat - bPat
+  const pa = parseSemver(a)
+  const pb = parseSemver(b)
+  if (!pa || !pb) return 0
+
+  if (pa.major !== pb.major) return pa.major - pb.major
+  if (pa.minor !== pb.minor) return pa.minor - pb.minor
+  if (pa.patch !== pb.patch) return pa.patch - pb.patch
+
+  if (pa.prerelease && !pb.prerelease) return -1
+  if (!pa.prerelease && pb.prerelease) return 1
+  if (pa.prerelease && pb.prerelease) {
+    const naMatch = pa.prerelease.match(/^(.+?)(\d+)$/)
+    const nbMatch = pb.prerelease.match(/^(.+?)(\d+)$/)
+    if (naMatch && nbMatch && naMatch[1] === nbMatch[1]) {
+      return parseInt(naMatch[2], 10) - parseInt(nbMatch[2], 10)
+    }
+    return pa.prerelease.localeCompare(pb.prerelease)
+  }
+  return 0
 }
 
 function patchUp(version) {
-  const [major, minor, patch] = version.split('.').map(Number)
-  return `${major}.${minor}.${patch + 1}`
+  const parsed = parseSemver(version)
+  if (!parsed) return version
+
+  if (parsed.prerelease) {
+    const match = parsed.prerelease.match(/^(.+?)(\d+)$/)
+    if (match) {
+      return `${parsed.major}.${parsed.minor}.${parsed.patch}-${match[1]}${parseInt(match[2], 10) + 1}`
+    }
+    return `${parsed.major}.${parsed.minor}.${parsed.patch}-${parsed.prerelease}.1`
+  }
+
+  return `${parsed.major}.${parsed.minor}.${parsed.patch + 1}`
 }
 
 /**
@@ -65,6 +100,7 @@ module.exports = {
   DEFAULT_REGISTRY,
   getRegistry,
   getRemoteVersion,
+  parseSemver,
   compareVersions,
   patchUp,
   calculateNewVersion,
