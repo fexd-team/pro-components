@@ -210,24 +210,25 @@ controller.ref                         // 原始 ref
 
 `ProTable` 组件上挂载的所有静态方法：
 
-| 静态方法                                | 说明                                                        |
-| --------------------------------------- | ----------------------------------------------------------- |
-| `ProTable.useRef()`                     | 创建 ref Hook（返回完整插件 ref）                           |
-| `ProTable.createRef()`                  | 非 Hook 方式创建 ref                                        |
-| `ProTable.useController()`              | 创建控制器 Hook（扁平化 API）                               |
-| `ProTable.setDefaultProps(props)`       | 全局修改默认 props                                          |
-| `ProTable.useProps`                     | 获取合并后的 props（内部用）                                |
-| `ProTable.defineColumns(config)`        | 对象格式定义列（返回增强对象，见下文）                      |
-| `ProTable.defineColumn(config)`         | 定义单列                                                    |
-| `ProTable.defineFields(config)`         | 对象格式定义字段（返回增强对象，见下文）                    |
-| `ProTable.defineField(config)`          | 定义单字段                                                  |
-| `ProTable.extendColumn(base, override)` | 继承并扩展列配置                                            |
-| `ProTable.extendField(base, override)`  | 继承并扩展字段配置                                          |
-| `ProTable.defineCoverableProps(config)` | Coverable props 定义                                        |
-| `ProTable.useCoverableProps(config)`    | Coverable props Hook（自动保护 `ref`/`tableRef`/`formRef`） |
-| `ProTable.useItem`                      | 获取当前行 item                                             |
-| `ProTable.useFieldParams`               | 获取字段参数                                                |
-| `ProTable.useColumnConfig`              | 获取列配置                                                  |
+| 静态方法                                        | 说明                                                        |
+| ----------------------------------------------- | ----------------------------------------------------------- |
+| `ProTable.useRef()`                             | 创建 ref Hook（返回完整插件 ref）                           |
+| `ProTable.createRef()`                          | 非 Hook 方式创建 ref                                        |
+| `ProTable.useController()`                      | 创建控制器 Hook（扁平化 API）                               |
+| `ProTable.setDefaultProps(props)`               | 全局修改默认 props                                          |
+| `ProTable.useProps`                             | 获取合并后的 props（内部用）                                |
+| `ProTable.defineColumns(config)`                | 对象格式定义列（返回增强对象，见下文）                      |
+| `ProTable.defineColumn(config)`                 | 定义单列                                                    |
+| `ProTable.defineFields(config)`                 | 对象格式定义字段（返回增强对象，见下文）                    |
+| `ProTable.defineFields.from(source, overrides)` | 从列或字段定义批量派生字段，只覆盖差异项                    |
+| `ProTable.defineField(config)`                  | 定义单字段                                                  |
+| `ProTable.extendColumn(base, override)`         | 继承并扩展列配置                                            |
+| `ProTable.extendField(base, override)`          | 继承并扩展字段配置                                          |
+| `ProTable.defineCoverableProps(config)`         | Coverable props 定义                                        |
+| `ProTable.useCoverableProps(config)`            | Coverable props Hook（自动保护 `ref`/`tableRef`/`formRef`） |
+| `ProTable.useItem`                              | 获取当前行 item                                             |
+| `ProTable.useFieldParams`                       | 获取字段参数                                                |
+| `ProTable.useColumnConfig`                      | 获取列配置                                                  |
 
 ### defineColumns / defineFields — 对象格式定义与按 key 引用
 
@@ -424,6 +425,30 @@ const addFields = defineFields({
 - **查询/详情 → 新增字段**：在已有字段配置上追加 required、rules
 - **一处改动全局生效**：修改 `columns.推送ID` 的 label 后，所有继承的地方自动同步
 
+#### defineFields.from — 从列或字段批量派生
+
+当字段与表格列高度重合，只需要覆盖少量差异时，优先使用 `defineFields.from(source, overrides)`。它会保留 source 的 key，自动继承 `label`、`name`、`type`、`options` 等字段属性，再合并 overrides。
+
+```tsx
+const columns = ProTable.defineColumns({
+  状态: { label: '状态', name: 'status', type: 'select', options: statusOptions },
+  金额: { label: '金额', name: 'amount', type: 'money' },
+  创建时间: { label: '创建时间', name: 'createdAt', type: 'dateTime' },
+})
+
+const queryFields = ProTable.defineFields.from(columns, {
+  状态: { placeholder: '全部' },
+  创建时间: { type: 'dateTimeRange', name: 'createdRange' },
+})
+
+;<ProTable columns={columns} queryFields={queryFields} />
+
+// queryFields.状态 自动继承 label/name/type/options，只覆盖 placeholder
+// queryFields.创建时间 自动继承 label/name，只把 type/name 改成查询字段需要的值
+```
+
+`source` 可以是 `defineColumns()` 的返回值，也可以是 `defineFields()` 的返回值。返回值仍是标准 `defineFields()` 增强对象，支持 `.getConfigs()`、`.getRawConfig()` 和 `fields.key.name` 引用。
+
 #### 设计意图：key 为契约，name 为实现
 
 `defineColumns`/`defineFields` 的对象格式中，**key 是稳定的语义标识符**，而字段的 `.name` 属性是可变的实现细节：
@@ -448,6 +473,7 @@ renderFields([['status', 'amount', 'createTime']])
 | 场景                  | 推荐做法                                                        |
 | --------------------- | --------------------------------------------------------------- |
 | 多字段组 + 自定义布局 | `defineFields` 分组，`renderFields` 中用 `fields.key.name` 引用 |
+| 从列快速派生字段      | `defineFields.from(columns, { key: overrides })` 只写差异配置   |
 | 跨组继承字段配置      | `extendColumn`/`extendField` 提取公共属性 + spread 覆盖         |
 | 列定义 + coverable    | `defineColumns` 对象格式，消费方按 key 覆盖                     |
 | 单列需要 Hooks        | `defineColumn(() => { useRequest... })`                         |

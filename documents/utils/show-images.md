@@ -9,7 +9,7 @@ order: 2
 
 ```tsx | pure
 import React from 'react'
-import { Action, showImages } from '@fexd/pro-utils'
+import { Action, showImages } from '@fexd/pro-components'
 
 export default () => {
   return (
@@ -31,7 +31,7 @@ export default () => {
 
 ```tsx
 import React from 'react'
-import { Action, showImages } from '@fexd/pro-utils'
+import { Action, showImages } from '@fexd/pro-components'
 
 export default () => {
   return (

@@ -698,6 +698,206 @@ describe('useCoverable Hook', () => {
 })
 
 // ═══════════════════════════════════════════════════════
+//  useCoverable 数据类型与原始数据保护
+// ═══════════════════════════════════════════════════════
+
+describe('useCoverable 数据类型与原始数据保护', () => {
+  const describeValue = (value: any) => ({
+    tag: Object.prototype.toString.call(value),
+    ctor: value?.constructor?.name,
+    keys: value && typeof value === 'object' ? Object.keys(value) : [],
+  })
+
+  it('基础类型、普通对象、数组、函数、React 元素、ref/raw 的当前引用与拷贝行为', () => {
+    const fn = jest.fn()
+    const element = React.createElement('span', { className: 'icon' }, 'icon')
+    const ref = { current: { value: 'ref-value' } }
+    const raw = markRaw({ secret: { value: 'raw-value' } })
+    const original = {
+      text: 'hello',
+      count: 1,
+      enabled: true,
+      empty: null as null,
+      missing: undefined as undefined,
+      nested: { deep: { value: 1 } },
+      list: [{ id: 1, name: 'first' }],
+      fn,
+      element,
+      ref,
+      raw,
+    }
+
+    const { result } = renderHook(() => useCoverable(original))
+    const config = result.current.getConfig()
+
+    expect(config.text).toBe(original.text)
+    expect(config.count).toBe(original.count)
+    expect(config.enabled).toBe(original.enabled)
+    expect(config.empty).toBeNull()
+    expect(config.missing).toBeUndefined()
+    expect(config.fn).toBe(fn)
+    expect(React.isValidElement(config.element)).toBe(true)
+    expect(config.ref).toBe(ref)
+    expect(config.raw).toBe(raw)
+
+    expect(config.nested).toEqual(original.nested)
+    expect(config.nested).not.toBe(original.nested)
+    expect(config.nested.deep).not.toBe(original.nested.deep)
+    expect(config.list).toEqual(original.list)
+    expect(config.list).not.toBe(original.list)
+    expect(config.list[0]).not.toBe(original.list[0])
+
+    config.nested.deep.value = 99
+    config.list[0].id = 99
+
+    expect(original.nested.deep.value).toBe(1)
+    expect(original.list[0].id).toBe(1)
+  })
+
+  it('内建特殊对象在 getConfig 后应保持原类型和行为', () => {
+    class CustomConfig {
+      constructor(public name: string) {}
+      getName() {
+        return this.name
+      }
+    }
+
+    const values = {
+      regexp: /abc\d+/gi,
+      date: new Date('2026-05-20T00:00:00.000Z'),
+      map: new Map([
+        ['enabled', true],
+        ['count', 2],
+      ]),
+      set: new Set(['read', 'write']),
+      error: new Error('boom'),
+      url: new URL('https://example.com/path?foo=bar'),
+      classInstance: new CustomConfig('demo'),
+    }
+
+    const validators = {
+      regexp: (value: any) =>
+        value instanceof RegExp && value.source === values.regexp.source && value.flags === values.regexp.flags,
+      date: (value: any) => value instanceof Date && value.getTime() === values.date.getTime(),
+      map: (value: any) => value instanceof Map && value.get('enabled') === true && value.get('count') === 2,
+      set: (value: any) => value instanceof Set && value.has('read') && value.has('write'),
+      error: (value: any) => value instanceof Error && value.message === values.error.message,
+      url: (value: any) => value instanceof URL && value.href === values.url.href,
+      classInstance: (value: any) => value instanceof CustomConfig && value.getName() === 'demo',
+    }
+
+    const { result } = renderHook(() => useCoverable(values))
+    const config = result.current.getConfig()
+
+    const failures = Object.keys(validators)
+      .filter((key) => !(validators as any)[key](config[key]))
+      .map((key) => ({
+        key,
+        original: describeValue((values as any)[key]),
+        actual: describeValue(config[key]),
+        actualValue: config[key],
+      }))
+
+    expect(failures).toEqual([])
+    Object.keys(values).forEach((key) => {
+      expect(config[key]).toBe((values as any)[key])
+    })
+  })
+
+  it('正则默认值和正则覆盖值都应保持 RegExp 实例', () => {
+    const defaultPasswordReg = /^(?=.*[A-Z])(?=.*\d).{8,}$/g
+    const overridePasswordReg = /^[a-z]{3,}$/i
+    const defaultHook = renderHook(() =>
+      useCoverable({
+        passwordReg: defaultPasswordReg,
+      }),
+    )
+
+    expect(defaultHook.result.current.getConfig().passwordReg).toBeInstanceOf(RegExp)
+
+    const overrideHook = renderHook(() =>
+      useCoverable({
+        passwordReg: defaultPasswordReg,
+      }),
+    )
+
+    act(() => {
+      ;(overrideHook.result.current as any).__cover({ passwordReg: overridePasswordReg })
+    })
+
+    const config = overrideHook.result.current.getConfig()
+    expect(config.passwordReg).toBeInstanceOf(RegExp)
+    expect(config.passwordReg.source).toBe(overridePasswordReg.source)
+    expect(config.passwordReg.flags).toBe(overridePasswordReg.flags)
+    expect(defaultPasswordReg.source).toBe('^(?=.*[A-Z])(?=.*\\d).{8,}$')
+  })
+
+  it('非普通对象可以被 coverable 覆盖为新的非普通对象', () => {
+    const defaults = {
+      regexp: /default/i,
+      date: new Date('2026-05-20T00:00:00.000Z'),
+      map: new Map([['from', 'default']]),
+      set: new Set(['default']),
+    }
+    const overrides = {
+      regexp: /override/g,
+      date: new Date('2027-01-01T00:00:00.000Z'),
+      map: new Map([['from', 'override']]),
+      set: new Set(['override']),
+    }
+    const { result } = renderHook(() => useCoverable(defaults))
+
+    act(() => {
+      ;(result.current as any).__cover(overrides)
+    })
+
+    const config = result.current.getConfig()
+    expect(config.regexp).toBe(overrides.regexp)
+    expect(config.date).toBe(overrides.date)
+    expect(config.map).toBe(overrides.map)
+    expect(config.set).toBe(overrides.set)
+    expect(defaults.regexp.source).toBe('default')
+    expect(defaults.date.getTime()).toBe(new Date('2026-05-20T00:00:00.000Z').getTime())
+    expect(defaults.map.get('from')).toBe('default')
+    expect(defaults.set.has('default')).toBe(true)
+  })
+
+  it('覆盖合并后修改结果，不应回写污染默认配置或覆盖配置中的普通对象', () => {
+    const defaultConfig = {
+      nested: {
+        keep: { value: 1 },
+        list: [{ id: 1, name: 'default' }],
+      },
+    }
+    const overrideConfig = {
+      nested: {
+        keep: { value: 2 },
+        added: { value: 3 },
+        list: {
+          0: { id: 99, extra: true },
+        } as any,
+      },
+    }
+    const { result } = renderHook(() => useCoverable(defaultConfig))
+
+    act(() => {
+      ;(result.current as any).__cover(overrideConfig)
+    })
+
+    const config = result.current.getConfig()
+    config.nested.keep.value = 100
+    config.nested.added.value = 100
+    config.nested.list[0].id = 100
+
+    expect(defaultConfig.nested.keep.value).toBe(1)
+    expect(defaultConfig.nested.list[0].id).toBe(1)
+    expect(overrideConfig.nested.keep.value).toBe(2)
+    expect(overrideConfig.nested.added.value).toBe(3)
+    expect(overrideConfig.nested.list[0].id).toBe(99)
+  })
+})
+
+// ═══════════════════════════════════════════════════════
 //  useCoverable.component 集成测试
 // ═══════════════════════════════════════════════════════
 

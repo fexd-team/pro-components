@@ -29,6 +29,8 @@ import { ProTable } from '@fexd/pro-components'
   ]}
   actions={['add']}
   columnActions={['view', 'edit', 'delete']}
+  selectable
+  batchActions={['delete']}
   onQuery={async (params) => {
     const res = await api.fetchUsers(params)
     return { success: true, data: res.data, total: res.total }

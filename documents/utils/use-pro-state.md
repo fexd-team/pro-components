@@ -81,6 +81,36 @@ const { state, setState } = useProState(
 
 设置相同 `key` 的多个组件实例会自动同步状态，刷新页面后从 localStorage 恢复。
 
+### 用户偏好设置
+
+适合保存表格密度、主题、分页大小等用户偏好。多个组件只要使用相同 `key`，就能共享并持久化这些设置：
+
+```tsx | pure
+import { ProTable, useProState } from '@fexd/pro-components'
+
+function PreferenceToolbar() {
+  const { state, setState } = useProState(
+    { density: 'middle', pageSize: 20 },
+    {
+      key: '@app/user-preferences',
+      persist: 'localStorage',
+      autoMergeObject: true,
+    },
+  )
+
+  return <button onClick={() => setState({ density: state.density === 'small' ? 'middle' : 'small' })}>切换密度</button>
+}
+
+function UserTable() {
+  const { state } = useProState(
+    { density: 'middle', pageSize: 20 },
+    { key: '@app/user-preferences', persist: 'localStorage' },
+  )
+
+  return <ProTable defaultSize={state.density} defaultPageSize={state.pageSize} />
+}
+```
+
 ### 全局共享状态
 
 ```tsx | pure
@@ -116,9 +146,24 @@ const { state, setState, debouncedState } = useProState(
 // debouncedState.keyword 300ms 后更新（用于请求）
 ```
 
+### 闭包安全读取
+
+异步回调、定时器、事件监听中如果需要最新状态，优先使用 `getState()`，避免闭包捕获旧值：
+
+```tsx | pure
+const { setState, getState } = useProState({ count: 0 })
+
+async function submitLater() {
+  await Promise.resolve()
+  const latest = getState()
+  setState({ count: latest.count + 1 })
+}
+```
+
 ## ⚠️ 注意事项
 
 1. `key` 不传时，`persist` 和 `sync` 不会生效
 2. `autoMergeObject` 仅对纯对象类型有效，数组/原始值不会自动合并
 3. `persist: true` 默认使用 localStorage，传 `'sessionStorage'` 可切换为 sessionStorage
 4. 持久化的值会在页面加载时自动恢复，优先级高于 `defaultValue`
+5. 异步回调里需要最新值时使用 `getState()`，不要依赖闭包中的旧 `state`

@@ -6,7 +6,7 @@
   "bin": "dist/cli.js",
   "scripts": {
     "_start": "node dist/cli.js",
-    "build": "tsup",
+    "_build": "tsup",
     "_dev": "tsup --watch",
     "_pretest": "tsup",
     "_test": "tsx test-server.ts",

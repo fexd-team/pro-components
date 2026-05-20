@@ -48,7 +48,7 @@
 | useDebounce | 防抖 Hook | 搜索输入、API 调用优化 | [useDebounce.md](references/useDebounce.md) |
 | useAutoLoading | 自动管理异步加载状态 | 异步操作的 loading 管理 | [useAutoLoading.md](references/useAutoLoading.md) |
 | useRequest | 请求 Hook（来自 ahooks） | 数据请求与缓存 | - |
-| useProState | 增强 state Hook | 组件状态管理 | - |
+| useProState | 增强 state Hook，支持同步、持久化、对象自动合并 | 用户偏好、查询条件、跨组件共享状态 | [useProState.md](references/useProState.md) |
 | useThrottle | 节流 Hook | 滚动/resize 等高频事件 | - |
 | useForceUpdate | 强制更新 Hook | 需要手动触发重渲染 | - |
 | useLazyRender | 懒渲染 Hook | 延迟渲染优化 | - |

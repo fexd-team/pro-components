@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useDebounce } from '@fexd/pro-utils'
+import { useDebounce } from '@fexd/pro-components'
 import { Input, Card, Space, Tag, Typography } from 'antd'
 
 const { Text } = Typography

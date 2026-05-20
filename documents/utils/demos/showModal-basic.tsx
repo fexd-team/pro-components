@@ -1,5 +1,5 @@
 import React from 'react'
-import { showModal } from '@fexd/pro-utils'
+import { showModal } from '@fexd/pro-components'
 import { Button, Space, Input, Form, message, Progress } from 'antd'
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))

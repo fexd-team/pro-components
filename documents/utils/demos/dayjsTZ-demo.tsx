@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { dayjsTZ } from '@fexd/pro-utils'
+import { dayjsTZ } from '@fexd/pro-components'
 import { Card, Select, Space, Typography, Divider } from 'antd'
 
 const { Text } = Typography

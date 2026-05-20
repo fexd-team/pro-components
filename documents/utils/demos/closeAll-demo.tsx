@@ -1,5 +1,5 @@
 import React from 'react'
-import { showModal, showDrawer } from '@fexd/pro-utils'
+import { showModal, showDrawer } from '@fexd/pro-components'
 import { closeAll } from '@fexd/pro-utils/src/components/showModal/controller'
 import { Button, Space, Card, message } from 'antd'
 

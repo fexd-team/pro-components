@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createValueProxy } from '@fexd/pro-utils'
+import { createValueProxy } from '@fexd/pro-components'
 import { Card, Select, Space, Typography, Tag } from 'antd'
 
 const { Text } = Typography

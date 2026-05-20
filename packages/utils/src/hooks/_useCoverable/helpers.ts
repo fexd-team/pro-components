@@ -27,9 +27,17 @@ export function isReactRef(value: any): boolean {
   return keys.length === 1 && keys[0] === 'current'
 }
 
+/** 只有 plain object 才参与 coverable 的深度遍历 / 合并 */
+export function isPlainObject(value: any): boolean {
+  if (!isObject(value) || isArray(value) || isValidElement(value)) return false
+
+  const proto = Object.getPrototypeOf(value)
+  return proto === Object.prototype || proto === null
+}
+
 /** 判断一个值是否应被 coverable 跳过（不深入遍历 / 不克隆） */
 export function isOpaqueValue(value: any): boolean {
-  return isRaw(value) || isReactRef(value)
+  return isRaw(value) || isReactRef(value) || (isObject(value) && !isArray(value) && !isPlainObject(value))
 }
 
 export function deepItemFilter(item) {
@@ -45,7 +53,7 @@ export function deepItemFilter(item) {
     return false
   }
 
-  return isObject(item) && !isValidElement(item)
+  return isPlainObject(item)
 }
 
 export function deepMap<T>(
@@ -98,6 +106,14 @@ export function deepMap<T>(
 }
 
 export function deepMerge(target: any, source: any, filter: (value: any, key: string) => boolean = () => true): any {
+  if (isOpaqueValue(source)) {
+    return source
+  }
+
+  if (isOpaqueValue(target)) {
+    return source ?? target
+  }
+
   if ((!isObject(target) && !isArray(target)) || !isObject(source)) {
     return source ?? target
   }

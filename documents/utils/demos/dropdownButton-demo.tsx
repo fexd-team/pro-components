@@ -1,5 +1,5 @@
 import React from 'react'
-import { DropdownButton } from '@fexd/pro-utils'
+import { DropdownButton } from '@fexd/pro-components'
 import { Card, message } from 'antd'
 import { DownOutlined } from '@ant-design/icons'
 

@@ -8,7 +8,7 @@ import { isObject, random, run, sample } from '@fexd/tools'
 import * as globalTools from '@fexd/tools/es'
 import dayjs from 'dayjs'
 import { ProTable, showDrawer } from '@fexd/pro-components'
-import { Action, Hook } from '@fexd/pro-utils'
+import { Action, Hook } from '@fexd/pro-components'
 import MonacoEditor from './components/MonacoEditor'
 import { useDebounce, useLocalStorageState, useDebounceFn, useUpdateEffect, useRequest } from 'ahooks'
 

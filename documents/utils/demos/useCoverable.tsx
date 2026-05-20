@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCoverable } from '@fexd/pro-utils'
+import { useCoverable } from '@fexd/pro-components'
 
 const CoverableComponent = useCoverable.component((props: { normalProp: number }, ref: any) => {
   const config1 = useCoverable({

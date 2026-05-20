@@ -354,7 +354,7 @@ function merge(obj1: any, obj2: any, filter?: (value, key) => boolean): any
 
 ```tsx | pure
 import React from 'react'
-import { useCoverable } from '@fexd/pro-utils'
+import { useCoverable } from '@fexd/pro-components'
 
 const MyComponent = useCoverable.component((props: { title: string }, ref) => {
   const config = useCoverable({

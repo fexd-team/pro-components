@@ -1,5 +1,5 @@
 import React from 'react'
-import { Actions, confirmPromise } from '@fexd/pro-utils'
+import { Actions, confirmPromise } from '@fexd/pro-components'
 import { Card, message } from 'antd'
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))

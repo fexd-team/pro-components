@@ -12,6 +12,18 @@ order: 1
 
 `@fexd/pro-components` 提供了丰富的工具函数、Hooks 和命令式组件，全部通过统一入口导出。
 
+### 🖥️ CLI
+
+| 文档              | 说明                                 |
+| ----------------- | ------------------------------------ |
+| [CLI](/utils/cli) | 终端查文档、搜索用法、安装 AI Skills |
+
+### 🤖 AI Skills
+
+| 文档                          | 说明                                     |
+| ----------------------------- | ---------------------------------------- |
+| [AI Skills](/utils/ai-skills) | 让 AI 编辑器理解组件库的 Skills 配置指南 |
+
 ### 🧩 命令式组件
 
 | 工具                             | 说明                                     |
@@ -36,9 +48,3 @@ order: 1
 | [request / defineApi](/utils/request) | 请求工具与 API 定义                        |
 | [dayjsTZ](/utils/dayjs-tz)            | 时区安全的 dayjs 包装                      |
 | [更多工具](/utils/more-utils)         | deepMerge / diffArray / coloringOptions 等 |
-
-### 🤖 AI Skills
-
-| 文档                          | 说明                                     |
-| ----------------------------- | ---------------------------------------- |
-| [AI Skills](/utils/ai-skills) | 让 AI 编辑器理解组件库的 Skills 配置指南 |

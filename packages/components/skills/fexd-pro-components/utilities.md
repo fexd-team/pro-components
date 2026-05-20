@@ -56,7 +56,7 @@ data.run()
 
 ### useProState — 增强状态管理
 
-`useState` 的增强版本，支持**跨组件同步**、**持久化**（localStorage/sessionStorage）、**对象自动合并**、**防抖/节流**。
+`useState` 的增强版本，支持**跨组件同步**、**持久化**（localStorage/sessionStorage）、**对象自动合并**、**防抖/节流**。详见 [references/useProState.md](references/useProState.md)。
 
 ```tsx
 import { useProState } from '@fexd/pro-components'

@@ -1,6 +1,6 @@
 {
   "name": "@fexd/pro-table",
-  "version": "0.5.78",
+  "version": "0.5.79",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "types": "src/index.tsx",
@@ -21,9 +21,9 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@babel/runtime": "^7.13.10",
-    "@fexd/pro-form": "^0.2.64",
-    "@fexd/pro-provider": "^0.1.23",
-    "@fexd/pro-utils": "^0.2.31",
+    "@fexd/pro-form": "^0.2.65",
+    "@fexd/pro-provider": "^0.1.24",
+    "@fexd/pro-utils": "^0.2.32",
     "@fexd/tools": "^0.1.6",
     "@types/hoist-non-react-statics": "^3.3.1",
     "@types/mockjs": "^1.0.6",

@@ -33,9 +33,22 @@ React 管理系统组件库，基于 Ant Design 4.x + React 16/17，覆盖表格
 | 业务组件化 | `references/useCoverable.md`（→ [设计指南](references/useCoverable-design.md) · [BC编写](references/useCoverable-bc.md) · [消费指南](references/useCoverable-consume.md) · [request.coverable](references/useCoverable-request.md) · [迁移](references/useCoverable-migration.md)） |
 | 理解架构 | [architecture.md](architecture.md) |
 | 体验规范 / 最佳实践 | [guide.md](guide.md) |
-| 使用 Hooks / 工具函数 | [utilities.md](utilities.md) |
+| 使用 Hooks / 工具函数 | [utilities.md](utilities.md)；`useProState` 详见 [references/useProState.md](references/useProState.md) |
 | 源码探索 | [source-navigation.md](source-navigation.md) |
 | 终端快速查文档 | `npx pro-components list/docs/search` |
+
+## CLI 可用性
+
+`@fexd/pro-components` 包内置了 `pro-components` CLI。AI Agent 或开发者可以用它做快速发现与检索：
+
+- `npx pro-components list`：查看组件、Hooks、工具函数清单
+- `npx pro-components docs <name>`：输出某个组件/工具的内置文档
+- `npx pro-components search <query>`：在内置文档中全文搜索
+- `npx pro-components skills install`：把本 skill 注册到 Cursor / Codex / Claude Code / OpenCode 等常见 Agent
+
+默认项目级安装位置：Cursor 使用 `.cursor/skills`，Codex / OpenCode 使用 `.agents/skills`，Claude Code 使用 `.claude/skills`。
+
+CLI 是检索辅助；当 Agent 已加载本 skill 时，应优先按本文件的任务路由读取 `references/**`、`catalog.md`、`guide.md` 等结构化文档。
 
 ## BC 组件（Business Components）
 
@@ -98,7 +111,7 @@ const UserList = useCoverable.component(({ coverable }) => {
 
 ## CLI 命令
 
-安装 `@fexd/pro-components` 后可通过 CLI 快速查阅文档：
+安装 `@fexd/pro-components` 后可通过 CLI 快速查阅文档，并注册本 skill 到常见 AI Agent：
 
 ```bash
 # 列出所有组件
@@ -113,6 +126,11 @@ npx pro-components docs request
 # 全文搜索文档内容
 npx pro-components search "queryField"
 npx pro-components search "hook dependencies"
+
+# 安装 AI Skills
+npx pro-components skills install
+npx pro-components skills install --agents cursor,claude-code,opencode
+npx pro-components skills install --agents codex --scope global
 ```
 
 ## Import 规范

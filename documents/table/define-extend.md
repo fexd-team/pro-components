@@ -125,6 +125,7 @@ const columns = ProTable.defineColumns({
   推送ID: { label: '推送ID', name: 'pushId', width: 190, copyable: true },
   推送标题: { label: '推送标题', name: 'title', width: 200 },
   推送状态: { label: '推送状态', name: 'status', type: 'select', options: statusOpts },
+  推送时间: { label: '推送时间', name: 'pushTime', type: 'dateTime' },
 })
 
 // 从 columns 派生查询字段，可覆盖 name/type
@@ -132,12 +133,16 @@ const queryFields = ProTable.defineFields.from(columns, {
   推送ID: { name: 'id' },
   推送标题: { name: 'pushTitle' },
   推送状态: { placeholder: '全部' },
+  推送时间: { type: 'dateTimeRange', name: 'pushTimeRange' },
 })
 
 // queryFields.推送ID 自动继承了 label、type、options，只覆盖了 name
+// queryFields.推送时间 自动继承 label/name，只把 type/name 改成查询字段需要的值
 ```
 
 `from` 内部会自动判断 source 是列（`extendColumn`）还是字段（`extendField`），提取基础属性后合并 override。
+
+返回值仍是标准 `defineFields()` 增强对象，支持 `.getConfigs()`、`.getRawConfig()` 和 `fields.key.name` 引用。
 
 ---
 

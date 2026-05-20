@@ -112,6 +112,49 @@ const UserList = useCoverable.component((props, ref) => {
 <UserList coverable={{ permission: { add: false }, tableProps: { title: '员工列表' } }} />
 ```
 
+## 轻量数据面板示例
+
+不是所有可覆盖组件都需要封装成完整管理页。简单的数据面板也可以用 `useCoverable.component` 暴露布局、分页和数据源等默认配置：
+
+```tsx
+import { useCoverable } from '@fexd/pro-components'
+
+const DataPanel = useCoverable.component((props, ref) => {
+  const layout = useCoverable({
+    pageSize: 10,
+    columns: 3,
+    showTotal: true,
+  })
+  const data = useCoverable({
+    fetchList: async (params) => ({ total: 0, list: [] }),
+  })
+
+  return useCoverable.props({ layout, data }).render(() => {
+    const layoutConfig = layout.getConfig()
+    const dataConfig = data.getConfig()
+
+    return (
+      <PanelGrid
+        columns={layoutConfig.columns}
+        pageSize={layoutConfig.pageSize}
+        showTotal={layoutConfig.showTotal}
+        request={dataConfig.fetchList}
+      />
+    )
+  })
+})
+
+// 消费方只覆盖差异项
+;<DataPanel
+  coverable={{
+    layout: { pageSize: 20, columns: 4 },
+    data: { fetchList: fetchDashboardCards },
+  }}
+/>
+```
+
+轻量场景也遵循同一条规则：默认配置用 `useCoverable()` 声明，渲染前用 `useCoverable.props({ ... }).render()` 接入管线，在 `render()` 回调内通过 `getConfig()` 读取最终配置。
+
 ## 注意事项
 
 1. `getConfig()` 延迟求值，在 `render()` 回调中调用最安全
