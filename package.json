@@ -30,8 +30,6 @@
     "release:public": "node ./scripts/release.js --public",
     "release": "node ./scripts/release.js",
     "release:force": "node ./scripts/release.js --force",
-    "prerelease": "npm run version:check && node ./scripts/bringDocuments.js",
-    "postrelease": "npm run version:restore && node ./scripts/bringDocuments.js --delete",
     "unpublish": "node ./scripts/unpublish",
     "link:project": "node ./scripts/symlink",
     "size": "node ./scripts/size/index.js",

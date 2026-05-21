@@ -5,7 +5,7 @@ const registry = getRegistry()
 const isPublic = process.argv.includes('--public')
 const isForce = process.argv.includes('--force')
 
-const accessFlag = isPublic ? ' --access=public' : ''
+const accessFlag = isPublic || !process.argv.includes('--private') ? ' --access=public' : ''
 
 function run(cmd, label) {
   console.log(`\n> ${label || cmd}`)
@@ -17,12 +17,13 @@ console.log(`\n📦 发布目标 registry: ${registry}`)
 if (isForce) {
   run(`pnpm -r publish --no-git-checks --force${accessFlag} --registry=${registry}`, 'pnpm publish (force)')
 } else {
-  run('npm run version:check', 'version:check')
+  const registryArg = `--registry=${registry}`
+  run(`node ./scripts/checkVersionAndMarkPrivate.js check ${registryArg}`, 'version:check')
   run('node ./scripts/bringDocuments.js', 'bring documents')
 
   run(`pnpm -r publish --no-git-checks --force${accessFlag} --registry=${registry}`, 'pnpm publish')
 
-  run('npm run version:restore', 'version:restore')
+  run(`node ./scripts/checkVersionAndMarkPrivate.js restore ${registryArg}`, 'version:restore')
   run('node ./scripts/bringDocuments.js --delete', 'clean documents')
 }
 
