@@ -297,7 +297,7 @@ bc-library/
   },
   "dependencies": {
     "@fexd/pro-components": "^0.2.101",
-    "@fexd/tools": "^0.2.2",
+    "@fexd/tools": "^0.2.3",
     "ahooks": "^3.8.1",
     "antd": "^4.24.10"
   }

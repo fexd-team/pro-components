@@ -131,3 +131,145 @@ describe('utils.i18n', () => {
     node.unmount()
   })
 })
+
+describe('utils.i18n.defaultApplyMode', () => {
+  test('defaultApplyMode=supplement 时 applyConfig 不覆盖已有翻译', async () => {
+    const i18n = new I18n({
+      defaultApplyMode: 'supplement',
+      types: {
+        default: {
+          resources: {
+            en_US: { greeting: 'Hello', shared: 'Shared' },
+          },
+        },
+      },
+    })
+    await I18n.applyLanguage('en_US')
+
+    await i18n.applyConfig({
+      types: {
+        default: {
+          resources: {
+            en_US: { greeting: 'Hi', newKey: 'New Value' },
+          },
+        },
+      },
+    })
+
+    expect(i18n.t('greeting')).toBe('Hello')
+    expect(i18n.t('newKey')).toBe('New Value')
+    expect(i18n.t('shared')).toBe('Shared')
+  })
+
+  test('defaultApplyMode=supplement 时显式 mode=override 仍可覆盖', async () => {
+    const i18n = new I18n({
+      defaultApplyMode: 'supplement',
+      types: {
+        default: {
+          resources: {
+            en_US: { greeting: 'Hello' },
+          },
+        },
+      },
+    })
+    await I18n.applyLanguage('en_US')
+
+    await i18n.applyConfig(
+      {
+        types: {
+          default: {
+            resources: {
+              en_US: { greeting: 'Hi' },
+            },
+          },
+        },
+      },
+      { mode: 'override' },
+    )
+
+    expect(i18n.t('greeting')).toBe('Hi')
+  })
+
+  test('未设置 defaultApplyMode 时默认 override 行为', async () => {
+    const i18n = new I18n({
+      types: {
+        default: {
+          resources: {
+            en_US: { greeting: 'Hello' },
+          },
+        },
+      },
+    })
+    await I18n.applyLanguage('en_US')
+
+    await i18n.applyConfig({
+      types: {
+        default: {
+          resources: {
+            en_US: { greeting: 'Hi', newKey: 'New Value' },
+          },
+        },
+      },
+    })
+
+    expect(i18n.t('greeting')).toBe('Hi')
+    expect(i18n.t('newKey')).toBe('New Value')
+  })
+
+  test('globalI18n 的 defaultApplyMode 为 supplement', async () => {
+    await I18n.applyLanguage('en_US')
+
+    expect((globalI18n.config as any).defaultApplyMode).toBe('supplement')
+
+    await globalI18n.applyConfig({
+      types: {
+        default: {
+          resources: {
+            en_US: { testSupplementKey: 'Original' },
+          },
+        },
+      },
+    })
+    expect(globalI18n.t('testSupplementKey')).toBe('Original')
+
+    await globalI18n.applyConfig({
+      types: {
+        default: {
+          resources: {
+            en_US: { testSupplementKey: 'Overwritten' },
+          },
+        },
+      },
+    })
+    expect(globalI18n.t('testSupplementKey')).toBe('Original')
+  })
+
+  test('globalI18n.applyConfig 显式 mode=override 可强制覆盖', async () => {
+    await I18n.applyLanguage('en_US')
+
+    await globalI18n.applyConfig({
+      types: {
+        default: {
+          resources: {
+            en_US: { testOverrideKey: 'Original' },
+          },
+        },
+      },
+    })
+    expect(globalI18n.t('testOverrideKey')).toBe('Original')
+
+    await globalI18n.applyConfig(
+      {
+        types: {
+          default: {
+            resources: {
+              en_US: { testOverrideKey: 'Forced Override' },
+            },
+          },
+        },
+      },
+      { mode: 'override' },
+    )
+    expect(globalI18n.t('testOverrideKey')).toBe('Forced Override')
+  })
+})

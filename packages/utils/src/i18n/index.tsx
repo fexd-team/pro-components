@@ -185,6 +185,7 @@ export const fallbackI18n = new I18n({
 
 export const globalI18n = new I18n({
   fallback: [fallbackI18n],
+  defaultApplyMode: 'supplement',
   types: {
     default: {},
     jsx: { format: jsxTranslate },
