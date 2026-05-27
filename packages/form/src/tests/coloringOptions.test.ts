@@ -26,9 +26,9 @@ describe('coloringOptions', () => {
       expect(options[1].tag).not.toBe('success')
     })
 
-    it('前 11 个使用预设色板', () => {
-      const options = coloringOptions(Array.from({ length: 11 }, (_, i) => ({ label: `选项${i}`, value: i })))
-      const presetColors = [
+    it('前 22 个使用预设色板（antd 名称 + 扩展色）', () => {
+      const options = coloringOptions(Array.from({ length: 22 }, (_, i) => ({ label: `选项${i}`, value: i })))
+      const antdPresets = [
         'magenta',
         'red',
         'volcano',
@@ -43,28 +43,28 @@ describe('coloringOptions', () => {
       ]
 
       options.forEach((opt: any) => {
-        expect(presetColors).toContain(opt.tag)
+        const isAntdPreset = typeof opt.tag === 'string' && antdPresets.includes(opt.tag)
+        const isStylePreset = typeof opt.tag === 'object' && !!opt.tag?.style?.backgroundColor
+        expect(isAntdPreset || isStylePreset).toBe(true)
       })
     })
 
-    it('超出 11 个时使用随机 RGB 色', () => {
-      const options = coloringOptions(Array.from({ length: 15 }, (_, i) => ({ label: `选项${i}`, value: i })))
+    it('超出预设数量时使用随机 RGB 色', () => {
+      const options = coloringOptions(Array.from({ length: 30 }, (_, i) => ({ label: `选项${i}`, value: i })))
 
-      const randomStyleOptions = options.filter((opt: any) => typeof opt.tag === 'object')
-      expect(randomStyleOptions.length).toBeGreaterThan(0)
-      randomStyleOptions.forEach((opt: any) => {
-        expect(opt.tag).toHaveProperty('style')
-        expect(opt.tag.style).toHaveProperty('backgroundColor')
-        expect(opt.tag.style).toHaveProperty('color')
-        expect(opt.tag.style).toHaveProperty('borderColor')
+      const randomStyleOptions = options.filter((opt: any) => {
+        if (typeof opt.tag !== 'object') return false
+        const bg = opt.tag?.style?.backgroundColor ?? ''
+        return bg.startsWith('#') && bg.length === 7
       })
+      expect(randomStyleOptions.length).toBeGreaterThan(0)
     })
 
     it('每个预设色只使用一次', () => {
-      const options = coloringOptions(Array.from({ length: 11 }, (_, i) => ({ label: `选项${i}`, value: i })))
-      const tags = options.map((opt: any) => opt.tag)
+      const options = coloringOptions(Array.from({ length: 22 }, (_, i) => ({ label: `选项${i}`, value: i })))
+      const tags = options.map((opt: any) => JSON.stringify(opt.tag))
       const uniqueTags = new Set(tags)
-      expect(uniqueTags.size).toBe(11)
+      expect(uniqueTags.size).toBe(22)
     })
   })
 

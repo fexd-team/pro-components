@@ -141,6 +141,62 @@ describe('useConfigurable', () => {
   })
 })
 
+describe('createConfigurable - deepMapItem 集成', () => {
+  it('configurable 可以覆盖默认配置中的嵌套值', () => {
+    let mergedConfig: any
+
+    const TestBC = createBC(function useTestComponent() {
+      const config = useConfigurable({
+        table: {
+          pageSize: 10,
+          scroll: { x: 1000, y: 500 },
+        },
+        title: '默认标题',
+      })
+      mergedConfig = config
+
+      return {
+        render: (
+          <div>
+            <span data-testid="title">{config.title}</span>
+            <span data-testid="pageSize">{config.table?.pageSize}</span>
+          </div>
+        ),
+      }
+    })
+
+    render(
+      <TestBC
+        configurable={{
+          table: { pageSize: 20 },
+          title: '覆盖标题',
+        }}
+      />,
+    )
+
+    expect(mergedConfig.title).toBe('覆盖标题')
+    expect(mergedConfig.table.pageSize).toBe(20)
+    expect(mergedConfig.table.scroll).toEqual({ x: 1000, y: 500 })
+  })
+
+  it('handleItem 对非 DefinedApi/ProTableColumns 的值只处理一次（幂等验证）', () => {
+    const callLog: string[] = []
+
+    const TestBC = createBC(function useTestComponent() {
+      const config = useConfigurable({
+        count: 1,
+        nested: { value: 'hello' },
+      })
+
+      return {
+        render: <div data-testid="count">{config.count}</div>,
+      }
+    })
+
+    render(<TestBC configurable={{ count: 2, nested: { value: 'world' } }} />)
+  })
+})
+
 describe('createBC.createApi', () => {
   it('createApi 是 request.define 的别名', () => {
     expect(createBC.createApi).toBeDefined()

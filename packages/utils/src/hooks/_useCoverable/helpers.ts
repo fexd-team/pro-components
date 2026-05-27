@@ -27,8 +27,8 @@ export function isReactRef(value: any): boolean {
   return keys.length === 1 && keys[0] === 'current'
 }
 
-/** 只有 plain object 才参与 coverable 的深度遍历 / 合并 */
-export function isPlainObject(value: any): boolean {
+/** plain object 且非 React 元素，才参与 coverable 深度合并 */
+export function isMergeableNode(value: any): boolean {
   if (!isObject(value) || isArray(value) || isValidElement(value)) return false
 
   const proto = Object.getPrototypeOf(value)
@@ -37,7 +37,7 @@ export function isPlainObject(value: any): boolean {
 
 /** 判断一个值是否应被 coverable 跳过（不深入遍历 / 不克隆） */
 export function isOpaqueValue(value: any): boolean {
-  return isRaw(value) || isReactRef(value) || (isObject(value) && !isArray(value) && !isPlainObject(value))
+  return isRaw(value) || isReactRef(value) || (isObject(value) && !isArray(value) && !isMergeableNode(value))
 }
 
 export function deepItemFilter(item) {
@@ -53,7 +53,7 @@ export function deepItemFilter(item) {
     return false
   }
 
-  return isPlainObject(item)
+  return isMergeableNode(item)
 }
 
 export function deepMap<T>(
@@ -186,6 +186,7 @@ export function useMemoizedFn<T extends NOOP>(fn: T) {
   return memoizedFn.current as T
 }
 
-export function isIterable(value: any): boolean {
+/** 对象或数组视为可遍历节点（coverable 深度递归判断） */
+export function isTraversable(value: any): boolean {
   return isObject(value) || isArray(value)
 }

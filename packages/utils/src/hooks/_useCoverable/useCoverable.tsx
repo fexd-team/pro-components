@@ -1,7 +1,7 @@
 import { get, isExist, memoize, run, isObject } from '@fexd/tools'
 import { useRef, useMemo } from 'react'
 
-import { cloneDeep, deepItemFilter, deepMap, isIterable, shallowMerge, useLatest, useMemoizedFn } from './helpers'
+import { cloneDeep, deepItemFilter, deepMap, isTraversable, shallowMerge, useLatest, useMemoizedFn } from './helpers'
 import { Coverable, CoverableInternal } from './types'
 
 export default function useCoverable<T extends Record<string, any>, O = T>(
@@ -64,7 +64,7 @@ export default function useCoverable<T extends Record<string, any>, O = T>(
         return [false, result]
       }
 
-      const canMerge = deepItemFilter(item) && isIterable(item) && (isObject(override) || !isExist(override))
+      const canMerge = deepItemFilter(item) && isTraversable(item) && (isObject(override) || !isExist(override))
       const result = canMerge
         ? (shallowMerge as any)(...[item, override, deepMap(item, handleItem, keyPath)].filter(Boolean))
         : (override ?? item)

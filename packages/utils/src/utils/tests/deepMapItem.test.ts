@@ -2,16 +2,15 @@ import deepMapItem from '../deepMapItem'
 
 describe('deepMapItem', () => {
   describe('数组处理', () => {
-    it('[行为记录] handleItem 在叶值上被双重应用（递归返回 + 父级赋值）', () => {
+    it('handleItem 在叶值上只应用一次', () => {
       const input = [1, 2, 3]
       const result = deepMapItem(input, {
         handleItem: (value) => (typeof value === 'number' ? value * 2 : value),
       })
-      // 叶值 1: deepMapItem(1) → handleItem(1)=2 → 父级 handleItem(2)=4
-      expect(result).toEqual([4, 8, 12])
+      expect(result).toEqual([2, 4, 6])
     })
 
-    it('[行为记录] 嵌套数组中叶值也被双重应用', () => {
+    it('嵌套数组中叶值也只应用一次', () => {
       const input = [
         [1, 2],
         [3, 4],
@@ -19,10 +18,9 @@ describe('deepMapItem', () => {
       const result = deepMapItem(input, {
         handleItem: (value) => (typeof value === 'number' ? value * 10 : value),
       })
-      // 叶值 1: deepMapItem(1) → handleItem(1)=10 → 父级 handleItem(10)=100
       expect(result).toEqual([
-        [100, 200],
-        [300, 400],
+        [10, 20],
+        [30, 40],
       ])
     })
 
@@ -37,15 +35,14 @@ describe('deepMapItem', () => {
   })
 
   describe('对象处理', () => {
-    it('[行为记录] 对象叶值也被双重应用 handleItem', () => {
+    it('对象叶值只应用一次 handleItem', () => {
       const input = { a: 1, b: 2, c: 3 }
       const result = deepMapItem(input, {
         handleItem: (value) => (typeof value === 'number' ? value + 100 : value),
       })
-      // 叶值 1: deepMapItem(1) → handleItem(1)=101 → 父级 handleItem(101)=201
-      expect(result.a).toBe(201)
-      expect(result.b).toBe(202)
-      expect(result.c).toBe(203)
+      expect(result.a).toBe(101)
+      expect(result.b).toBe(102)
+      expect(result.c).toBe(103)
     })
 
     it('递归处理嵌套对象 — 字符串叶值经过两次 toUpperCase 仍为大写', () => {
@@ -57,27 +54,26 @@ describe('deepMapItem', () => {
       expect(result.nested.y).toBe('WORLD')
     })
 
-    it('[行为记录] 对象是原地修改的，叶值被双重应用', () => {
+    it('对象处理返回新对象（不修改原对象）', () => {
       const input = { a: 1, b: 2 }
-      deepMapItem(input, {
+      const result = deepMapItem(input, {
         handleItem: (value) => (typeof value === 'number' ? value * 2 : value),
       })
-      // 1 → handleItem(1)=2 → handleItem(2)=4
-      expect(input.a).toBe(4)
-      expect(input.b).toBe(8)
+      expect(result.a).toBe(2)
+      expect(result.b).toBe(4)
+      expect(input.a).toBe(1)
+      expect(input.b).toBe(2)
     })
   })
 
   describe('filterItem', () => {
-    it('filterItem 返回 false 时跳过该项，但父级仍应用 handleItem', () => {
+    it('filterItem 返回 false 时跳过该项', () => {
       const input = [1, 2, 3, 4, 5]
       const result = deepMapItem(input, {
         handleItem: (value) => (typeof value === 'number' ? value * 10 : value),
         filterItem: (value) => value !== 3,
       })
-      // 被 filter 的 3 直接返回原值
-      // 其他叶值: deepMapItem(n) → handleItem(n)=n*10 → 父级 handleItem(n*10)=n*100
-      expect(result).toEqual([100, 200, 3, 400, 500])
+      expect(result).toEqual([10, 20, 3, 40, 50])
     })
 
     it('filterItem 返回 false 时跳过该项（对象）', () => {
@@ -133,6 +129,49 @@ describe('deepMapItem', () => {
       const input = { a: 1, b: 2 }
       const result = deepMapItem(input)
       expect(result).toEqual({ a: 1, b: 2 })
+    })
+  })
+
+  describe('mutable 模式', () => {
+    it('mutable=true 时原地修改对象', () => {
+      const input = { a: 1, b: 2 }
+      const result = deepMapItem(input, {
+        handleItem: (value) => (typeof value === 'number' ? value * 2 : value),
+        mutable: true,
+      })
+      expect(result).toBe(input)
+      expect(input.a).toBe(2)
+      expect(input.b).toBe(4)
+    })
+
+    it('mutable=true 时原地修改数组', () => {
+      const input = [1, 2, 3]
+      const result = deepMapItem(input, {
+        handleItem: (value) => (typeof value === 'number' ? value + 10 : value),
+        mutable: true,
+      })
+      expect(result).toBe(input)
+      expect(input).toEqual([11, 12, 13])
+    })
+
+    it('mutable=true 递归对嵌套对象也原地修改', () => {
+      const inner = { x: 1 }
+      const input = { nested: inner }
+      deepMapItem(input, {
+        handleItem: (value) => (typeof value === 'number' ? value * 3 : value),
+        mutable: true,
+      })
+      expect(inner.x).toBe(3)
+    })
+
+    it('mutable=false（默认）不修改原数据', () => {
+      const input = { a: 1 }
+      const result = deepMapItem(input, {
+        handleItem: (value) => (typeof value === 'number' ? value + 100 : value),
+      })
+      expect(result).not.toBe(input)
+      expect(input.a).toBe(1)
+      expect(result.a).toBe(101)
     })
   })
 })

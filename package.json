@@ -35,6 +35,8 @@
     "size": "node ./scripts/size/index.js",
     "new:component": "node ./scripts/new-component/index.js",
     "patch": "patch-package code-kitchen --use-yarn --patch-dir ./scripts/patches",
+    "prepare:skills": "fexd-tools skills install",
+    "prepare": "npm run prepare:skills",
     "postinstall": "patch-package --patch-dir ./scripts/patches",
     "version:auto-update": "node ./scripts/autoUpdateVersions.js",
     "version:check-remote": "node ./scripts/checkRemoteVersions.js"
@@ -45,7 +47,7 @@
     "@swc/jest": "^0.2.39",
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",
-    "@fexd/tools": "^0.1.6",
+    "@fexd/tools": "^0.2.2",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@testing-library/react-hooks": "^7.0.0",

@@ -29,9 +29,27 @@ export interface DayjsTZType extends DayjsTimezone {
   tz: DayjsTimezone
 }
 
+const tzCache = new Map<string, boolean>()
+function isValidTimezone(value: string): boolean {
+  if (tzCache.has(value)) return tzCache.get(value)!
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: value })
+    tzCache.set(value, true)
+    return true
+  } catch {
+    tzCache.set(value, false)
+    return false
+  }
+}
+
 const dayjsTZ: DayjsTZType = Object.assign(
   (date = Date.now(), ...args: any[]) => {
     if (rawDayjs.tz) {
+      if (args.length === 1 && typeof args[0] === 'string' && !isValidTimezone(args[0])) {
+        const defaultTz = rawDayjs.tz.guess()
+        // @ts-ignore
+        return rawDayjs.tz(date, args[0], defaultTz)
+      }
       // @ts-ignore
       return rawDayjs.tz(date, ...args)
     }

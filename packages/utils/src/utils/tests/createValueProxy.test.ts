@@ -13,10 +13,10 @@ describe('createValueProxy', () => {
       expect(proxied.age).toBe(25)
     })
 
-    it('valueHandler 返回 null/undefined 时使用原始值', () => {
+    it('valueHandler 返回 undefined 时返回 undefined（不回退原始值）', () => {
       const target = { x: 'hello' }
       const proxied = createValueProxy(target, () => undefined)
-      expect(proxied.x).toBe('hello')
+      expect(proxied.x).toBeUndefined()
     })
 
     it('不存在的自有属性返回 undefined', () => {
@@ -25,10 +25,13 @@ describe('createValueProxy', () => {
       expect(proxied.b).toBeUndefined()
     })
 
-    it('[行为记录] 原型链属性（如 toString）仍可访问（prop in obj 包含原型链）', () => {
+    it('原型链属性（如 toString）通过 Reflect.get 正确返回，不经过 valueHandler', () => {
       const target = { a: 1 }
-      const proxied = createValueProxy(target, (v) => v)
+      const handler = jest.fn((v) => `handled:${v}`)
+      const proxied = createValueProxy(target, handler)
       expect(proxied.toString).toBeDefined()
+      expect(typeof proxied.toString).toBe('function')
+      expect(handler).not.toHaveBeenCalledWith(expect.anything(), 'toString')
     })
 
     it('valueHandler 接收 prop 参数', () => {

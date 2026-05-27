@@ -2,65 +2,34 @@
 
 > 本文件记录测试编写过程中发现的源码行为异常或设计问题。仅记录不修改源码。
 
-## 1. `deepMapItem` — handleItem 双重应用
+## 1. `deepMapItem` — handleItem 双重应用（已修复）
 
 **严重度：** 中（功能可用但容易误用）
 
 **文件：** `packages/utils/src/utils/deepMapItem.tsx`
 
-**问题描述：** 对于叶节点（原始值），`handleItem` 会被调用**两次**：
+**已修复：** 通过两处改动消除双重应用：
 
-1. 递归底部 `return run(handleItem, undefined, object, undefined, prefixKeys)` — 第一次
-2. 父级容器中 `return run(handleItem, undefined, nextItem, index, nextPrefixKeys)` — 第二次
-
-**影响：**
-
-```ts
-// 用户期望 [1, 2, 3] → [2, 4, 6]
-// 实际结果 [1, 2, 3] → [4, 8, 12]（每个值被 *2 两次）
-deepMapItem([1, 2, 3], { handleItem: (v) => (typeof v === 'number' ? v * 2 : v) })
-```
-
-对于幂等操作（如 `null → ''`、`toUpperCase`）不受影响，但对累积操作（`+100`、`*2`）会产生非预期结果。
-
-**建议修复方向：**
-
-- 方案 A：移除最底部的 `handleItem` 调用，仅在容器层应用
-- 方案 B：区分叶节点和容器节点，叶节点只应用一次
+1. 对象分支处理完子项后直接 `return object`，不再走底部的 `handleItem`
+2. 底部的 `handleItem` 仅在顶层直接传入叶值时生效（`prefixKeys.length === 0`），被父级递归调用的叶节点由父级容器的循环统一处理
 
 ---
 
-## 2. `deepMapItem` — 数组不可变 vs 对象原地修改
+## 2. `deepMapItem` — 数组不可变 vs 对象原地修改（已修复）
 
 **严重度：** 低（不一致但已在使用中）
 
-**问题描述：**
-
-- **数组**：`object.map(...)` 返回新数组，原数组不变
-- **对象**：`object[key] = ...` 直接修改原对象
-
-这种不对称行为可能导致使用者困惑。
+**已修复：** 默认不可变（数组和对象都返回新副本），并新增 `mutable: true` 选项支持原地修改场景。
 
 ---
 
-## 3. `createValueProxy` — `prop in obj` 包含原型链
+## 3. `createValueProxy` — `prop in obj` 包含原型链（已修复）
 
 **严重度：** 低
 
 **文件：** `packages/utils/src/utils/createValueProxy.tsx`
 
-**问题描述：** `if (prop in obj)` 检查包含原型链上的属性（如 `toString`、`valueOf`）。这意味着 `valueHandler` 也会处理这些原型链属性。
-
-如果用户的 `valueHandler` 对所有非 `label` 的 key 返回 `undefined`，可能导致 `toString()` 等内置方法失效。
-
-**可能的改进：**
-
-```ts
-if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-  return valueHandler?.(obj?.[prop], prop) ?? obj?.[prop]
-}
-return obj[prop] // 原型链属性直接返回
-```
+**已修复：** 实现替换为 `@fexd/tools@0.2.1` 新增的 `createProxyGetter`，使用 `Object.prototype.hasOwnProperty.call` + `Reflect.get` 正确处理原型链属性和 Symbol。
 
 ---
 
@@ -98,52 +67,39 @@ if (propKey !== 'viewField' && !(column as any)?.[propKey]) {
 **已修复：** 在 `jest.config.js` 中补充了完整的 moduleNameMapper 规则：
 
 - `'^moment/dist/locale/(.*)$'` → `'<rootDir>/node_modules/moment/locale/$1'`
-- `'^antd/es/(.*)$'`、`'^ahooks/es/(.*)$'`、`'^rc-field-form/es/(.*)$'` 使用捕获组正确映射子路径
+- `'^antd/es/(.*)$'`、`'^ahooks/es/(.*)$'`、`'^rc-field-form/es/(.*)$'` 加子路径匹配
 
 ---
 
-## 6. `genMemoizedFetch` — SAS 锁机制导致 Jest worker 崩溃
+## 6. `dayjsTZ` — customParseFormat 参数冲突（已修复）
 
-**严重度：** 低（仅影响错误恢复场景的测试）
-
-**文件：** `packages/utils/src/utils/genMemoizedFetch.tsx`
-
-**问题描述：** `genMemoizedFetch` 内部通过 `SAS`（Serialize Async Sequential，来自 `@fexd/tools`）包装原始 fetch 函数。当请求失败时，`disable` 回调中的 `catch` 处理器使用 `throw e` 重新抛出异常。
-
-这在 Jest 的子进程 worker 模型中导致 unhandled rejection，从而使整个 worker 进程崩溃（`Jest worker encountered 4 child process exceptions, exceeding retry limit`）。
-
-**影响：**
-
-- 无法测试 "请求失败后缓存被清除、重新发起请求" 的场景
-- 正常的成功路径和缓存行为可以正常测试
-
-**根本原因：** `@fexd/tools@0.1.8` 的 `SAS.js` 中，异步锁链内抛出的异常没有被正确地限制在 Promise chain 内，导致逃逸为全局 unhandled rejection。
-
----
-
-## 7. `dayjsTZ` — 第二参数被 tz 插件劫持
-
-**严重度：** 低（使用限制，非 bug）
+**严重度：** 低（设计限制）
 
 **文件：** `packages/utils/src/utils/dayjsTZ.tsx`
 
-**问题描述：** `dayjsTZ` 函数内部直接调用 `rawDayjs.tz(date, ...args)`。`dayjs.tz` 的第二个参数是**时区字符串**，因此无法像原始 `dayjs(date, format)` 一样传入格式字符串。
+**问题描述：** `dayjsTZ(date, ...args)` 内部调用 `rawDayjs.tz(date, ...args)`，第二个参数会被 `dayjs/plugin/timezone` 当作时区而非格式字符串。因此通过 `dayjsTZ` 无法使用 `customParseFormat` 插件的格式化语法。
 
-```ts
-// 原始 dayjs 支持：
-dayjs('15/01/2024', 'DD/MM/YYYY') // ✅
+**已修复：** 通过 `Intl.DateTimeFormat` 自动检测第二参数是否为合法 IANA 时区名：
 
-// dayjsTZ 不支持（第二参数被当作时区）：
-dayjsTZ('15/01/2024', 'DD/MM/YYYY') // ❌ RangeError: Invalid time zone
-```
-
-**影响：** 需要自定义格式解析时，用户必须使用原始 dayjs 而非 dayjsTZ。这在文档中未明确说明。
-
-**建议：** 在文档或 JSDoc 中注明此限制，或提供一个 `dayjsTZ.parse(date, format)` 工具方法。
+- 不是合法时区 → 视为 customParseFormat 格式串，自动推断默认时区
+- 是合法时区 → 保持原有行为不变
+- 三参数形式 `(date, format, timezone)` 不受影响
 
 ---
 
-## 8. 预存测试 — `multipleTreeSelect.test.tsx` onChange 参数不匹配
+## 7. `genMemoizedFetch` — SAS 锁机制在错误恢复时导致 Jest Worker 崩溃
+
+**严重度：** 中（影响测试环境）
+
+**文件：** `packages/utils/src/utils/genMemoizedFetch.tsx`
+
+**问题描述：** `genMemoizedFetch` 内部使用 `@fexd/tools` 的 SAS（Serialize Async Sequential）锁机制。当 fetch 函数抛出异常时，SAS 的 `disable` 回调中的 `throw e` 会导致未捕获的 Promise rejection，使整个 Jest worker 进程崩溃。
+
+在测试中无法安全地测试错误恢复场景（如 fetch 失败后重试）。
+
+---
+
+## 8. 预存测试 — `multipleTreeSelect.test.tsx` onChange 参数不匹配（已恢复）
 
 **严重度：** 低（预存测试问题）
 
@@ -151,12 +107,16 @@ dayjsTZ('15/01/2024', 'DD/MM/YYYY') // ❌ RangeError: Invalid time zone
 
 **问题描述：** 测试期望 `onChange` 被调用时传入 `[2, '2-1']`，但实际参数格式与预期不一致。可能是 antd TreeSelect 版本更新导致回调参数变化。
 
+**当前状态：** 已恢复通过，可能为偶发时序问题。
+
 ---
 
-## 9. 预存测试 — `dateTime.test.tsx` 日期选择器 cell 未出现
+## 9. 预存测试 — `dateTime.test.tsx` 日期选择器 cell 未出现（已恢复）
 
 **严重度：** 低（预存测试问题）
 
 **文件：** `packages/form/src/valueTypes/type-date-time/tests/dateTime.test.tsx`
 
 **问题描述：** 测试尝试查找 `.ant-picker-cell[title="${date}"]` 元素但返回 null。可能是 antd DatePicker 渲染时机问题，日历面板尚未完全展开时断言已执行。
+
+**当前状态：** 已恢复通过，可能为偶发时序问题。

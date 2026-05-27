@@ -1,9 +1,8 @@
 import { useMemo, useCallback } from 'react'
-import { run } from '@fexd/tools'
+import { run, isUndefined } from '@fexd/tools'
 import { useProps, flattenChildren } from '../../utils'
 import { getFieldFromColumn, getAllFieldFromColumn } from '../valueType'
 import { ProTableEditFieldsConfig, ProTableEditFieldMode, ProTableEditFieldType } from '../../types'
-import { isUndefined } from 'lodash'
 
 function useColumnFields(propKey: string): ProTableEditFieldType[] {
   const { columns } = useProps()

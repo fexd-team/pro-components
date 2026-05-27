@@ -36,16 +36,19 @@ const scopeFallbackI18n = new I18n({
 scopeFallbackI18n.applyLanguage('en_US')
 scopeFallbackI18n.applyLanguage = () => Promise.resolve()
 
-globalI18n.applyConfig({
-  types: {
-    default: {
-      resources: builtInLocaleMap,
-    },
-    jsx: {
-      resources: builtInLocaleMap,
+globalI18n.applyConfig(
+  {
+    types: {
+      default: {
+        resources: builtInLocaleMap,
+      },
+      jsx: {
+        resources: builtInLocaleMap,
+      },
     },
   },
-})
+  { mode: 'supplement', priority: 2 },
+)
 
 export default function useLocales() {
   const { localeKey, locale } = useProps()

@@ -41,3 +41,8 @@ package-lock.json
 coverage
 nul
 debug*.log
+# Agent skills installed from npm packages
+.cursor/skills/fexd-tools
+.agents/skills/fexd-tools
+.claude/skills/fexd-tools
+.opencode/skills/fexd-tools

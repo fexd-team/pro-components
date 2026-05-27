@@ -67,9 +67,29 @@ describe('dayjsTZ', () => {
   })
 
   it('customParseFormat 插件已注册（通过 rawDayjs 使用）', () => {
-    // dayjsTZ 的第二个参数被 tz 插件当作时区，customParseFormat 需直接用 dayjs
-    // 这里验证插件确实被加载了
     const result = dayjsTZ('2024-01-15T10:30:00')
     expect(result.isValid()).toBe(true)
+  })
+
+  it('customParseFormat 两参数形式可直接使用', () => {
+    const result = dayjsTZ('15/01/2024', 'DD/MM/YYYY')
+    expect(result.isValid()).toBe(true)
+    expect(result.year()).toBe(2024)
+    expect(result.month()).toBe(0)
+    expect(result.date()).toBe(15)
+  })
+
+  it('customParseFormat 不影响合法时区参数', () => {
+    const result = dayjsTZ('2024-06-15', 'Asia/Shanghai')
+    expect(result.isValid()).toBe(true)
+    expect(result.year()).toBe(2024)
+  })
+
+  it('customParseFormat 三参数形式（格式 + 时区）', () => {
+    const result = dayjsTZ('15/01/2024', 'DD/MM/YYYY', 'UTC')
+    expect(result.isValid()).toBe(true)
+    expect(result.year()).toBe(2024)
+    expect(result.month()).toBe(0)
+    expect(result.date()).toBe(15)
   })
 })

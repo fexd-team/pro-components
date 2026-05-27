@@ -10,7 +10,7 @@ import {
   deepMerge,
   shallowMerge,
   cloneDeep,
-  isIterable,
+  isTraversable,
   builtInMerge,
   isReactRef,
   isRaw,
@@ -70,19 +70,19 @@ describe('helpers', () => {
     })
   })
 
-  // ─── isIterable ───────────────────────────────────
-  describe('isIterable', () => {
+  // ─── isTraversable ───────────────────────────────────
+  describe('isTraversable', () => {
     it('对象和数组返回 true', () => {
-      expect(isIterable({})).toBe(true)
-      expect(isIterable([])).toBe(true)
-      expect(isIterable({ a: 1 })).toBe(true)
+      expect(isTraversable({})).toBe(true)
+      expect(isTraversable([])).toBe(true)
+      expect(isTraversable({ a: 1 })).toBe(true)
     })
 
     it('基本类型返回 false', () => {
-      expect(isIterable(1)).toBe(false)
-      expect(isIterable('str')).toBe(false)
-      expect(isIterable(null)).toBe(false)
-      expect(isIterable(undefined)).toBe(false)
+      expect(isTraversable(1)).toBe(false)
+      expect(isTraversable('str')).toBe(false)
+      expect(isTraversable(null)).toBe(false)
+      expect(isTraversable(undefined)).toBe(false)
     })
   })
 
