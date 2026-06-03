@@ -41,6 +41,12 @@ order: 1
 | [useProState](/utils/use-pro-state)          | 跨组件同步 + 持久化 + 对象自动合并 |
 | [useDebounce / useAutoLoading](/utils/hooks) | 防抖与自动 loading                 |
 
+### 🌍 i18n 国际化
+
+| 工具                | 说明                                      |
+| ------------------- | ----------------------------------------- |
+| [i18n](/utils/i18n) | 全局翻译实例、React 集成、数字/JSX 格式化 |
+
 ### 🔧 工具函数
 
 | 工具                                  | 说明                                       |
