@@ -90,6 +90,28 @@ API 请求的可覆盖配置值。详见 [useCoverable-request](./useCoverable-r
 | React ref      | 自动检测，保持引用，整体替换        |
 | raw 标记对象   | 跳过 clone/traverse/merge，保持引用 |
 
+### 顶层 key 不可新增
+
+`useCoverable` 只能**覆盖**已声明的配置项，**不能**在顶层新增原配置中不存在的 key。这是有意为之的设计约束：
+
+```typescript
+const config = useCoverable({ a: 1, b: 2 })
+// ❌ 顶层新增 key 无效
+// __cover({ c: 3 }) → getConfig() 仍为 { a: 1, b: 2 }，c 不存在
+
+// ✅ 嵌套对象中可以新增 key（子对象合并时会带入 override 的所有属性）
+const config = useCoverable({ data: { a: 1, b: 2 } })
+// __cover({ data: { c: 3 } }) → getConfig().data = { a: 1, b: 2, c: 3 }
+```
+
+**设计原因**：
+
+1. **类型安全**：`CoverableProps<T>` 使用 `[K in keyof T]?` 映射，TypeScript 类型系统不允许传入未声明的 key
+2. **API 契约**：顶层 key 是组件的配置面声明，组件作者通过 `useCoverable({...})` 明确暴露哪些项可被覆盖
+3. **实现机制**：核心 `deepMap(defaultConfig, handleItem)` 只遍历 `defaultConfig` 自有的 key
+
+嵌套对象能新增 key 是因为 `shallowMerge(item, override, ...)` 在合并时会把 override 的所有属性带入结果。
+
 ## 最小使用示例
 
 ```tsx
@@ -164,3 +186,4 @@ const DataPanel = useCoverable.component((props, ref) => {
 5. React ref（`{ current: ... }` 单键对象）自动保持引用
 6. 非 ref 特殊对象用 `useCoverable.raw()` 标记保护
 7. `useCoverableProps` 自动处理 `ref` / `tableRef` / `formRef` 的安全传递
+8. 顶层 key 不可新增——只能覆盖已声明的配置项（嵌套对象中可以新增 key，参见合并策略章节）

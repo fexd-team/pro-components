@@ -1865,3 +1865,89 @@ describe('useCoverableProps 模拟集成 — ref 安全性', () => {
     expect('formRef' in props).toBe(false)
   })
 })
+
+// ═══════════════════════════════════════════════════════
+//  新增 key 场景测试 — 验证 __cover 能否给配置添加原本不存在的字段
+// ═══════════════════════════════════════════════════════
+
+describe('useCoverable 新增配置项（config.c 场景）', () => {
+  it('扁平对象：__cover 无法添加原本不存在的顶层 key', () => {
+    const { result } = renderHook(() => useCoverable({ a: 1, b: 2 }))
+    const coverable = result.current as any
+
+    act(() => {
+      coverable.__cover({ c: 3 })
+    })
+
+    const config = coverable.getConfig()
+    expect(config).toEqual({ a: 1, b: 2 })
+    expect(config.c).toBeUndefined()
+  })
+
+  it('嵌套对象：__cover 可以在子对象中添加原本不存在的 key', () => {
+    const { result } = renderHook(() => useCoverable({ data: { a: 1, b: 2 } }))
+    const coverable = result.current as any
+
+    act(() => {
+      coverable.__cover({ data: { c: 3 } })
+    })
+
+    const config = coverable.getConfig()
+    expect(config.data).toEqual({ a: 1, b: 2, c: 3 })
+    expect(config.data.c).toBe(3)
+  })
+
+  it('扁平对象：通过 coverable.component 也无法添加新的顶层 key', () => {
+    const TestComp = useCoverable.component(function TestContent(props: {}, ref: any) {
+      const config = useCoverable({ a: 1, b: 2 })
+
+      return useCoverable.props({ config }).render(() => {
+        const cfg = config.getConfig() as any
+        return (
+          <div>
+            <span data-testid="a">{cfg.a}</span>
+            <span data-testid="b">{cfg.b}</span>
+            <span data-testid="c">{cfg.c ?? 'undefined'}</span>
+          </div>
+        )
+      })
+    })
+
+    render(
+      <TestComp
+        coverable={{
+          config: { c: 3 },
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('c').textContent).toBe('undefined')
+  })
+
+  it('嵌套对象：通过 coverable.component 可以在子对象中添加新 key', () => {
+    const TestComp = useCoverable.component(function TestContent(props: {}, ref: any) {
+      const config = useCoverable({ data: { a: 1, b: 2 } })
+
+      return useCoverable.props({ config }).render(() => {
+        const cfg = config.getConfig() as any
+        return (
+          <div>
+            <span data-testid="a">{cfg.data.a}</span>
+            <span data-testid="b">{cfg.data.b}</span>
+            <span data-testid="c">{cfg.data.c ?? 'undefined'}</span>
+          </div>
+        )
+      })
+    })
+
+    render(
+      <TestComp
+        coverable={{
+          config: { data: { c: 3 } },
+        }}
+      />,
+    )
+
+    expect(screen.getByTestId('c').textContent).toBe('3')
+  })
+})

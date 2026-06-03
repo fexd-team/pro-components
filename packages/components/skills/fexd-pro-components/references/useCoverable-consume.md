@@ -306,3 +306,4 @@ export default () => (
 4. **函数替换**：基本类型和函数是直接替换，不会合并
 5. **API 覆盖**：对象形式深度合并配置，函数形式完全接管请求
 6. **权限惯例**：BC 默认开启全部权限，消费方按需关闭（而非反过来）
+7. **只能覆盖已声明的配置**：不能在配置组的顶层新增 BC 未定义的 key。例如 BC 声明了 `permission: { add, edit, delete }`，消费方不能覆盖 `permission: { export: true }` 来新增一个 `export` 字段——除非 BC 内部已预先声明了该字段。嵌套对象（如 `tableProps.pagination`）内可以新增属性

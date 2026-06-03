@@ -346,6 +346,26 @@ function merge(obj1: any, obj2: any, filter?: (value, key) => boolean): any
 | 基本类型（string / number / boolean） | 直接替换                                       |
 | React 元素                            | 跳过深度遍历，直接替换                         |
 
+### 重要限制：顶层 key 不可新增
+
+覆盖操作**只能修改已有的配置项**，不能在 `useCoverable` 声明的配置对象顶层新增 key：
+
+```tsx | pure
+const config = useCoverable({ a: 1, b: 2 })
+// 覆盖 { c: 3 } → getConfig() 结果仍为 { a: 1, b: 2 }
+// ❌ c 不会出现在结果中
+```
+
+**嵌套对象**中可以新增 key（因为子对象在合并时会通过 `shallowMerge` 引入 override 的所有属性）：
+
+```tsx | pure
+const config = useCoverable({ data: { a: 1, b: 2 } })
+// 覆盖 { data: { c: 3 } } → getConfig().data = { a: 1, b: 2, c: 3 }
+// ✅ 嵌套对象中新增 key 有效
+```
+
+这是从实现之初（2024-07）就确立的设计约束，目的是保证类型安全和 API 契约的明确性——组件作者通过顶层 key 的声明，明确定义了组件暴露的配置面。
+
 ---
 
 ## 使用场景
@@ -523,6 +543,7 @@ type CoverableProps<T> = {
 3. **React 元素会被跳过** — 深度遍历时遇到 React 元素不会继续递归
 4. **数组索引覆盖** — 使用对象 `{ index: value }` 形式，不会改变数组长度
 5. **CoverableValue 的 `config` 字段** — 仅用于 TypeScript 类型推导，运行时不参与合并逻辑
+6. **顶层 key 不可新增** — 只能覆盖 `useCoverable()` 声明时已定义的顶层配置项，不能通过覆盖新增原配置中不存在的 key（嵌套对象内可以新增）
 
 ---
 

@@ -44,9 +44,8 @@ React 管理系统组件库，基于 Ant Design 4.x + React 16/17，覆盖表格
 - `npx pro-components list`：查看组件、Hooks、工具函数清单
 - `npx pro-components docs <name>`：输出某个组件/工具的内置文档
 - `npx pro-components search <query>`：在内置文档中全文搜索
-- `npx pro-components skills install`：把本 skill 注册到 Cursor / Codex / Claude Code / OpenCode 等常见 Agent
 
-默认项目级安装位置：Cursor 使用 `.cursor/skills`，Codex / OpenCode 使用 `.agents/skills`，Claude Code 使用 `.claude/skills`。
+安装本 skill 请使用 `fexd-tools skills install @fexd/pro-components`。`fexd-tools` 会扫描当前项目 `node_modules` 和 workspace 包中的 `skills/*/SKILL.md`，统一安装依赖包发布的 skills。
 
 CLI 是检索辅助；当 Agent 已加载本 skill 时，应优先按本文件的任务路由读取 `references/**`、`catalog.md`、`guide.md` 等结构化文档。
 
@@ -111,7 +110,7 @@ const UserList = useCoverable.component(({ coverable }) => {
 
 ## CLI 命令
 
-安装 `@fexd/pro-components` 后可通过 CLI 快速查阅文档，并注册本 skill 到常见 AI Agent：
+安装 `@fexd/pro-components` 后可通过 CLI 快速查阅文档；安装 AI Skills 请使用 `fexd-tools` 的集中式入口：
 
 ```bash
 # 列出所有组件
@@ -128,9 +127,9 @@ npx pro-components search "queryField"
 npx pro-components search "hook dependencies"
 
 # 安装 AI Skills
-npx pro-components skills install
-npx pro-components skills install --agents cursor,claude-code,opencode
-npx pro-components skills install --agents codex --scope global
+npx fexd-tools skills install @fexd/pro-components
+npx fexd-tools skills install @fexd/pro-components --agents cursor,claude-code,opencode
+npx fexd-tools skills install @fexd/pro-components --agents codex --scope global
 ```
 
 ## Import 规范

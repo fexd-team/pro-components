@@ -296,8 +296,8 @@ bc-library/
     "types": "types.d.ts"
   },
   "dependencies": {
-    "@fexd/pro-components": "^0.2.101",
-    "@fexd/tools": "^0.2.3",
+    "@fexd/pro-components": "^0.2.104",
+    "@fexd/tools": "^0.2.7",
     "ahooks": "^3.8.1",
     "antd": "^4.24.10"
   }

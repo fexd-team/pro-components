@@ -42,7 +42,9 @@ coverage
 nul
 debug*.log
 # Agent skills installed from npm packages
+.cursor/skills/fexd-pro-components
+.agents/skills/fexd-pro-components
+.claude/skills/fexd-pro-components
 .cursor/skills/fexd-tools
 .agents/skills/fexd-tools
 .claude/skills/fexd-tools
-.opencode/skills/fexd-tools

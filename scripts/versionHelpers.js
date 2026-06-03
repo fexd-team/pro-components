@@ -75,12 +75,14 @@ function patchUp(version) {
 
 /**
  * 以线上版本为基准计算新版本，保证幂等：
- * - 取 max(本地, 线上) 为基准 patch +1
+ * - 目标始终是线上版本 patch +1
  * - 若本地已 >= 目标版本则返回 null（无需更新）
+ * - 线上没有版本时不自动递增，避免未发布包反复自增
  */
 function calculateNewVersion(localVersion, remoteVersion) {
-  const base = remoteVersion && compareVersions(remoteVersion, localVersion) > 0 ? remoteVersion : localVersion
-  const target = patchUp(base)
+  if (!remoteVersion) return null
+
+  const target = patchUp(remoteVersion)
   if (compareVersions(localVersion, target) >= 0) return null
   return target
 }

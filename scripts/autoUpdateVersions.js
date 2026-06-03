@@ -11,30 +11,60 @@ const {
   printDivider,
 } = require('./versionHelpers')
 
+const statusText = { M: '修改', A: '新增', D: '删除', R: '重命名', C: '复制', '??': '未跟踪' }
+
+function toPosixPath(filepath) {
+  return filepath.replace(/\\/g, '/')
+}
+
+function normalizeGitStatusPath(filepath) {
+  return toPosixPath(filepath).replace(/^"|"$/g, '')
+}
+
+function parseGitStatusLine(line) {
+  const status = line.slice(0, 2).trim() || line.slice(0, 2)
+  const paths = line.slice(3).split(' -> ').map(normalizeGitStatusPath)
+
+  return {
+    status,
+    path: paths[paths.length - 1],
+    paths,
+  }
+}
+
+function isTestFile(filepath) {
+  const normalizedPath = toPosixPath(filepath)
+  return /(^|\/)(__tests__|tests?)(\/|$)/i.test(normalizedPath) || /\.(test|spec)\.[^/]+$/i.test(normalizedPath)
+}
+
 function hasSourceChanged(packagePath) {
-  const srcPath = path.join(path.dirname(packagePath), 'src')
+  const packageDir = path.dirname(packagePath)
+  const sourcePaths = ['src', 'skills'].map((dir) => path.join(packageDir, dir))
   try {
-    const statusResult = execSync(`git status --porcelain "${srcPath}"`, {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    }).trim()
+    const statusResult = execSync(
+      `git status --porcelain ${sourcePaths.map((sourcePath) => `"${sourcePath}"`).join(' ')}`,
+      {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      },
+    ).trim()
 
     const changedFiles = statusResult
       .split('\n')
       .filter(Boolean)
-      .map((line) => ({ status: line.slice(0, 2), path: line.slice(3) }))
+      .map(parseGitStatusLine)
+      .filter((f) => !isTestFile(f.path))
 
     if (changedFiles.length > 0) {
-      console.log(`\n检测到 ${path.dirname(packagePath)} 有源码改动:`)
-      const statusText = { M: '修改', A: '新增', D: '删除', '??': '未跟踪' }
+      console.log(`\n检测到 ${packageDir} 有源码/skills 改动:`)
       changedFiles.forEach((f) => {
-        console.log(`  ${statusText[f.status.trim()] || f.status.trim()}: ${f.path}`)
+        console.log(`  ${statusText[f.status] || f.status}: ${f.path}`)
       })
     }
 
     return { hasChanges: changedFiles.length > 0, changedFiles: changedFiles.map((f) => f.path) }
   } catch (error) {
-    console.error(`检查 ${srcPath} 改动时发生错误:`, error.message)
+    console.error(`检查 ${packageDir} 源码/skills 改动时发生错误:`, error.message)
     return { hasChanges: false, changedFiles: [] }
   }
 }
@@ -46,16 +76,12 @@ function hasDependenciesChanged(packagePath) {
       stdio: ['pipe', 'pipe', 'pipe'],
     }).trim()
 
-    const changedFiles = statusResult
-      .split('\n')
-      .filter(Boolean)
-      .map((line) => ({ status: line.slice(0, 2), path: line.slice(3) }))
+    const changedFiles = statusResult.split('\n').filter(Boolean).map(parseGitStatusLine)
 
     if (changedFiles.length > 0) {
       console.log(`\n检测到 ${packagePath} 有 package.json 改动:`)
-      const statusText = { M: '修改', A: '新增', D: '删除', '??': '未跟踪' }
       changedFiles.forEach((f) => {
-        console.log(`  ${statusText[f.status.trim()] || f.status.trim()}: ${f.path}`)
+        console.log(`  ${statusText[f.status] || f.status}: ${f.path}`)
       })
     }
 
@@ -64,6 +90,19 @@ function hasDependenciesChanged(packagePath) {
     console.error(`检查 ${packagePath} 改动时发生错误:`, error.message)
     return { hasChanges: false, changedFiles: [] }
   }
+}
+
+function getExpectedDependencyVersion(version) {
+  return `^${version}`
+}
+
+function getDeclaredDependencyVersion(info, depName) {
+  return info.dependencies[depName] || info.devDependencies[depName]
+}
+
+function shouldUpdateDependencyVersion(info, depName, version) {
+  const declaredVersion = getDeclaredDependencyVersion(info, depName)
+  return declaredVersion && declaredVersion !== getExpectedDependencyVersion(version)
 }
 
 function getAllPackagesInfo() {
@@ -171,7 +210,7 @@ function processVersionUpdates() {
   const graph = buildDependencyGraph(packagesInfo)
   const updateOrder = visualizeDependencyGraph(graph, packagesInfo)
 
-  console.log('\n🔍 检查源码和依赖变更...')
+  console.log('\n🔍 检查源码/skills 和依赖变更...')
 
   Object.entries(packagesInfo).forEach(([, info]) => {
     const sourceChanges = hasSourceChanged(info.path)
@@ -199,7 +238,7 @@ function processVersionUpdates() {
 
     for (const dep of graph[pkgName].dependencies) {
       const depVersion = calculatePackageUpdates(dep)
-      if (depVersion !== packagesInfo[dep].version) {
+      if (depVersion !== packagesInfo[dep].version || shouldUpdateDependencyVersion(info, dep, depVersion)) {
         depVersions[dep] = depVersion
         hasUpdatedDeps = true
       }
@@ -210,9 +249,15 @@ function processVersionUpdates() {
 
     const remoteVersion = getRemoteVersion(pkgName, registry)
     const newVersion = calculateNewVersion(info.version, remoteVersion)
-    const reason = info.hasChanged ? '源码改动' : `依赖更新 (${Object.keys(depVersions).join(', ')})`
+    const depNames = Object.keys(depVersions)
+    const reason =
+      info.hasChanged && depNames.length > 0
+        ? `源码/skills 改动 + 依赖更新 (${depNames.join(', ')})`
+        : info.hasChanged
+          ? '源码/skills 改动'
+          : `依赖更新 (${depNames.join(', ')})`
 
-    if (!newVersion) {
+    if (!newVersion && depNames.length === 0) {
       skippedPackages.push({
         pkgName,
         localVersion: info.version,
@@ -226,7 +271,7 @@ function processVersionUpdates() {
       pkgName,
       path: info.path,
       currentVersion: info.version,
-      newVersion,
+      newVersion: newVersion || info.version,
       remoteVersion: remoteVersion || '-',
       reason,
       depVersions,
@@ -246,7 +291,17 @@ function processVersionUpdates() {
   printDivider(totalWidth)
 
   for (const u of versionUpdates.values()) {
-    printTableRow([u.pkgName, u.remoteVersion, u.currentVersion, u.newVersion, u.reason, '📤 更新'], W)
+    printTableRow(
+      [
+        u.pkgName,
+        u.remoteVersion,
+        u.currentVersion,
+        u.newVersion,
+        u.reason,
+        u.currentVersion === u.newVersion ? '🔗 同步' : '📤 更新',
+      ],
+      W,
+    )
   }
   for (const s of skippedPackages) {
     printTableRow([s.pkgName, s.remoteVersion, s.localVersion, '-', s.reason, '⏭️  跳过'], W)
@@ -284,7 +339,11 @@ function processVersionUpdates() {
 
   console.log(`\n✅ 已更新 ${versionUpdates.size} 个包：`)
   for (const { pkgName, currentVersion, newVersion } of versionUpdates.values()) {
-    console.log(`   ${pkgName}: ${currentVersion} → ${newVersion}`)
+    if (currentVersion === newVersion) {
+      console.log(`   ${pkgName}: 已同步依赖版本`)
+    } else {
+      console.log(`   ${pkgName}: ${currentVersion} → ${newVersion}`)
+    }
   }
   console.log()
 }

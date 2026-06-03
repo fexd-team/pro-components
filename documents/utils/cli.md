@@ -5,7 +5,7 @@ order: 1.1
 
 # CLI 命令行工具
 
-`@fexd/pro-components` 内置了 `pro-components` 命令，安装组件库后即可在项目中快速查文档、搜索组件用法、注册 AI Skills。
+`@fexd/pro-components` 内置了 `pro-components` 命令，安装组件库后即可在项目中快速查文档、搜索组件用法。
 
 ```bash
 pro-components help
@@ -17,7 +17,7 @@ pro-components help
 {
   "scripts": {
     "pro:list": "pro-components list",
-    "pro:skills": "pro-components skills install"
+    "pro:skills": "fexd-tools skills install @fexd/pro-components"
   }
 }
 ```
@@ -67,101 +67,47 @@ pro-components search "大数字"
 
 ## 安装 AI Skills
 
+`pro-components` CLI 不再内置 skill 安装能力。请使用 `@fexd/tools` 提供的集中式入口，它会扫描当前项目 `node_modules` 和 workspace 包中的 `skills/*/SKILL.md`：
+
+```bash
+fexd-tools skills install @fexd/pro-components
+```
+
+如需安装当前项目依赖里所有可发现的 skills，可以不传 include：
+
+```bash
+fexd-tools skills install
+```
+
+在 npm scripts 中推荐这样配置：
+
+```json
+{
+  "scripts": {
+    "prepare:skills": "fexd-tools skills install @fexd/pro-components"
+  }
+}
+```
+
+### 指定范围
+
+```bash
+fexd-tools skills install @fexd/pro-components --agents cursor,codex,claude-code,opencode
+fexd-tools skills install @fexd/pro-components --scope global
+fexd-tools skills install --include @fexd/pro-components
+fexd-tools skills install --exclude @fexd/pro-components
+```
+
+`install` 后面的裸参数会被当作 include 白名单，多个规则可以用逗号分隔。黑白名单也可以写在 `package.json` 的 `skills-install` 字段或 `skills.config.js` / `skills.config.cjs` / `skills.config.json` 中。
+
+### 旧命令迁移
+
+如果执行旧命令：
+
 ```bash
 pro-components skills install
 ```
 
-默认安装到常见 agent 的项目级目录：
-
-```text
-.cursor/skills/fexd-pro-components       # Cursor
-.agents/skills/fexd-pro-components       # Codex / OpenCode
-.claude/skills/fexd-pro-components       # Claude Code
-```
-
-这些目录默认链接到：
-
-```text
-node_modules/@fexd/pro-components/skills/fexd-pro-components
-```
-
-安装后会自动把项目级 skill 目录写入 `.gitignore`。
-
-### 预览安装计划
-
-如果想先确认会写入哪些目录，可以使用 dry-run：
-
-```bash
-pro-components skills install --dry-run
-pro-components skills install --agents codex,opencode --dry-run
-```
-
-当多个 agent 使用同一个目录时，CLI 会合并展示，例如 Codex 和 OpenCode 默认共用 `.agents/skills/fexd-pro-components`。
-
-### 指定 agent
-
-```bash
-pro-components skills install --agents cursor
-pro-components skills install --agents cursor,claude-code,opencode
-pro-components skills install --agents codex --scope global
-```
-
-支持的 agent：
-
-| agent         | 说明                    |
-| ------------- | ----------------------- |
-| `common`      | 常见 agent 集合，默认值 |
-| `cursor`      | Cursor                  |
-| `codex`       | Codex                   |
-| `claude-code` | Claude Code             |
-| `opencode`    | OpenCode                |
-
-### 安装范围
-
-```bash
-pro-components skills install --scope project
-pro-components skills install --scope global
-pro-components skills install --scope both
-```
-
-| scope     | 说明                       |
-| --------- | -------------------------- |
-| `project` | 安装到当前项目目录，默认值 |
-| `global`  | 安装到用户全局 agent 目录  |
-| `both`    | 同时安装 project 和 global |
-
-全局目录规则：
-
-| agent         | global 安装位置                                                                           |
-| ------------- | ----------------------------------------------------------------------------------------- |
-| `cursor`      | `~/.cursor/skills/fexd-pro-components`                                                    |
-| `codex`       | `$CODEX_HOME/skills/fexd-pro-components` 或 `~/.codex/skills/fexd-pro-components`         |
-| `claude-code` | `$CLAUDE_CONFIG_DIR/skills/fexd-pro-components` 或 `~/.claude/skills/fexd-pro-components` |
-| `opencode`    | `~/.agents/skills/fexd-pro-components`                                                    |
-
-### 其他参数
-
-| 参数             | 说明                              |
-| ---------------- | --------------------------------- |
-| `--cwd <path>`   | 指定消费项目目录                  |
-| `--copy`         | 复制 skill 目录，不创建链接       |
-| `--force`        | 目标已存在普通文件/目录时强制覆盖 |
-| `--dry-run`      | 只打印安装计划，不写文件          |
-| `--no-gitignore` | 不自动更新 `.gitignore`           |
-
-Windows 环境如果创建链接失败，CLI 会自动回退为复制。也可以显式使用复制模式：
-
-```bash
-pro-components skills install --copy
-pro-components skills install --copy --force
-```
-
-使用 `--copy` 后，更新 `@fexd/pro-components` 不会自动刷新已复制的 skill，需要重新执行一次命令。
-
-查看 skills 命令帮助：
-
-```bash
-pro-components skills install --help
-```
+CLI 只会输出迁移提示，不再创建链接、复制目录或修改 `.gitignore`。
 
 更多 AI Skills 配置说明见 [AI Skills](/utils/ai-skills)。
